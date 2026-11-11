@@ -13,6 +13,7 @@ export type ActionBody =
   | { type: 'piece.move'; pieceId: string; spotId: string }
   // Meilensteine und Gutscheine
   | { type: 'milestone.seen'; at: number }
+  // Geheimen Gutschein hinterlegen; die id der Aktion wird zur id des Gutscheins.
   | { type: 'coupon.deposit'; text: string }
   | { type: 'coupon.requestRedeem'; couponId: string }
   | { type: 'coupon.confirmRedeem'; couponId: string };

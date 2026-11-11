@@ -15,8 +15,8 @@
         { "id": "P1-01", "criterion": "Typecheck grün, lokal", "check": "npm run typecheck", "status": "passed" },
         { "id": "P1-02", "criterion": "Vitest grün, lokal", "check": "npm test", "status": "passed" },
         { "id": "P1-03", "criterion": "Playwright (WebKit) grün, lokal", "check": "npm run test:e2e", "status": "passed" },
-        { "id": "P1-04", "criterion": "Typecheck, Vitest und Playwright grün im Workflow", "check": "GitHub Actions: Workflow Deploy, Job build", "status": "open" },
-        { "id": "P1-05", "criterion": "Push auf main veröffentlicht automatisch; Live-Adresse lädt", "check": "Workflow Deploy, Job deploy; Live-Adresse im Browser öffnen", "status": "open" },
+        { "id": "P1-04", "criterion": "Typecheck, Vitest und Playwright grün im Workflow", "check": "GitHub Actions: Workflow Deploy, Job build", "status": "passed" },
+        { "id": "P1-05", "criterion": "Push auf main veröffentlicht automatisch; Live-Adresse lädt", "check": "Workflow Deploy, Job deploy; Live-Adresse im Browser öffnen", "status": "passed" },
         { "id": "P1-06", "criterion": "Ein zweiter Deploy zeigt den Update-Hinweis, Tippen aktualisiert, Versionszeile zeigt den neuen Stand", "check": "e2e/update.spec.ts (nachgestellter zweiter Deploy); zusätzlich auf der Live-Adresse nach echtem zweitem Deploy", "status": "open", "note": "lokal per Test belegt, Live-Prüfung steht aus" },
         { "id": "P1-07", "criterion": "\"Check for updates\" meldet ein Ergebnis", "check": "e2e/update.spec.ts", "status": "passed" },
         { "id": "P1-08", "criterion": "CLAUDE.md, Agenten-Definitionen und tests.json vorhanden", "check": "Dateien CLAUDE.md, .claude/agents/*.md (5), tests.json", "status": "passed" }
