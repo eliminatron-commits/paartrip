@@ -84,6 +84,7 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - Keine Inhalte im Code: Aufgaben, Rätseldaten, Fragen, Story, Katalog, Gutscheine und Meilensteine gehören nach `content/`.
 - Keine Mahnungen, Serien oder Verfall – Pausen haben keine Folgen.
 - Tests nicht löschen oder abschwächen, um sie grün zu bekommen; keine hartcodierten Werte für Testfälle.
+- Die App ist seit Phase 1 auf beiden iPhones installiert. `BASE`, Manifest-`id`, `scope` und `start_url` sowie der Dateiname `sw.js` dürfen sich nicht mehr ändern – sonst finden die installierten Apps keine Updates mehr und müssten neu installiert werden. Jeder Push auf `main` landet auf echten Geräten.
 - Port 4190 und andere von Browsern gesperrte Ports nicht für Testserver verwenden (WebKit lädt dann nichts).
 
 ## Gestaltungsvorgaben
