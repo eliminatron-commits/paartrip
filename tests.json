@@ -1,0 +1,104 @@
+{
+  "project": "Nhà Mình – PaarTrip",
+  "updated": "2026-11-11",
+  "statuses": {
+    "open": "noch nicht erfüllt",
+    "passed": "mit echtem Check belegt",
+    "failed": "geprüft und nicht erfüllt",
+    "user": "nur auf echtem iPhone prüfbar – vom Nutzer zu prüfen"
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Fundament",
+      "tests": [
+        { "id": "P1-01", "criterion": "Typecheck grün, lokal", "check": "npm run typecheck", "status": "passed" },
+        { "id": "P1-02", "criterion": "Vitest grün, lokal", "check": "npm test", "status": "passed" },
+        { "id": "P1-03", "criterion": "Playwright (WebKit) grün, lokal", "check": "npm run test:e2e", "status": "passed" },
+        { "id": "P1-04", "criterion": "Typecheck, Vitest und Playwright grün im Workflow", "check": "GitHub Actions: Workflow Deploy, Job build", "status": "open" },
+        { "id": "P1-05", "criterion": "Push auf main veröffentlicht automatisch; Live-Adresse lädt", "check": "Workflow Deploy, Job deploy; Live-Adresse im Browser öffnen", "status": "open" },
+        { "id": "P1-06", "criterion": "Ein zweiter Deploy zeigt den Update-Hinweis, Tippen aktualisiert, Versionszeile zeigt den neuen Stand", "check": "e2e/update.spec.ts (nachgestellter zweiter Deploy); zusätzlich auf der Live-Adresse nach echtem zweitem Deploy", "status": "open", "note": "lokal per Test belegt, Live-Prüfung steht aus" },
+        { "id": "P1-07", "criterion": "\"Check for updates\" meldet ein Ergebnis", "check": "e2e/update.spec.ts", "status": "passed" },
+        { "id": "P1-08", "criterion": "CLAUDE.md, Agenten-Definitionen und tests.json vorhanden", "check": "Dateien CLAUDE.md, .claude/agents/*.md (5), tests.json", "status": "passed" }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Abgleich und Push",
+      "tests": [
+        { "id": "P2-01", "criterion": "Zwei Browser-Kontexte koppeln sich gegen den lokalen Worker", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P2-02", "criterion": "Eine Aktion von A erscheint bei B nach Abgleich", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P2-03", "criterion": "Eine offline erzeugte Aktion wird nachgereicht", "check": "Playwright mit setOffline", "status": "open" },
+        { "id": "P2-04", "criterion": "Eine doppelt gesendete Aktion verändert den Stand nicht zweimal", "check": "Vitest (Regeln) und Test gegen den lokalen Worker", "status": "open" },
+        { "id": "P2-05", "criterion": "Ein dritter Beitritt wird abgelehnt", "check": "Test gegen den lokalen Worker", "status": "open" },
+        { "id": "P2-06", "criterion": "Verborgene Inhalte gehen nicht an das andere Gerät", "check": "Vitest auf die Sicht-Ableitung und Test auf die Serverantwort", "status": "open" },
+        { "id": "P2-07", "criterion": "Worker ist veröffentlicht und von der Live-App erreichbar", "check": "Abgleich von der Live-Adresse aus", "status": "open" },
+        { "id": "P2-08", "criterion": "Keine Secrets im Repo", "check": "Suche nach Schlüsseln und Tokens im Repo und in der Git-Historie", "status": "open" },
+        { "id": "P2-09", "criterion": "Cloudflare-Gratis-Grenzen vor dem Einrichten geprüft; kein Bezahltarif nötig", "check": "aktuelle Cloudflare-Doku zu Workers und D1", "status": "open" },
+        { "id": "P2-10", "criterion": "Export und Import des Gerätestands samt Token", "check": "Playwright: exportieren, Speicher leeren, importieren, selbe Rolle", "status": "open" },
+        { "id": "P2-11", "criterion": "Push-Zustellung auf echtem iPhone", "check": "installierte App auf beiden iPhones", "status": "user" }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Haus und Gutscheine",
+      "tests": [
+        { "id": "P3-01", "criterion": "Screenshots aller Bildschirme bei 440×956 ohne Überdeckung durch Uhr, Dynamic Island oder Home-Indikator", "check": "Playwright-Screenshots mit simulierter Safe Area, Sichtprüfung", "status": "open" },
+        { "id": "P3-02", "criterion": "Bauzug mit Rollenwechsel läuft zwischen zwei Kontexten", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P3-03", "criterion": "Ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text", "check": "Playwright, zwei Kontexte, und Test auf die Serverantwort", "status": "open" },
+        { "id": "P3-04", "criterion": "Einlösen durchläuft alle Zustände (verhüllt, freigeschaltet, eingelöst)", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P3-05", "criterion": "App startet offline mit letztem Stand", "check": "Playwright mit setOffline und Neuladen", "status": "open" },
+        { "id": "P3-06", "criterion": "Ton abschaltbar", "check": "Playwright: Einstellung; Vitest: Ton-Logik", "status": "open" },
+        { "id": "P3-07", "criterion": "Tap-Ziele mindestens 44 px, Kontrast WCAG AA, prefers-reduced-motion beachtet", "check": "Playwright: Größen aller Bedienelemente; Vitest: Kontrast der Tokens", "status": "open" },
+        { "id": "P3-08", "criterion": "iPhone-Hülle: Startbilder je Gerätegröße, Icons, Safe Area, Precache von Shell, Schriften und Inhalten", "check": "Playwright: Verweise und Dateien; Build-Ausgabe", "status": "open" },
+        { "id": "P3-09", "criterion": "Review durch pruefer ohne offene Mängel", "check": "Subagent pruefer", "status": "open" }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Aufgaben und Rätsel",
+      "tests": [
+        { "id": "P4-01", "criterion": "Jede der sechs Rätselarten ist mit zwei Kontexten lösbar und zeigt jedem nur seine Hälfte", "check": "Playwright, zwei Kontexte, je Rätselart", "status": "open" },
+        { "id": "P4-02", "criterion": "Die nächste Aufgabe erscheint erst nach beidseitigem Abschluss und frühestens am Folgetag (Europe/Berlin)", "check": "Vitest und Test gegen den Worker mit gestellter Uhr", "status": "open" },
+        { "id": "P4-03", "criterion": "Eine neue Rätselvariante lässt sich allein durch eine Inhaltsdatei ergänzen", "check": "Test: Variante als Datei hinzufügen, ohne Codeänderung spielbar", "status": "open" },
+        { "id": "P4-04", "criterion": "Kein Festhängen, wenn ein Spieler offline ist", "check": "Playwright mit setOffline auf einem Kontext", "status": "open" },
+        { "id": "P4-05", "criterion": "Kennst-du-mich: Aufdecken erst nach beidseitiger Abgabe, Treffer bringt ein Herz-Abzeichen, Antworten werden Erinnerungsstücke", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P4-06", "criterion": "Aufgaben im echten Leben gelten erst nach Bestätigung durch den Empfänger als erledigt", "check": "Playwright, zwei Kontexte", "status": "open" },
+        { "id": "P4-07", "criterion": "Erledigte Aufgabe → Bauzug → Meilenstein ist verknüpft; Push-Auslöser sind eingehängt", "check": "Vitest (Regeln) und Test gegen den Worker", "status": "open" }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Inhalte Kapitel 1",
+      "tests": [
+        { "id": "P5-01", "criterion": "Alle Inhaltsdateien bestehen die Schemaprüfung", "check": "npm run content", "status": "open" },
+        { "id": "P5-02", "criterion": "Kapitel 1 ist vollständig: 30 Aufgaben (12 Rätsel, 10 Kennst-du-mich, 8 echtes Leben), 6 Szenen, mindestens 30 Plätze, rund 45 Stücke, Dekostücke für Meilensteine", "check": "Vitest auf das gebaute Bündel", "status": "open" },
+        { "id": "P5-03", "criterion": "Jede Rätselvariante ist per Test lösbar und nicht mit nur einer Hälfte lösbar", "check": "Vitest je Variante", "status": "open" },
+        { "id": "P5-04", "criterion": "Automatisierter Durchlauf aller 30 Aufgaben mit zwei Spielern bis Meilenstein 30", "check": "Playwright bzw. Test gegen den Worker mit gestellter Uhr", "status": "open" },
+        { "id": "P5-05", "criterion": "Jeder vietnamesische Begriff steht in content/vi-terms.json", "check": "Bezugsprüfung in npm run content und Vitest", "status": "open" },
+        { "id": "P5-06", "criterion": "Review durch pruefer zu Verständlichkeit, Ton und Rollenverteilung ohne offene Mängel", "check": "Subagent pruefer", "status": "open" }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Abnahme",
+      "tests": [
+        { "id": "P6-01", "criterion": "Typecheck, Vitest, Playwright grün lokal und im Workflow", "check": "npm run typecheck, npm test, npm run test:e2e; GitHub Actions", "status": "open" },
+        { "id": "P6-02", "criterion": "Automatischer Deploy und erreichbare Live-Adresse", "check": "Workflow Deploy; Live-Adresse öffnen", "status": "open" },
+        { "id": "P6-03", "criterion": "Screenshots ohne Überdeckung", "check": "Playwright-Screenshots bei 440×956", "status": "open" },
+        { "id": "P6-04", "criterion": "Offline-Start", "check": "Playwright mit setOffline", "status": "open" },
+        { "id": "P6-05", "criterion": "Stand übersteht Neuladen; Export und Import funktionieren", "check": "Playwright", "status": "open" },
+        { "id": "P6-06", "criterion": "Update-Hinweis nach zweitem Deploy und \"Check for updates\"", "check": "e2e/update.spec.ts und Live-Adresse", "status": "open" },
+        { "id": "P6-07", "criterion": "Ton kehrt nach Sperre und App-Wechsel zurück", "check": "echtes iPhone", "status": "user" },
+        { "id": "P6-08", "criterion": "Push kommt auf beiden iPhones an", "check": "echte iPhones", "status": "user" },
+        { "id": "P6-09", "criterion": "Installation auf dem Home-Bildschirm", "check": "echte iPhones", "status": "user" },
+        { "id": "P6-10", "criterion": "Tap-Ziele, Kontrast, reduzierte Bewegung", "check": "Playwright und Vitest", "status": "open" },
+        { "id": "P6-11", "criterion": "Keine Secrets im Repo", "check": "Suche im Repo und in der Git-Historie", "status": "open" },
+        { "id": "P6-12", "criterion": "Cloudflare im Gratis-Tarif", "check": "Cloudflare-Dashboard und aktuelle Doku", "status": "open" },
+        { "id": "P6-13", "criterion": "Vollständiger Durchlauf von Kapitel 1 mit zwei simulierten Spielern läuft automatisiert durch", "check": "Playwright bzw. Test gegen den Worker", "status": "open" },
+        { "id": "P6-14", "criterion": "Anleitung für beide Spieler übergeben", "check": "Abschlussbericht", "status": "open" },
+        { "id": "P6-15", "criterion": "Review durch pruefer ohne offene Mängel", "check": "Subagent pruefer", "status": "open" }
+      ]
+    }
+  ]
+}

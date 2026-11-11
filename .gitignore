@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-e2e/
+generated/
+public/icons/
+test-results/
+playwright-report/
+.wrangler/
+.dev.vars
+*.local
+.claude/settings.local.json

@@ -1,0 +1,5 @@
+[
+  { "id": "fixed-10", "milestone": 10, "from": "a", "to": "b", "text": "I cook dinner for the two of us" },
+  { "id": "fixed-20", "milestone": 20, "from": "a", "to": "b", "text": "A massage" },
+  { "id": "fixed-30", "milestone": 30, "from": "a", "to": "b", "text": "Dinner out together" }
+]

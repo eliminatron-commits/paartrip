@@ -1,0 +1,17 @@
+[
+  {
+    "term": "Nhà Mình",
+    "meaning": "our home",
+    "where": ["app name: vite.config.ts (manifest), index.html, src/App.svelte"]
+  },
+  {
+    "term": "Dọn về nhà mới",
+    "meaning": "moving into the new home",
+    "where": ["content/chapter-1/chapter.json: titleVi"]
+  },
+  {
+    "term": "Cà phê phin",
+    "meaning": "Vietnamese drip-filter coffee",
+    "where": ["content/chapter-1/pieces/ca-phe-phin.json: nameVi"]
+  }
+]

@@ -1,0 +1,95 @@
+/* Gestaltungs-Tokens und Grundlayout. Palette: Creme als Grund, Terrakotta, Salbeigrün, tiefes Petrol. */
+:root {
+  --cream: #faf3e7;
+  --cream-deep: #f0e4cf;
+  --terracotta: #9e4526; /* Text, Knöpfe und Flächen mit heller Schrift (AA auf beiden Cremetönen) */
+  --terracotta-soft: #c96a45; /* nur Dekor, nicht für Text */
+  --sage: #8fa68a; /* nur Dekor */
+  --sage-deep: #46614b;
+  --petrol: #1f4e5a;
+  --ink: #23373c;
+  --ink-soft: #4e6166;
+
+  --font-title: 'Fraunces Variable', Georgia, serif;
+  --font-body: 'Nunito Variable', system-ui, sans-serif;
+
+  /* Safe Area als eigene Variablen, damit Tests sie überschreiben können (Desktop-Browser kennen env() nur als 0). */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  --tap: 44px; /* Mindestgröße für Tap-Ziele */
+  --radius: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--cream);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--petrol);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--terracotta);
+  color: var(--cream);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--petrol);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

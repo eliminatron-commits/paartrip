@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Vollflächig, Motiv in der mittleren Sicherheitszone: taugt als App-Icon, maskierbares Icon und apple-touch-icon. -->
+  <rect width="512" height="512" fill="#C96A45"/>
+  <circle cx="256" cy="262" r="186" fill="#D57C58"/>
+  <!-- Garten -->
+  <path d="M96 372h320v12a12 12 0 0 1-12 12H108a12 12 0 0 1-12-12z" fill="#8FA68A"/>
+  <!-- Hauskörper -->
+  <rect x="156" y="232" width="200" height="142" fill="#FAF3E7"/>
+  <!-- Dach -->
+  <path d="M256 116 396 240H116z" fill="#1F4E5A"/>
+  <!-- Herz im Giebel -->
+  <path d="M256 214c-22-15-30-28-21-39 7-8 18-5 21 4 3-9 14-12 21-4 9 11 1 24-21 39z" fill="#FAF3E7"/>
+  <!-- Tür -->
+  <path d="M232 374v-58a24 24 0 0 1 48 0v58z" fill="#A84B2A"/>
+  <circle cx="270" cy="338" r="4" fill="#FAF3E7"/>
+  <!-- Fenster -->
+  <rect x="176" y="264" width="38" height="42" rx="4" fill="#F2C76B"/>
+  <rect x="298" y="264" width="38" height="42" rx="4" fill="#F2C76B"/>
+</svg>

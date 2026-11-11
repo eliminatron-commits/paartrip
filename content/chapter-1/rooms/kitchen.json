@@ -1,0 +1,8 @@
+{
+  "id": "kitchen",
+  "name": "Kitchen",
+  "spots": [
+    { "id": "kitchen-counter-1", "kind": "surface", "x": 130, "y": 160 },
+    { "id": "kitchen-wall-1", "kind": "wall", "x": 310, "y": 75 }
+  ]
+}

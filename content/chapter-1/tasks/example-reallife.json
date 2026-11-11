@@ -1,0 +1,7 @@
+{
+  "id": "example-reallife",
+  "type": "reallife",
+  "title": "Window view",
+  "text": "Send each other a photo of what you can see from your window right now.",
+  "doer": "both"
+}
