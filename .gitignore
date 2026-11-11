@@ -9,3 +9,4 @@ playwright-report/
 .dev.vars
 *.local
 .claude/settings.local.json
+HANDOFF.md

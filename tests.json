@@ -88,7 +88,7 @@
         { "id": "P6-03", "criterion": "Screenshots ohne Überdeckung", "check": "Playwright-Screenshots bei 440×956", "status": "open" },
         { "id": "P6-04", "criterion": "Offline-Start", "check": "Playwright mit setOffline", "status": "open" },
         { "id": "P6-05", "criterion": "Stand übersteht Neuladen; Export und Import funktionieren", "check": "Playwright", "status": "open" },
-        { "id": "P6-06", "criterion": "Update-Hinweis nach zweitem Deploy und \"Check for updates\"", "check": "e2e/update.spec.ts und Live-Adresse", "status": "open" },
+        { "id": "P6-06", "criterion": "Update-Hinweis nach zweitem Deploy und \"Check for updates\"", "check": "e2e/update.spec.ts und Live-Adresse", "status": "open", "note": "Nutzer meldet am 2026-11-11: Update nach echtem Deploy (7027c8e → 50fb2a7) hat auf beiden iPhones funktioniert. Mit dem fertigen Stand in Phase 6 erneut prüfen." },
         { "id": "P6-07", "criterion": "Ton kehrt nach Sperre und App-Wechsel zurück", "check": "echtes iPhone", "status": "user" },
         { "id": "P6-08", "criterion": "Push kommt auf beiden iPhones an", "check": "echte iPhones", "status": "user" },
         { "id": "P6-09", "criterion": "Installation auf dem Home-Bildschirm", "check": "echte iPhones", "status": "user", "note": "Nutzer meldet am 2026-11-11: Phase-1-Stand auf beiden iPhones installiert. Mit dem fertigen Stand in Phase 6 erneut bestätigen lassen." },
