@@ -4,8 +4,10 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 ## Stand
 
-- **Phase 1/6 – Fundament:** lokal fertig und geprüft (2026-11-11). Veröffentlichung auf GitHub Pages steht aus, siehe `tests.json` P1-04 bis P1-06.
+- **Phase 1/6 – Fundament:** abgeschlossen am 2026-11-11, alle Akzeptanzpunkte P1-01 bis P1-08 erfüllt. Live unter `https://eliminatron-commits.github.io/paartrip/` (Repo `eliminatron-commits/paartrip`, öffentlich, Pages über GitHub Actions). Der Update-Ablauf ist auch live über einen echten zweiten Deploy belegt.
 - **Nächste Phase:** 2/6 – Abgleich und Push | Opus 5.5 (hoch). Neue Sitzung starten, damit die Subagenten aus `.claude/agents/` geladen werden.
+- Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
+- Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
 ## Was steht
 
