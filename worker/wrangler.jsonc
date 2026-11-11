@@ -1,0 +1,32 @@
+// Cloudflare Worker "paartrip-api": Koppeln, Abgleich und Push. Läuft im Gratis-Tarif.
+// Secrets stehen nicht hier: VAPID_PRIVATE_KEY wird mit `wrangler secret put` gesetzt.
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "paartrip-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  // Keine Nutzungsdaten von Wrangler an Cloudflare.
+  "send_metrics": false,
+  "preview_urls": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "paartrip",
+      // Wird beim Einrichten durch die id der echten Datenbank ersetzt (kein Geheimnis).
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    // CORS: nur die Pages-Adresse der App.
+    "ALLOWED_ORIGIN": "https://eliminatron-commits.github.io",
+    "MAX_HOUSES": "20",
+    // Öffentlicher Schlüssel; wird beim Einrichten gesetzt. Leer = Push ist aus.
+    "VAPID_PUBLIC_KEY": "",
+    "VAPID_SUBJECT": "https://eliminatron-commits.github.io/paartrip/",
+    // Push-Dienste von Apple, Google, Mozilla und Microsoft.
+    "PUSH_HOSTS": "push.apple.com,fcm.googleapis.com,push.services.mozilla.com,notify.windows.com",
+    "PUSH_TEST_DELAY_MS": "5000"
+  }
+}

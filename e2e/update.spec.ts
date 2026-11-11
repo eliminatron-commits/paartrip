@@ -64,3 +64,22 @@ test('"Check for updates" meldet ohne Netz einen Fehler', async ({ page, context
   await page.getByRole('button', { name: 'Check for updates' }).click();
   await expect(page.getByTestId('update-result')).toHaveText("Couldn't check. Are you offline?");
 });
+
+test('Erstinstallation zeigt keinen Update-Hinweis', async ({ browser }) => {
+  // Früher erfuhr die Seite vom Zustand "installed" manchmal erst, nachdem der Service Worker sie schon
+  // übernommen hatte, und hielt die Erstinstallation für ein Update. Mehrere frische Installationen,
+  // weil das vom Zeitablauf abhängt; der Hinweis kam jeweils einen Moment nach der Übernahme.
+  for (let install = 0; install < 5; install++) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await openInstalled(page);
+    await page.waitForFunction(async () => (await navigator.serviceWorker.ready).active?.state === 'activated');
+    await page.waitForTimeout(300);
+    await expect(page.getByTestId('update-banner'), `Installation ${install + 1}`).toBeHidden();
+    // Eine Suche direkt danach findet nichts Neues.
+    await page.getByRole('button', { name: 'Check for updates' }).click();
+    await expect(page.getByTestId('update-result')).toHaveText("You're up to date.");
+    await expect(page.getByTestId('update-banner')).toBeHidden();
+    await context.close();
+  }
+});

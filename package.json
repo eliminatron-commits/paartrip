@@ -11,18 +11,21 @@
     "assets": "node scripts/gen-assets.ts",
     "gen": "npm run content && npm run assets",
     "dev": "npm run gen && vite",
+    "dev:api": "npm run content && node e2e/api-server.ts 8787 http://localhost:5173",
     "build": "npm run gen && vite build",
     "preview": "vite preview",
-    "typecheck": "npm run content && svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "typecheck": "npm run content && svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json && tsc -p worker/tsconfig.json",
     "test": "npm run content && vitest run",
     "test:e2e": "npm run gen && node e2e/build-versions.ts && playwright test"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261110.1",
     "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",
     "@playwright/test": "^1.65.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/node": "^24.19.2",
+    "fake-indexeddb": "^6.2.8",
     "sharp": "^0.35.5",
     "svelte": "^5.57.3",
     "svelte-check": "^4.7.8",
@@ -31,6 +34,7 @@
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.1.0",
     "workbox-precaching": "^7.4.1",
+    "wrangler": "^4.160.1",
     "zod": "^4.6.7"
   }
 }

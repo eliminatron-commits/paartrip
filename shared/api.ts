@@ -15,7 +15,11 @@ export const ROUTES = {
   /** Push-Anmeldung dieses Geräts speichern bzw. löschen. */
   pushSubscribe: { method: 'PUT', path: '/push/subscription' },
   pushUnsubscribe: { method: 'DELETE', path: '/push/subscription' },
+  /** Probe-Mitteilung an dieses Gerät, damit sich die Zustellung prüfen lässt. */
+  pushTest: { method: 'POST', path: '/push/test' },
 } as const;
+
+export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 
 export interface CreateHouseRequest {
   name: string;
@@ -47,18 +51,29 @@ export interface PushKeyResponse {
   publicKey: string;
 }
 
-/** Entspricht PushSubscription.toJSON() im Browser. */
+/** Die Felder aus PushSubscription.toJSON() im Browser, die der Server braucht. */
 export interface PushSubscribeRequest {
   endpoint: string;
   keys: { p256dh: string; auth: string };
 }
 
+/** Antwort der Routen, die nichts zurückzugeben haben. */
+export interface OkResponse {
+  ok: true;
+}
+
 export type ApiErrorCode =
   | 'bad_request'
   | 'unauthorized' // Token fehlt oder ist unbekannt
+  | 'forbidden' // Anfrage kommt nicht von der App-Adresse
   | 'invalid_code' // Kopplungscode unbekannt
   | 'house_full' // dritter Beitritt
-  | 'not_found';
+  | 'house_limit' // Obergrenze an Häusern erreicht (Schutz des Gratis-Tarifs)
+  | 'busy' // gleichzeitige Änderungen, bitte erneut abgleichen
+  | 'push_unavailable' // Server hat keine VAPID-Schlüssel
+  | 'no_subscription' // Probe-Mitteilung ohne Push-Anmeldung
+  | 'not_found'
+  | 'server_error';
 
 export interface ApiError {
   error: ApiErrorCode;
@@ -71,7 +86,8 @@ export type PushKind =
   | 'partner_done' // Partner hat seinen Teil erledigt
   | 'new_task' // neue Aufgabe verfügbar
   | 'coupon_unlocked' // Gutschein freigeschaltet
-  | 'redeem_requested'; // Einlösen angefragt
+  | 'redeem_requested' // Einlösen angefragt
+  | 'test'; // Probe-Mitteilung aus den Einstellungen
 
 /** Nutzlast einer Push-Nachricht; der Service Worker zeigt sie als Mitteilung an. */
 export interface PushPayload {

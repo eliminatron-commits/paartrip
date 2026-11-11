@@ -78,6 +78,78 @@ button:disabled {
   opacity: 0.6;
 }
 
+/* Zweitrangige Knöpfe: Umriss statt Fläche. */
+button.quiet {
+  background: transparent;
+  color: var(--petrol);
+  box-shadow: inset 0 0 0 2px var(--petrol);
+}
+
+input,
+textarea {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 14px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--ink);
+  /* Unter 16 px zoomt iOS beim Antippen in das Feld. */
+  font: inherit;
+}
+
+textarea {
+  resize: none;
+}
+
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--petrol);
+  outline-offset: 2px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+}
+
+/* Fläche für einen zusammengehörigen Abschnitt. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 20px;
+  border-radius: var(--radius);
+  background: var(--cream-deep);
+}
+
+.panel h2 {
+  font-size: 1.45rem;
+}
+
+.panel h3 {
+  margin-top: 6px;
+  font-size: 1.1rem;
+}
+
+.note {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.problem {
+  color: var(--terracotta);
+  font-weight: 700;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 button:focus-visible {
   outline: 3px solid var(--petrol);
   outline-offset: 3px;

@@ -1,4 +1,5 @@
-// Baut generated/content.json aus den Datendateien unter content/ und prüft sie dabei gegen das Schema.
+// Baut generated/content.json (App) und generated/content-rules.json (Worker) aus den Datendateien
+// unter content/ und prüft sie dabei gegen das Schema.
 // Fehlerhafte Inhalte brechen den Lauf ab – so kommt nichts Ungeprüftes in App oder Worker.
 // Neue Kapitel (content/chapter-N/) und neue Dateien werden ohne Codeänderung aufgenommen.
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
@@ -16,6 +17,7 @@ import {
   storySceneSchema,
   type SvgArt,
   taskSchema,
+  toRulesContent,
   viTermsFileSchema,
 } from '../shared/content-schema.ts';
 
@@ -124,6 +126,8 @@ if (problems.length > 0) {
 
 await mkdir(OUT_DIR, { recursive: true });
 await writeFile(join(OUT_DIR, 'content.json'), JSON.stringify(content));
+// Der Worker braucht nur, was die Spielregeln brauchen – ohne Zeichnungen und Story-Texte.
+await writeFile(join(OUT_DIR, 'content-rules.json'), JSON.stringify(toRulesContent(content)));
 const count = (select: (chapter: Chapter) => unknown[]) => chapters.reduce((sum, c) => sum + select(c).length, 0);
 console.log(
   `Inhalte geprüft: ${chapters.length} Kapitel, ${count((c) => c.tasks)} Aufgaben, ${count((c) => c.pieces)} Stücke, ` +

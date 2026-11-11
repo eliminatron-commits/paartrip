@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4173;
-const URL = `http://localhost:${PORT}/paartrip/`;
+const ORIGIN = `http://localhost:${PORT}`;
+const URL = `${ORIGIN}/paartrip/`;
+// Dieselbe Adresse schreibt e2e/build-versions.ts als VITE_API_URL in die Test-Builds.
+const API_PORT = 8788;
 
 export default defineConfig({
   testDir: 'e2e',
@@ -18,9 +21,17 @@ export default defineConfig({
       use: { ...devices['iPhone 15 Pro Max'], viewport: { width: 440, height: 956 } },
     },
   ],
-  webServer: {
-    command: `node e2e/serve.ts dist-e2e/v1 ${PORT}`,
-    url: URL,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: `node e2e/serve.ts dist-e2e/v1 ${PORT}`,
+      url: URL,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      // Der echte Worker, lokal gestartet, mit frischer Datenbank.
+      command: `node e2e/api-server.ts ${API_PORT} ${ORIGIN}`,
+      url: `http://localhost:${API_PORT}/`,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });

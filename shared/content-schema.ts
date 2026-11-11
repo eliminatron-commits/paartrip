@@ -163,6 +163,30 @@ export type ViTerm = z.infer<typeof viTermsFileSchema>[number];
 export const contentSchema = z.strictObject({ chapters: z.array(chapterSchema).min(1), viTerms: viTermsFileSchema });
 export type Content = z.infer<typeof contentSchema>;
 
+// ---------------------------------------------------------------- Inhalte für die Spielregeln
+
+/**
+ * Inhalte ohne Zeichnungen, Story-Texte und Begriffsliste: alles, was die Spielregeln brauchen.
+ * Der Worker bündelt nur das (generated/content-rules.json), die App das volle Bündel.
+ */
+export type RulesChapter = Omit<Chapter, 'rooms' | 'pieces' | 'story'> & {
+  rooms: Omit<Room, 'art'>[];
+  pieces: Omit<Piece, 'art'>[];
+};
+export interface RulesContent {
+  chapters: RulesChapter[];
+}
+
+export function toRulesContent(content: Content): RulesContent {
+  return {
+    chapters: content.chapters.map(({ story: _story, rooms, pieces, ...chapter }) => ({
+      ...chapter,
+      rooms: rooms.map(({ art: _art, ...room }) => room),
+      pieces: pieces.map(({ art: _art, ...piece }) => piece),
+    })),
+  };
+}
+
 // ---------------------------------------------------------------- Prüfungen über Dateigrenzen
 
 /** Zerlegt eine .svg-Datei in viewBox und Inhalt. Liefert bei Verstößen eine Fehlermeldung statt SvgArt. */

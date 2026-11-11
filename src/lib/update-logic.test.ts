@@ -1,5 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { AUTO_CHECK_INTERVAL_MS, shouldAutoCheck } from './update-logic.ts';
+import { AUTO_CHECK_INTERVAL_MS, shouldAutoCheck, updateIsWaiting } from './update-logic.ts';
+
+describe('updateIsWaiting', () => {
+  const worker = {};
+
+  it('eine neue Version wartet, wenn neben dem aktiven Worker ein fertiger wartet', () => {
+    expect(updateIsWaiting({ waiting: worker, active: worker })).toBe(true);
+  });
+
+  it('die Erstinstallation ist kein Update: Es gibt noch keinen aktiven Worker', () => {
+    expect(updateIsWaiting({ waiting: worker, active: null })).toBe(false);
+  });
+
+  it('ohne wartenden Worker gibt es nichts zu übernehmen', () => {
+    expect(updateIsWaiting({ waiting: null, active: worker })).toBe(false);
+    expect(updateIsWaiting({ waiting: null, active: null })).toBe(false);
+  });
+});
 
 describe('shouldAutoCheck', () => {
   it('sucht beim ersten Mal sofort', () => {

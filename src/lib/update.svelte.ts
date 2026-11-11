@@ -1,6 +1,6 @@
 // Update-Funktion: iOS holt eine Home-Bildschirm-App aus dem Hintergrund zurück, ohne neu zu laden.
 // Deshalb sucht die App selbst nach neuen Versionen, zeigt einen Hinweis und übernimmt erst auf Tippen.
-import { type CheckResult, shouldAutoCheck } from './update-logic.ts';
+import { type CheckResult, shouldAutoCheck, updateIsWaiting } from './update-logic.ts';
 
 export const updates = $state<{ available: boolean; checking: boolean; result: CheckResult | null }>({
   available: false,
@@ -32,12 +32,13 @@ export async function initUpdates(): Promise<void> {
 }
 
 function watchForWaitingWorker(reg: ServiceWorkerRegistration): void {
-  // Ein Worker ohne aktiven Vorgänger ist die Erstinstallation, kein Update.
-  if (reg.waiting && navigator.serviceWorker.controller) updates.available = true;
+  // Schon beim Start kann eine früher geladene Version warten.
+  if (updateIsWaiting(reg)) updates.available = true;
   reg.addEventListener('updatefound', () => {
-    const worker = reg.installing;
-    worker?.addEventListener('statechange', () => {
-      if (worker.state === 'installed' && navigator.serviceWorker.controller) updates.available = true;
+    // Nach jedem Zustandswechsel neu hinsehen: Ein Update wartet, die Erstinstallation nie
+    // (siehe updateIsWaiting) – unabhängig davon, wie spät die Seite davon erfährt.
+    reg.installing?.addEventListener('statechange', () => {
+      if (updateIsWaiting(reg)) updates.available = true;
     });
   });
 }
@@ -62,7 +63,9 @@ export async function checkForUpdate(): Promise<CheckResult> {
   try {
     if (registration) {
       await registration.update();
-      const found = registration.installing ? await installed(registration.installing) : registration.waiting !== null;
+      if (registration.installing) await installed(registration.installing);
+      const found = updateIsWaiting(registration);
+      if (found) updates.available = true;
       result = found ? 'found' : 'current';
     }
   } catch {

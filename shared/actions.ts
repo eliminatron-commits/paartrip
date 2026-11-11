@@ -12,7 +12,8 @@ export type ActionBody =
   | { type: 'build.place'; turn: number; spotId: string }
   | { type: 'piece.move'; pieceId: string; spotId: string }
   // Meilensteine und Gutscheine
-  | { type: 'milestone.seen'; at: number }
+  // `milestone` = Anzahl erledigter Aufgaben, bei der er erreicht wurde (ReachedMilestone.at).
+  | { type: 'milestone.seen'; milestone: number }
   // Geheimen Gutschein hinterlegen; die id der Aktion wird zur id des Gutscheins.
   | { type: 'coupon.deposit'; text: string }
   | { type: 'coupon.requestRedeem'; couponId: string }

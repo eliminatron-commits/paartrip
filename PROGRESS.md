@@ -10,6 +10,25 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
+## Phase 2/6 – Abgleich und Push: Zwischenstand vom 2026-11-11 (noch nicht abgenommen, nichts gepusht)
+
+Lief in der alten Sitzung auf Fable 5.2 und ohne Subagenten (sie waren nicht geladen; der Nutzer schrieb nach dem Hinweis "weiter"). Abgebrochen am Nutzungslimit.
+
+**Fertig und lokal belegt** (Typecheck grün, 93 Vitest-Tests, 13 Playwright-Tests in WebKit):
+- Worker `worker/` (Cloudflare, D1): Koppeln per Code, Token-Prüfung, Abgleich mit Schutz vor doppelten Aktionen und gleichzeitigem Schreiben, CORS nur für die App-Adresse, Obergrenze an Häusern, Web Push mit VAPID samt Probe-Mitteilung. Tests in `worker/test/` laufen gegen den echten Worker in lokalem workerd (`createTestHarness` aus wrangler).
+- Regeln und gefilterte Sicht: `shared/rules.ts`, `shared/view.ts`, `shared/wire.ts` (Prüfung der Anfragen), `shared/limits.ts`, `shared/time.ts`, `shared/push-texts.ts`. Von den Aktionen ist bisher nur `coupon.deposit` umgesetzt; alle anderen lehnt der Server ab, bis Phase 3 und 4 ihre Regeln bringen.
+- App: lokale Kopie in IndexedDB (`src/lib/store.ts`), Abgleich mit Warteschlange (`src/lib/sync-engine.ts`, `session.svelte.ts`), Export/Import (`device-file.ts`), Push (`push.svelte.ts`, Empfang in `src/sw.ts`), Oberfläche in `src/components/` (Pairing, HouseStatus, SecretGifts, DeviceSettings, RestoreBackup).
+- Zwei-Geräte-Tests `e2e/sync.spec.ts` gegen den lokalen Worker (`e2e/api-server.ts`, Port 8788).
+- Cloudflare-Gratis-Grenzen geprüft (Doku, Stand 2026-10-29): Workers 100.000 Anfragen/Tag, 10 ms CPU je Anfrage, 50 Unteranfragen, 5 Cron-Trigger; D1 10 Datenbanken, 500 MB je Datenbank, 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 50 Abfragen je Aufruf. Bei Überschreitung Fehler, keine Kosten.
+- **Fehler aus Phase 1 behoben:** Nach der Erstinstallation erschien fälschlich "New version – Update" (gemessen: 37 von 40 frischen Installationen, nach der Korrektur 0 von 40). Ursache und Korrektur: `updateIsWaiting` in `src/lib/update-logic.ts`. Der neue Test in `e2e/update.spec.ts` erwischt den alten Fehler im Testlauf nicht zuverlässig (mit Aufzeichnung tritt er seltener auf) – belegt ist die Korrektur durch die Messung und die Vitest-Tests.
+
+**Offen in Phase 2:**
+1. Cloudflare mit dem Nutzer einrichten (Klick für Klick): Konto, `npx wrangler login`, `wrangler d1 create paartrip` und die id in `worker/wrangler.jsonc` eintragen, VAPID-Schlüssel erzeugen (öffentlichen in `wrangler.jsonc`, privaten per `wrangler secret put VAPID_PRIVATE_KEY`), Migration und erster Deploy.
+2. Adresse des Workers in `.env.production` als `VITE_API_URL` eintragen. Ohne sie bricht `npm run build` absichtlich ab – deshalb vorher nicht pushen.
+3. `.github/workflows/deploy.yml` um Migration und Worker-Deploy erweitern; Repo-Secrets `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` legt der Nutzer an.
+4. Abnahme: P2-07 (Live-Abgleich), P2-08 (Suche nach Secrets in Repo und Historie), P2-11 (Push auf dem iPhone, Nutzer); `tests.json` aktualisieren (P2-01 bis P2-06, P2-09, P2-10 sind lokal belegt, aber dort noch nicht eingetragen); `CLAUDE.md` um Worker, Befehle (`npm run dev:api`) und die zweite Inhaltsdatei `generated/content-rules.json` ergänzen; Commit "Phase 2: Abgleich und Push"; Push erst nach Rückfrage.
+5. Noch nicht geprüft: Sichtprüfung der neuen Bildschirme im Querformat; `npm audit` nach der Installation von wrangler.
+
 ## Was steht
 
 - Gerüst: Svelte 5, Vite 8, TypeScript 6, vite-plugin-pwa 2 (`injectManifest`), eigener Service Worker `src/sw.ts`.

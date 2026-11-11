@@ -1,9 +1,15 @@
 <script lang="ts">
   import AboutUpdates from './components/AboutUpdates.svelte';
+  import DeviceSettings from './components/DeviceSettings.svelte';
+  import HouseStatus from './components/HouseStatus.svelte';
+  import Pairing from './components/Pairing.svelte';
+  import SecretGifts from './components/SecretGifts.svelte';
   import UpdateBanner from './components/UpdateBanner.svelte';
   import { content } from './lib/content.ts';
+  import { session } from './lib/session.svelte.ts';
 
-  // Phase 1: leere Hülle. Navigation, Haus und Einstellungen folgen in Phase 3.
+  // Phase 2: Koppeln, Abgleich und Einstellungen in einer einfachen Abfolge.
+  // Navigation, Haus und Geschenke-Seite folgen in Phase 3.
   const chapter = content.chapters[0];
 </script>
 
@@ -14,6 +20,13 @@
   </header>
 
   <main>
+    {#if session.status === 'unpaired'}
+      <Pairing />
+    {:else if session.status === 'paired'}
+      <HouseStatus />
+      <SecretGifts />
+    {/if}
+
     {#if chapter}
       <section class="card">
         <p class="eyebrow">Chapter {chapter.number}</p>
@@ -21,6 +34,10 @@
         <p class="vi" lang="vi">{chapter.titleVi}</p>
         <p class="lead">The house is still empty. Soon the two of you will fill it, one small task at a time.</p>
       </section>
+    {/if}
+
+    {#if session.status === 'paired'}
+      <DeviceSettings />
     {/if}
     <AboutUpdates />
   </main>

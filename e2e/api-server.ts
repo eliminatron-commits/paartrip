@@ -1,0 +1,26 @@
+// Startet den Worker lokal auf einem festen Port: node e2e/api-server.ts <Port> <Adresse der App>
+// Fester Port, weil die Adresse des Workers beim Bauen in die App geschrieben wird; das Test-Geschirr
+// von Wrangler wählt seinen Port selbst, also leitet dieser kleine Server dorthin weiter.
+// Genutzt von den Zwei-Geräte-Tests (Playwright) und von `npm run dev:api`.
+import { createServer, request } from 'node:http';
+import { startLocalApi } from '../worker/test/local-api.ts';
+
+const port = Number(process.argv[2] ?? 8788);
+const origin = process.argv[3] ?? 'http://localhost:4173';
+
+const api = await startLocalApi({ origin });
+const upstream = new URL(api.url);
+
+createServer((req, res) => {
+  const forward = request(
+    { host: upstream.hostname, port: upstream.port, path: req.url, method: req.method, headers: { ...req.headers, host: upstream.host } },
+    (answer) => {
+      res.writeHead(answer.statusCode ?? 502, answer.headers);
+      answer.pipe(res);
+    },
+  );
+  forward.on('error', () => res.writeHead(502).end());
+  req.pipe(forward);
+}).listen(port, () => {
+  console.log(`Lokaler Worker auf http://localhost:${port} (nimmt Anfragen von ${origin} an)`);
+});
