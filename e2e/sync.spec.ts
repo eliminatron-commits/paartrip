@@ -84,6 +84,34 @@ test('eine Aktion von A erscheint bei B nach dem Abgleich – der Text bleibt f�
   expect(received.join('\n')).toContain('"veiled"');
 });
 
+test('"Refresh" in der Kopfleiste holt den Schritt des anderen, ohne dass die App verlassen wird', async ({ browser }) => {
+  const { a, b } = await pair(browser);
+  await openTab(b.page, 'Gifts');
+  await wrapGift(a.page, 'A walk by the river');
+  await expect(syncStatus(a.page)).toHaveText('Up to date.');
+
+  // B hat die App die ganze Zeit offen und erfährt von selbst nichts.
+  await expect(giftsForMe(b.page)).toHaveCount(0);
+  const refresh = b.page.getByRole('button', { name: 'Refresh' });
+  await refresh.click();
+  // Der Knopf zeigt, dass er holt, und ist danach wieder frei.
+  await expect(refresh).toHaveAttribute('aria-busy', 'true');
+  await expect(giftsForMe(b.page)).toHaveCount(1);
+  await expect(refresh).toHaveAttribute('aria-busy', 'false');
+  await expect(syncStatus(b.page)).toHaveText('Up to date.');
+
+  // Ohne Netz sagt der Streifen darunter, woran es liegt.
+  await b.context.setOffline(true);
+  await refresh.click();
+  await expect(syncStatus(b.page)).toHaveText('Offline. Showing what was saved last.');
+  await expect(syncStatus(b.page)).toBeInViewport();
+
+  // Solange kein Haus da ist, gibt es nichts zu holen.
+  const c = await phone(browser);
+  await expect(c.page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+  await expect(c.page.getByRole('button', { name: 'Refresh' })).toHaveCount(0);
+});
+
 test('eine offline erzeugte Aktion wird nachgereicht', async ({ browser }) => {
   const { a, b } = await pair(browser);
   // Der Service Worker muss die Seite steuern, damit sie ohne Netz neu lädt.

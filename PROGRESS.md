@@ -43,9 +43,15 @@ Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für
 **Bedingung für den echten Start (nach Phase 5/6):** Jedes Haus beginnt neu. Erledigte Test-Aufgaben bleiben im Stand und zählen für Bauzug und Meilensteine weiter mit; mit den 30 echten Aufgaben fiele Meilenstein 30 sonst schon auf etwa die zwanzigste. Also die echte Datenbank mit Zustimmung des Nutzers leeren (dort liegen auch drei Probehäuser aus den Abnahmen) – die App bietet danach auf den iPhones "Start over" an.
 
 **Nicht belegt:**
-- Auf echten iPhones ist von Phase 4 nichts geprüft (Bedienung der Rätsel mit dem Finger, Lesbarkeit der Symbole, Mitteilung am Morgen).
+- Auf den iPhones (vom Nutzer gemeldet am 2026-11-12): Update angekommen, beide gekoppelt, die erste Aufgabe (Geteilter Code) zu zweit gelöst – "sonst hat es funktioniert". Einziger Mangel: Die offene App zeigte den Schritt des anderen erst nach Schließen und Öffnen; daraus der Knopf "Refresh" (siehe unten). Nicht gemeldet: die übrigen fünf Rätselarten mit dem Finger, Lesbarkeit der Symbole, die Mitteilung am Morgen.
 - Der Cron-Trigger ist bei Cloudflare eingetragen (Protokoll des Deploys); dass er morgens läuft und die Mitteilung ankommt, ist nur lokal über das Test-Geschirr belegt.
 - Ob die Hinweise der Test-Rätsel für Menschen gut verständlich sind, hat niemand außer der KI beurteilt; die echten Varianten kommen in Phase 5.
+
+## Zwischenwunsch nach Phase 4: "Refresh" in der Kopfleiste (2026-11-12)
+
+Der Nutzer meldete von den iPhones: Hat der andere etwas getan, musste man die App schließen und neu öffnen, um es zu sehen. Gebaut wie von ihm vorgeschlagen: ein Knopf oben neben den Einstellungen (nur mit Haus), der den Stand holt (`src/components/TopBar.svelte`, ruft `syncNow`). Das Symbol dreht sich mindestens 0,7 s und wird blasser (bleibt sichtbar, wenn Bewegung abgeschaltet ist); ohne Netz sagt der Streifen darunter, woran es liegt. Keine Änderung am Worker oder an der Schnittstelle.
+
+Belegt: Typecheck 0 Fehler, 284 Vitest-Tests, 47 Browser-Tests in WebKit – neu `e2e/sync.spec.ts`, '"Refresh" in der Kopfleiste holt den Schritt des anderen, ohne dass die App verlassen wird' –, Produktions-Build, Bildschirmfoto `screenshots/07-today.png` angesehen. Lokal committet; hochladen nur mit Zustimmung des Nutzers. Auf dem iPhone noch nicht geprüft.
 
 ## Phase 3/6 – Haus und Gutscheine: abgeschlossen am 2026-11-12
 
@@ -138,4 +144,5 @@ Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), ei
 ## Ideen außerhalb des Umfangs
 
 - Abendpalette (Indigo, Laternengelb) als zweites Farbschema.
+- Die offene App aktualisiert sich von selbst, sobald die Mitteilung über den Schritt des anderen eintrifft (der Service Worker sagt es der offenen Seite, die gleicht ab). Braucht erlaubte Mitteilungen und berührt "keine Echtzeit-Anzeige" – nur, wenn der Nutzer es will; bis dahin gibt es "Refresh".
 - Kursive Fraunces für die vietnamesischen Zweitnamen (bräuchte die Kursiv-Schriftdateien im Precache).
