@@ -178,13 +178,29 @@ export async function finishTask(phone: Phone): Promise<void> {
 /** Lässt die nächste Aufgabe erscheinen, als wäre ein Tag vergangen. Die Geräte gleichen danach selbst ab (`returnToApp`). */
 export const nextTask = (phone: Phone): Promise<void> => testRoute(phone, 'next-task');
 
+/**
+ * Liegt eine Meilenstein-Szene über der App, öffnet das Geschenk und geht weiter, ohne etwas damit zu tun.
+ * Tut nichts, wenn keine da ist.
+ */
+export async function passMilestone(page: Page): Promise<void> {
+  const scene = page.getByTestId('milestone');
+  if (!(await scene.isVisible())) return;
+  const gift = scene.getByRole('button', { name: 'Open the gift' });
+  if (await gift.isVisible()) await gift.click();
+  await scene.getByRole('button', { name: /^(Later|Continue)$/ }).click();
+}
+
 /** Spielt auf dem Server so weit, bis diese Aufgabe die laufende ist, und zeigt sie auf beiden Geräten. */
 export async function openTask(phones: Phone[], taskId: string): Promise<void> {
   await testRoute(phones[0]!, 'open-task', `&task=${taskId}`);
   for (const { page } of phones) {
     await returnToApp(page);
-    await openTab(page, 'Today');
-    await expect(page.getByTestId('task')).toBeVisible();
+    // Der Abgleich läuft noch; unterwegs erreichte Meilensteine zeigen erst ihre Szene.
+    await expect(async () => {
+      await passMilestone(page);
+      await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Today' }).click({ timeout: 1000 });
+      await expect(page.locator(`[data-testid="task"][data-task="${taskId}"]`)).toBeVisible({ timeout: 1000 });
+    }).toPass();
   }
 }
 

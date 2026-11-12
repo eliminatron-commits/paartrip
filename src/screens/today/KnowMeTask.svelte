@@ -71,7 +71,7 @@
   {/if}
 {/snippet}
 
-<section class="panel" aria-labelledby="task-title" data-testid="task" data-type="knowme">
+<section class="panel" aria-labelledby="task-title" data-testid="task" data-task={spec.id} data-type="knowme">
   <p class="eyebrow">Know me?</p>
   <h2 id="task-title">{spec.question}</h2>
 

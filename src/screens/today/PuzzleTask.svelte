@@ -42,7 +42,7 @@
   }
 </script>
 
-<section class="panel" aria-labelledby="task-title" data-testid="task" data-type="puzzle" data-kind={spec.kind} data-role={role}>
+<section class="panel" aria-labelledby="task-title" data-testid="task" data-task={spec.id} data-type="puzzle" data-kind={spec.kind} data-role={role}>
   <p class="eyebrow">Puzzle · {texts.name}</p>
   <h2 id="task-title">{spec.title}</h2>
 

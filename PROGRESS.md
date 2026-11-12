@@ -12,6 +12,24 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
+## Phase 4/6 – Aufgaben und Rätsel: in Arbeit (am 2026-11-12 am Nutzungslimit unterbrochen)
+
+Läuft auf Fable 5.2 statt Opus 5.5. Nichts davon ist hochgeladen.
+
+**Fertig und belegt** (Commit `e8978c7` und der folgende; Typecheck 0 Fehler, Vitest grün, Browser-Tests 31 grün):
+- Regeln (`shared/rules.ts`): `advance` (Tagesregel: höchstens eine neue Aufgabe pro Kalendertag, nach einer Pause rückt die nächste gleich nach), `puzzle.solve`, `knowme.submit`, `knowme.judge` (frei getippte Antwort: wer geantwortet hat, entscheidet), `reallife.confirm`, `announceTask`. `test.completeTask` bleibt als Aktion bekannt und wird immer abgelehnt, damit eine ältere App nicht festhängt.
+- Sechs Rätselarten als Logik ohne Oberfläche in `shared/puzzles/` (Daten prüfen, Lösung, Versuch prüfen); das Inhaltsschema lehnt Varianten ab, die sich widersprechen oder ohne Partner lösbar wären. Symbole unterscheiden sich nur durch die Form, Farbe ist Schmuck. Zehn Test-Aufgaben in `content/chapter-1/tasks/`.
+- Worker: Tageswechsel bei jedem Abgleich, Cron `0 6 * * *` für die Mitteilung "neue Aufgabe", stellbare Uhr nur mit `TEST_CLOCK=1` (Kopf `X-Test-Now`; lokal und in Tests). `TEST_ACTIONS` ist entfernt.
+- Oberfläche: `src/screens/today/` mit `PuzzleTask` (Hülle, Erklärung je Rätselart), `puzzles/SplitCode`, `KnowMeTask`, `Reveal`, `RealLifeTask`; `src/lib/tasks.ts`; Zwischenstand einer Aufgabe in den Geräte-Einstellungen (`draft`).
+- Tests: `shared/tasks.test.ts`, `shared/puzzles/puzzles.test.ts`, `scripts/content-pipeline.test.ts` (neue Variante nur als Datei), `worker/test/tasks.test.ts` (gestellte Uhr, Cron), `src/lib/tasks.test.ts`, `e2e/puzzles.spec.ts` mit Treibern in `e2e/puzzle-drivers/`; Hilfsrouten `/__test/next-task`, `finish-task`, `open-task` in `e2e/api-server.ts`.
+
+**Offen, in dieser Reihenfolge:**
+1. Fünf Rätsel-Bausteine samt Treiber: `MapLegend`, `DescribeArrange`, `SpotDifference`, `Sequence`, `BlindMaze` (`src/screens/today/puzzles/`, `e2e/puzzle-drivers/`). Fünf `builder` waren gestartet und wurden am Limit gestoppt; ihre Dateien sind nicht committet und können halb fertig sein. Erst `git status` und `npx svelte-check` ansehen, dann je Art fertigstellen oder `builder` neu beauftragen (Schnittstelle und Kennzeichen wie `SplitCode.svelte`: `puzzle-input` nur beim Handelnden, `puzzle-feedback`, `puzzle-check`). Danach `npm run test:e2e`.
+2. `e2e/tasks.spec.ts` fehlt: Kennst-du-mich (Auswahl; Freitext mit Entscheiden; nichts Verborgenes in den Antworten), echtes Leben, Tagesregel mit `setClock`, Offline mit `setOffline` (P4-04, P4-05, P4-06).
+3. Neue Bildschirme in `e2e/screens.spec.ts` aufnehmen und sichten.
+4. `tests.json` (P4-01 bis P4-07), `CLAUDE.md` (Tagesablauf, Cron, `TEST_CLOCK`, `shared/puzzles/`, Hilfsrouten, Zwischenstand), Abschluss nach Protokoll.
+5. Vor dem Hochladen: Probestände in der echten Datenbank löschen (nur mit Zustimmung) – alten Ständen fehlt das Feld `judged`.
+
 ## Phase 3/6 – Haus und Gutscheine: abgeschlossen am 2026-11-12
 
 Lief auf Fable 5.2 statt Sonnet 5.5. Subagenten: `builder` (Sonnet 5.5) für `src/lib/sound.ts`, `fliessband` (Haiku 5.5) für 18 Platzhalter-Stücke und 5 Platzhalter-Szenen, `pruefer` (Opus 5.5) für das Review. `explorer` wurde nicht gebraucht.

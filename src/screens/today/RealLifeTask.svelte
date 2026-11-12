@@ -20,7 +20,7 @@
   }
 </script>
 
-<section class="panel" aria-labelledby="task-title" data-testid="task" data-type="reallife">
+<section class="panel" aria-labelledby="task-title" data-testid="task" data-task={spec.id} data-type="reallife">
   <p class="eyebrow">In real life</p>
   <h2 id="task-title">{spec.title}</h2>
   <p class="what">{spec.text}</p>
