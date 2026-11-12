@@ -32,6 +32,8 @@ Lief auf Fable 5.2 statt Sonnet 5.5. Subagenten: `builder` (Sonnet 5.5) für `sr
 
 **Setzungen** (Begründung in `CLAUDE.md`): Das Dekostück stellt auf, wer zuerst kommt. Nach dem letzten Meilenstein ist das Hinterlegen geschlossen. Wer eine Aktion selbst auslöst, bekommt dazu keine Mitteilung; beim Wählen im Bauzug geht "partner_done" an den anderen.
 
+**Live seit 2026-11-12** (Commit `d0189a1`, Workflow-Lauf 43222721648 grün: Build mit allen Tests, Worker, Pages): In WebKit von der Live-Adresse aus nennt die Versionszeile `d0189a1`; zwei Geräte haben sich gekoppelt, "Finish a test task" zählte "1 of 30", danach sah A "Your pick" und B "… picks next". In der echten Datenbank liegen damit zwei Probehäuser aus den Abnahmen; die iPhones des Nutzers waren bis dahin noch nicht gekoppelt.
+
 **Nicht belegt oder offen:**
 1. Auf den echten iPhones ist von dieser Phase nichts geprüft: Darstellung unter Uhr und Dynamic Island, Startbild, Klang (der Test-Browser hat kein Audio – geprüft ist nur der Weg von der Geste bis zum Ton).
 2. Der Nutzer hat am 2026-11-12 entschieden: hochladen mit Test-Knopf (`"TEST_ACTIONS": "1"` in `worker/wrangler.jsonc`). Was damit auf den iPhones entsteht, sind Probestände.
