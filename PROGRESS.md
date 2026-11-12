@@ -7,28 +7,33 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 1/6 – Fundament:** abgeschlossen am 2026-11-11, alle Akzeptanzpunkte P1-01 bis P1-08 erfüllt. Live unter `https://eliminatron-commits.github.io/paartrip/` (Repo `eliminatron-commits/paartrip`, öffentlich, Pages über GitHub Actions). Der Update-Ablauf ist auch live über einen echten zweiten Deploy belegt.
 - **Phase 2/6 – Abgleich und Push:** abgeschlossen am 2026-11-12, P2-01 bis P2-10 erfüllt, live seit Commit `a45b30d`. P2-11 (Push-Mitteilung auf dem iPhone) prüft der Nutzer.
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
-- **Nächste Phase:** 4/6 – Aufgaben und Rätsel | Opus 5.5 (hoch). Der Nutzer fügt dafür den Projekt-Prompt wieder ein (er liegt nicht im Repo).
+- **Phase 4/6 – Aufgaben und Rätsel:** gebaut und lokal belegt am 2026-11-12; Review durch `pruefer`, Abschluss und Hochladen stehen aus (siehe unten).
+- **Danach:** 5/6 – Inhalte Kapitel 1 | Sonnet 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; der Nutzer fügt ihn wieder ein, oder er wird aus dem Sitzungsverlauf geholt.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
-## Phase 4/6 – Aufgaben und Rätsel: in Arbeit (am 2026-11-12 am Nutzungslimit unterbrochen)
+## Phase 4/6 – Aufgaben und Rätsel: gebaut und belegt, Review und Abschluss stehen aus (Stand 2026-11-12)
 
-Läuft auf Fable 5.2 statt Opus 5.5. Nichts davon ist hochgeladen.
+Läuft auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für die Rätsel-Bausteine MapLegend, DescribeArrange, SpotDifference, Sequence, BlindMaze samt Treibern – zwei davon brach das Nutzungslimit beim Abschlussbericht ab, ihre Dateien waren fertig; `pruefer` (Opus 5.5) fürs Review. `explorer` und `zusammenfasser` wurden nicht gebraucht. Alles ist lokal committet, nichts hochgeladen.
 
-**Fertig und belegt** (Commit `e8978c7` und der folgende; Typecheck 0 Fehler, Vitest grün, Browser-Tests 31 grün):
-- Regeln (`shared/rules.ts`): `advance` (Tagesregel: höchstens eine neue Aufgabe pro Kalendertag, nach einer Pause rückt die nächste gleich nach), `puzzle.solve`, `knowme.submit`, `knowme.judge` (frei getippte Antwort: wer geantwortet hat, entscheidet), `reallife.confirm`, `announceTask`. `test.completeTask` bleibt als Aktion bekannt und wird immer abgelehnt, damit eine ältere App nicht festhängt.
-- Sechs Rätselarten als Logik ohne Oberfläche in `shared/puzzles/` (Daten prüfen, Lösung, Versuch prüfen); das Inhaltsschema lehnt Varianten ab, die sich widersprechen oder ohne Partner lösbar wären. Symbole unterscheiden sich nur durch die Form, Farbe ist Schmuck. Zehn Test-Aufgaben in `content/chapter-1/tasks/`.
-- Worker: Tageswechsel bei jedem Abgleich, Cron `0 6 * * *` für die Mitteilung "neue Aufgabe", stellbare Uhr nur mit `TEST_CLOCK=1` (Kopf `X-Test-Now`; lokal und in Tests). `TEST_ACTIONS` ist entfernt.
-- Oberfläche: `src/screens/today/` mit `PuzzleTask` (Hülle, Erklärung je Rätselart), `puzzles/SplitCode`, `KnowMeTask`, `Reveal`, `RealLifeTask`; `src/lib/tasks.ts`; Zwischenstand einer Aufgabe in den Geräte-Einstellungen (`draft`).
-- Tests: `shared/tasks.test.ts`, `shared/puzzles/puzzles.test.ts`, `scripts/content-pipeline.test.ts` (neue Variante nur als Datei), `worker/test/tasks.test.ts` (gestellte Uhr, Cron), `src/lib/tasks.test.ts`, `e2e/puzzles.spec.ts` mit Treibern in `e2e/puzzle-drivers/`; Hilfsrouten `/__test/next-task`, `finish-task`, `open-task` in `e2e/api-server.ts`.
+**Gebaut und belegt** (Typecheck 0 Fehler, 267 Vitest-Tests, 44 Browser-Tests in WebKit – zweimal hintereinander grün –, Produktions-Build läuft):
+- Regeln (`shared/rules.ts`): Tagesablauf `advance`, `puzzle.solve`, `knowme.submit`, `knowme.judge`, `reallife.confirm`, `announceTask`; jede erledigte Aufgabe läuft über `finishTask` → `completeTask` (Bauzug, Meilenstein).
+- Sechs Rätselarten: Logik in `shared/puzzles/`, Schema samt Prüfung "widerspruchsfrei, lösbar, nicht ohne Partner lösbar", Bausteine in `src/screens/today/puzzles/`, Erklärung je Art vor dem ersten Start, Treiber in `e2e/puzzle-drivers/`. Zehn Test-Aufgaben in `content/chapter-1/tasks/` (je Rätselart eine, zwei Fragen, zwei Aufgaben im echten Leben).
+- Worker: `advance` bei jedem Abgleich, Cron `0 6 * * *` für "neue Aufgabe", stellbare Uhr nur mit `TEST_CLOCK=1`. `TEST_ACTIONS`, der Test-Knopf und `HouseView.testActions` sind entfernt; `test.completeTask` wird immer abgelehnt.
+- Oberfläche: Today mit Rätsel-Hülle, Kennst-du-mich, Aufdecken mit Herz und Entscheidung, Aufgabe im echten Leben; Punkt am Reiter; Zwischenstand einer Aufgabe in den Geräte-Einstellungen.
+- Akzeptanz P4-01 bis P4-07: in `tests.json` auf `passed`, mit Fundstellen.
+- Gefundene und behobene Fehler: Zwei Einstellungsänderungen kurz nacheinander überschrieben sich (`SyncEngine.updateSettings`, mit Test). Der Test-Handgriff `openTask` übersah eine Meilenstein-Szene, die erst mit dem Abgleich kam (nur im Test, unter Last).
 
 **Offen, in dieser Reihenfolge:**
-1. Fünf Rätsel-Bausteine samt Treiber: `MapLegend`, `DescribeArrange`, `SpotDifference`, `Sequence`, `BlindMaze` (`src/screens/today/puzzles/`, `e2e/puzzle-drivers/`). Fünf `builder` waren gestartet und wurden am Limit gestoppt; ihre Dateien sind nicht committet und können halb fertig sein. Erst `git status` und `npx svelte-check` ansehen, dann je Art fertigstellen oder `builder` neu beauftragen (Schnittstelle und Kennzeichen wie `SplitCode.svelte`: `puzzle-input` nur beim Handelnden, `puzzle-feedback`, `puzzle-check`). Danach `npm run test:e2e`.
-2. `e2e/tasks.spec.ts` fehlt: Kennst-du-mich (Auswahl; Freitext mit Entscheiden; nichts Verborgenes in den Antworten), echtes Leben, Tagesregel mit `setClock`, Offline mit `setOffline` (P4-04, P4-05, P4-06).
-3. Neue Bildschirme in `e2e/screens.spec.ts` aufnehmen und sichten.
-4. `tests.json` (P4-01 bis P4-07), `CLAUDE.md` (Tagesablauf, Cron, `TEST_CLOCK`, `shared/puzzles/`, Hilfsrouten, Zwischenstand), Abschluss nach Protokoll.
-5. Vor dem Hochladen: Probestände in der echten Datenbank löschen (nur mit Zustimmung) – alten Ständen fehlt das Feld `judged`.
+1. Bericht von `pruefer` abwarten bzw. lesen und Befunde einarbeiten (er lief beim Schreiben dieser Zeilen noch). Kommt in der Sitzung kein Bericht an: Review neu starten – Auftrag: Commits `20d1d4c..HEAD` gegen P4-01 bis P4-07 und `CLAUDE.md`, Schwerpunkte Verborgenes, Regeln, Worker, Rätsel-Bausteine, abgeschwächte Tests.
+2. Abschluss nach Protokoll: Commit "Phase 4: Aufgaben und Rätsel", diese Datei, Zusammenfassung, Phase 5 ankündigen.
+3. Vor dem Hochladen den Nutzer fragen – und dazu, ob die Probestände in der echten Datenbank gelöscht werden dürfen: Alten Ständen fehlt das Feld `judged`, mit ihnen antwortet der neue Worker mit einem Fehler. Nach dem Löschen bietet die App auf den iPhones "Start over" an. Danach: Workflow-Lauf ansehen, Live-Adresse in WebKit prüfen, im Cloudflare-Dashboard nachsehen, dass der Cron-Trigger eingetragen ist.
+
+**Nicht belegt:**
+- Auf echten iPhones ist von Phase 4 nichts geprüft (Bedienung der Rätsel mit dem Finger, Lesbarkeit der Symbole, Mitteilung am Morgen).
+- Der Cron-Lauf ist nur lokal über das Test-Geschirr belegt, nicht bei Cloudflare.
+- Ob die Hinweise der Test-Rätsel für Menschen gut verständlich sind, hat niemand außer der KI beurteilt; die echten Varianten kommen in Phase 5.
 
 ## Phase 3/6 – Haus und Gutscheine: abgeschlossen am 2026-11-12
 
@@ -110,13 +115,10 @@ Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), ei
 
 ## Offene Punkte für spätere Phasen
 
-- **Tagesregel (Phase 4, vom Nutzer am 2026-11-12 bestätigt):** höchstens eine neue Aufgabe pro Kalendertag (`ActiveTask.availableOn`). Wer montags eine Aufgabe bekommt und sie mittwochs erledigt, bekommt die nächste sofort am Mittwoch, die übernächste frühestens am Donnerstag.
-- **Rätseldaten (Phase 4):** Nur `split-code` hat ein Datenschema, und das ist vorläufig. Die übrigen fünf Arten in `shared/content-schema.ts` bei `puzzleTask` ergänzen.
-- **Kennst-du-mich mit Freitext (Phase 4, vom Nutzer am 2026-11-12 entschieden):** Über den Treffer entscheidet, wer die Antwort über sich gegeben hat. Er sieht nach dem Aufdecken den Tipp des anderen und sagt, ob der zählt.
-- **Aufgabenablauf an `completeTask` anschließen (Phase 4):** Die Regeln für `puzzle.solve`, `knowme.submit` und `reallife.confirm` rufen `completeTask` auf; `test.completeTask`, `testDone`, die Variable `TEST_ACTIONS`, `HouseView.testActions` und der Abschnitt "Test mode" in `TodayScreen.svelte` entfallen dann. Eine noch installierte ältere App, die die Test-Aktion schickt, bekommt sie abgelehnt und verwirft sie.
+- **Rätselvarianten (Phase 5):** je Art zwei Varianten als Datei unter `tasks/`, Variante 2 schwerer und mit getauschter `lead`-Rolle. Die Inhaltsprüfung fängt Widersprüche und "ohne Partner lösbar" ab; ob frei formulierte Hinweise (Karte und Legende, Reihenfolge) eindeutig und verständlich sind, kann nur ein Mensch bzw. `pruefer` beurteilen. Der Zeichenvorrat hat 16 Symbole (`shared/puzzles/tiles.ts`); mehr brauchen eine Zeichnung in `src/components/Glyph.svelte`.
+- **Kapitelende (Phase 5/6):** Nach der letzten Aufgabe zeigt Today "That was the last one". Mit 30 Aufgaben fällt das mit Meilenstein 30 zusammen.
 - **Katalog (Phase 5):** rund 45 Stücke auf 34 Plätze (wall 8, surface 9, floor 6, ground 8, fence 3). Stücke je Platzart dürfen die Plätze übersteigen – hängen bleibt nichts –, aber jede Platzart braucht genug Auswahl, und die Dekostücke (5, 15, 25) sollten auf Arten mit Reserve passen. Stück-SVG: viewBox `0 0 100 100`, Unterkante bei y ≈ 96–100 (siehe `CLAUDE.md`, Benennung).
 - **Texte (Phase 5):** Die 6 Szenen und alle Stücknamen sind Platzhalter; die Texte der Oberfläche ("Your pick", "A special piece" …) sind fertig, aber noch von niemandem außer der KI gelesen.
-- **Push "neue Aufgabe verfügbar" (Phase 2/4):** Die nächste Aufgabe erscheint am Tageswechsel, ohne dass jemand die App öffnet. Dafür braucht der Worker einen Cron-Trigger; vorher Gratis-Grenzen prüfen.
 - **Vietnamesische Begriffe** in `content/vi-terms.json` sind ungeprüft, bis die Frau des Nutzers die Liste gesehen hat.
 - `npm audit` meldet 7 Hinweise (niedrig/mittel) in Build-Werkzeugen (glob, minimatch, deepmerge unter workbox-build). Sie laufen nur beim Bauen und stecken nicht in der App; `npm audit fix --force` würde Pakete auf alte Hauptversionen zurücksetzen und bleibt deshalb aus.
 
