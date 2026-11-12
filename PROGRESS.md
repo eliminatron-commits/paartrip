@@ -5,12 +5,13 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 ## Stand
 
 - **Phase 1/6 – Fundament:** abgeschlossen am 2026-11-11, alle Akzeptanzpunkte P1-01 bis P1-08 erfüllt. Live unter `https://eliminatron-commits.github.io/paartrip/` (Repo `eliminatron-commits/paartrip`, öffentlich, Pages über GitHub Actions). Der Update-Ablauf ist auch live über einen echten zweiten Deploy belegt.
-- **Laufende Phase:** 2/6 – Abgleich und Push, in der Abnahme (siehe unten). Danach 3/6 – Haus und Gutscheine | Sonnet 5.5 (hoch); der Nutzer fügt dafür den Projekt-Prompt wieder ein.
+- **Phase 2/6 – Abgleich und Push:** abgeschlossen am 2026-11-12, P2-01 bis P2-10 erfüllt, live seit Commit `a45b30d`. P2-11 (Push-Mitteilung auf dem iPhone) prüft der Nutzer.
+- **Nächste Phase:** 3/6 – Haus und Gutscheine | Sonnet 5.5 (hoch). Der Nutzer fügt dafür den Projekt-Prompt wieder ein (er liegt nicht im Repo).
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
-## Phase 2/6 – Abgleich und Push: Stand vom 2026-11-12 (Worker veröffentlicht, App noch nicht gepusht)
+## Phase 2/6 – Abgleich und Push: abgeschlossen am 2026-11-12
 
 Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), eingerichtet am 2026-11-12, ebenfalls auf Fable 5.2. Das Review durch `pruefer` (Opus 5.5) lief am 2026-11-12.
 
@@ -41,11 +42,15 @@ Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), ei
 - Scheitert eine Regel an einer Aktion, gilt die Aktion als abgelehnt, statt jeden weiteren Abgleich mit einem Serverfehler zu blockieren (`applyAction` in `shared/rules.ts`).
 - Nicht geändert, aber in `CLAUDE.md` festgehalten: Der Schutz hängt am Token, nicht an der Origin-Prüfung; `MAX_HOUSES` ist nur eine Bremse.
 
-**Offen in Phase 2:**
-1. Nutzer: Cloudflare-API-Token `paartrip-github` (Workers Scripts Write, D1 Write, Account Settings Read) als Repo-Secret `CLOUDFLARE_API_TOKEN` eintragen, dazu `CLOUDFLARE_ACCOUNT_ID`. Ohne sie schlägt der Job `worker` fehl und es wird nichts veröffentlicht.
-2. Push auf `main` erst nach Rückfrage. Im Workflow laufen dann erstmals die Worker-Tests (workerd unter Linux) – den ersten Lauf beobachten.
-3. Abnahme P2-07 (Abgleich von der Live-Adresse) nach dem Push; P2-11 (Push auf dem iPhone) prüft der Nutzer mit "Send a test notification".
-4. Häuser, die bis zum echten Start angelegt werden, sind Probehäuser (Obergrenze 20). Vor dem echten Start die Datenbank mit Zustimmung des Nutzers leeren – oder ab dann jede Änderung am gespeicherten `HouseState` als Umstellung mitliefern.
+**Abnahme am 2026-11-12:**
+- Push auf `main` mit Zustimmung des Nutzers; Workflow-Lauf 43174145516 grün: Build mit allen Tests (die Worker-Tests liefen dabei erstmals unter Linux), Job `worker` (keine neue Migration, Worker veröffentlicht), Job `deploy` (Pages). Die Repo-Secrets `CLOUDFLARE_API_TOKEN` (Token `paartrip-github`: Workers Scripts Write, D1 Write, Account Settings Read) und `CLOUDFLARE_ACCOUNT_ID` hat der Nutzer angelegt.
+- P2-07: In WebKit von der Live-Adresse aus (Versionszeile `a45b30d`) haben sich zwei Geräte gekoppelt; eine Aktion von A kam bei B an, der Text blieb verborgen. Anfragen an den veröffentlichten Worker: `POST /houses` 201, `POST /houses/join` 201, `POST /sync` 200.
+- P2-08: Suche über die gesamte Git-Historie nach privaten Schlüsseln, Tokens, Konto-ID und E-Mail-Adresse ohne Treffer. Das Worker-Secret `VAPID_PRIVATE_KEY` ist nach dem Deploy aus dem Workflow weiter gesetzt.
+
+**Offen:**
+1. P2-11: Der Nutzer prüft die Push-Mitteilung auf dem iPhone (App vom Home-Bildschirm öffnen, koppeln, "Turn on notifications", dann die Probe-Mitteilung).
+2. In der echten Datenbank liegt ein Probehaus aus der Abnahme ("Probe A & Probe B"); was der Nutzer zum Testen anlegt, ist ebenfalls ein Probestand (Obergrenze 20 Häuser). Vor dem echten Start die Datenbank mit Zustimmung des Nutzers leeren – oder ab dann jede Änderung am gespeicherten `HouseState` als Umstellung mitliefern. "Start over" sorgt dafür, dass die Telefone nach dem Leeren nicht festhängen.
+3. Dieser Abschluss-Commit (nur Doku) ist lokal und geht mit dem nächsten Push hinaus – ein eigener Push würde auf beiden iPhones nur einen weiteren Update-Hinweis auslösen.
 
 ## Was steht
 
