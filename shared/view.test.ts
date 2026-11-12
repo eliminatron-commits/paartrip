@@ -111,6 +111,37 @@ describe('Aufbau der Sicht', () => {
     );
   });
 
+  it('gilt auch in der Tiefe: Zusatzfelder in Aufgaben, Abgaben, Bauzügen, Meilensteinen und Gutscheinen bleiben zurück', () => {
+    const extra = { internalNote: 'nur-fuer-den-server' };
+    const base = paired();
+    const marked = (tag: string) => ({ own: { ...submission(tag).own, ...extra }, guess: { ...submission(tag).guess, ...extra }, ...extra });
+    const knowme = (hearts: Slot[]) => ({ type: 'knowme', submissions: { a: marked('A'), b: marked('B') }, hearts, ...extra });
+    const state = {
+      ...base,
+      players: { a: { ...base.players.a, ...extra }, b: { ...base.players.b!, ...extra } },
+      task: { taskId: 'q2', availableOn: '2026-11-11', completedAt: null, progress: knowme([]), ...extra },
+      done: [
+        { taskId: 'q1', completedAt: rules.now, progress: knowme(['a']), ...extra },
+        { taskId: 'p1', completedAt: rules.now, progress: { type: 'puzzle', solvedBy: 'a', ...extra }, ...extra },
+        { taskId: 'r1', completedAt: rules.now, progress: { type: 'reallife', confirmedBy: ['b'], ...extra }, ...extra },
+      ],
+      buildTurns: [{ n: 1, chooser: 'a', offer: ['lamp'], chosen: null, placedAt: null, ...extra }],
+      placements: [{ pieceId: 'lamp', spotId: 'hall-1', ...extra }],
+      milestones: [{ at: 5, reachedAt: rules.now, decoPiece: null, seenBy: ['a'], ...extra }],
+      coupons: base.coupons.map((c) => ({ ...c, ...extra })),
+    } as unknown as HouseState;
+
+    for (const you of ['a', 'b'] as const) expect(wire(state, you)).not.toContain('nur-fuer-den-server');
+    // Was beide sehen dürfen, kommt dabei vollständig an.
+    const forB = deriveView(state, 'b', ctx);
+    expect(forB.done).toEqual([
+      { taskId: 'q1', completedAt: rules.now, progress: { type: 'knowme', submissions: { a: submission('A'), b: submission('B') }, hearts: ['a'] } },
+      { taskId: 'p1', completedAt: rules.now, progress: { type: 'puzzle', solvedBy: 'a' } },
+      { taskId: 'r1', completedAt: rules.now, progress: { type: 'reallife', confirmedBy: ['b'] } },
+    ]);
+    expect(forB.task?.progress).toEqual({ type: 'knowme', mine: submission('B'), theirsSubmitted: true, theirs: submission('A'), hearts: [] });
+  });
+
   it('der heutige Tag kommt aus der Serverzeit in Europe/Berlin', () => {
     // 23:30 UTC ist in Berlin schon der nächste Tag.
     expect(deriveView(paired(), 'a', { ...ctx, now: '2026-11-11T23:30:00.000Z' }).today).toBe('2026-11-12');

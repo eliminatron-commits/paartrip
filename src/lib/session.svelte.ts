@@ -49,8 +49,25 @@ export const dispatch = (body: ActionBody) => ready().dispatch(body);
 export const syncNow = () => ready().sync();
 export const dismissRejected = () => ready().dismissRejected();
 export const updateSettings = (patch: Partial<Settings>) => ready().updateSettings(patch);
-export const importDevice = (text: string) => ready().importDevice(text);
 export const deviceToken = () => engine?.token ?? null;
+
+/** Aufräumen, wenn dieses Gerät seine bisherige Rolle ablegt (push.svelte.ts löst deren Anmeldung). */
+type RoleEnded = (previousToken: string) => Promise<void>;
+let roleEnded: RoleEnded | null = null;
+export function onRoleEnded(hook: RoleEnded): void {
+  roleEnded = hook;
+}
+
+/** Import und Neuanfang ersetzen die Rolle dieses Geräts. Scheitert der Wechsel, bleibt alles beim Alten. */
+async function switchRole(change: (engine: SyncEngine) => Promise<void>): Promise<void> {
+  const previous = ready().token;
+  await change(ready());
+  if (previous) await roleEnded?.(previous).catch((error: unknown) => console.error(error));
+}
+
+export const importDevice = (text: string) => switchRole((engine) => engine.importDevice(text));
+/** Löst die Kopplung auf diesem Gerät. Nur anbieten, wenn der Server das Gerät nicht mehr kennt. */
+export const startOver = () => switchRole((engine) => engine.reset());
 
 /** Gerätestand als Datei: auf dem iPhone über das Teilen-Menü ("In Dateien sichern"), sonst als Download. */
 export async function exportDevice(): Promise<void> {

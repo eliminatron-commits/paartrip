@@ -7,6 +7,9 @@ interface Phone {
   page: Page;
 }
 
+/** Der lokal gestartete Worker (Port wie in playwright.config.ts und e2e/build-versions.ts). */
+const LOCAL_API = 'http://localhost:8788';
+
 const phones: BrowserContext[] = [];
 
 async function phone(browser: Browser): Promise<Phone> {
@@ -144,6 +147,33 @@ test('eine offline erzeugte Aktion wird nachgereicht', async ({ browser }) => {
 
   await returnToApp(b.page);
   await expect(wrappedForMe(b.page)).toHaveCount(1);
+});
+
+test('kennt der Server das Gerät nicht mehr, führt "Start over" zurück zum Anfang', async ({ browser, request }) => {
+  const a = await phone(browser);
+  const code = await startHouse(a.page, 'Ada');
+  await expect(a.page.getByRole('button', { name: 'Start over' })).toBeHidden();
+
+  // Der Server vergisst das Haus samt Gerät, so als wäre die Datenbank zurückgesetzt worden
+  // (Hilfsroute des lokalen Testservers, siehe e2e/api-server.ts).
+  const forgotten = await request.post(`${LOCAL_API}/__test/forget-house?code=${code.replace('-', '')}`);
+  expect(forgotten.status()).toBe(204);
+  await returnToApp(a.page);
+  await expect(a.page.getByTestId('sync-status')).toHaveText("This phone isn't linked to the house anymore.");
+
+  // Erst nach der Rückfrage wird die Kopplung gelöst.
+  await a.page.getByRole('button', { name: 'Start over' }).click();
+  await a.page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(a.page.getByTestId('pairing-status')).toContainText('Linked as Ada.');
+  await a.page.getByRole('button', { name: 'Start over' }).click();
+  await a.page.getByRole('button', { name: 'Yes, start over' }).click();
+  await expect(a.page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+
+  // Das Gerät ist frei, auch nach dem Neuladen, und kann ein neues Haus anlegen.
+  await a.page.reload();
+  await expect(a.page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+  await startHouse(a.page, 'Ada');
+  await expect(a.page.getByTestId('sync-status')).toHaveText('Up to date.');
 });
 
 test('Export und Import: nach geleertem Speicher dieselbe Rolle im selben Haus', async ({ browser }) => {

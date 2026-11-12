@@ -1,6 +1,6 @@
 {
   "project": "Nhà Mình – PaarTrip",
-  "updated": "2026-11-11",
+  "updated": "2026-11-12",
   "statuses": {
     "open": "noch nicht erfüllt",
     "passed": "mit echtem Check belegt",
@@ -26,16 +26,16 @@
       "phase": 2,
       "name": "Abgleich und Push",
       "tests": [
-        { "id": "P2-01", "criterion": "Zwei Browser-Kontexte koppeln sich gegen den lokalen Worker", "check": "Playwright, zwei Kontexte", "status": "open" },
-        { "id": "P2-02", "criterion": "Eine Aktion von A erscheint bei B nach Abgleich", "check": "Playwright, zwei Kontexte", "status": "open" },
-        { "id": "P2-03", "criterion": "Eine offline erzeugte Aktion wird nachgereicht", "check": "Playwright mit setOffline", "status": "open" },
-        { "id": "P2-04", "criterion": "Eine doppelt gesendete Aktion verändert den Stand nicht zweimal", "check": "Vitest (Regeln) und Test gegen den lokalen Worker", "status": "open" },
-        { "id": "P2-05", "criterion": "Ein dritter Beitritt wird abgelehnt", "check": "Test gegen den lokalen Worker", "status": "open" },
-        { "id": "P2-06", "criterion": "Verborgene Inhalte gehen nicht an das andere Gerät", "check": "Vitest auf die Sicht-Ableitung und Test auf die Serverantwort", "status": "open" },
+        { "id": "P2-01", "criterion": "Zwei Browser-Kontexte koppeln sich gegen den lokalen Worker", "check": "Playwright, zwei Kontexte", "status": "passed", "note": "e2e/sync.spec.ts: \"zwei Geräte koppeln sich; ein dritter Beitritt wird abgelehnt\" (2026-11-12, 14 von 14 grün)." },
+        { "id": "P2-02", "criterion": "Eine Aktion von A erscheint bei B nach Abgleich", "check": "Playwright, zwei Kontexte", "status": "passed", "note": "e2e/sync.spec.ts: \"eine Aktion von A erscheint bei B nach dem Abgleich – der Text bleibt für B verborgen\"." },
+        { "id": "P2-03", "criterion": "Eine offline erzeugte Aktion wird nachgereicht", "check": "Playwright mit setOffline", "status": "passed", "note": "e2e/sync.spec.ts: \"eine offline erzeugte Aktion wird nachgereicht\" – übersteht auch das Neuladen ohne Netz." },
+        { "id": "P2-04", "criterion": "Eine doppelt gesendete Aktion verändert den Stand nicht zweimal", "check": "Vitest (Regeln) und Test gegen den lokalen Worker", "status": "passed", "note": "worker/test/api.test.ts: \"eine doppelt gesendete Aktion verändert den Stand nicht zweimal\" und der Test unter Andrang; die Sperre gegen Doppeltes liegt im Worker (Tabelle applied_actions), die Warteschlange des Geräts prüft src/lib/sync-engine.test.ts." },
+        { "id": "P2-05", "criterion": "Ein dritter Beitritt wird abgelehnt", "check": "Test gegen den lokalen Worker", "status": "passed", "note": "worker/test/api.test.ts: \"ein dritter Beitritt wird abgelehnt\" (auch bei gleichzeitigem Beitritt); shared/rules.test.ts; e2e/sync.spec.ts." },
+        { "id": "P2-06", "criterion": "Verborgene Inhalte gehen nicht an das andere Gerät", "check": "Vitest auf die Sicht-Ableitung und Test auf die Serverantwort", "status": "passed", "note": "shared/view.test.ts (Sicht-Ableitung) bis in die Tiefe der Sicht und worker/test/api.test.ts (Serverantworten für geheime Gutscheine und Kennst-du-mich); e2e/sync.spec.ts liest alle Antworten an Gerät B mit." },
         { "id": "P2-07", "criterion": "Worker ist veröffentlicht und von der Live-App erreichbar", "check": "Abgleich von der Live-Adresse aus", "status": "open" },
         { "id": "P2-08", "criterion": "Keine Secrets im Repo", "check": "Suche nach Schlüsseln und Tokens im Repo und in der Git-Historie", "status": "open" },
-        { "id": "P2-09", "criterion": "Cloudflare-Gratis-Grenzen vor dem Einrichten geprüft; kein Bezahltarif nötig", "check": "aktuelle Cloudflare-Doku zu Workers und D1", "status": "open" },
-        { "id": "P2-10", "criterion": "Export und Import des Gerätestands samt Token", "check": "Playwright: exportieren, Speicher leeren, importieren, selbe Rolle", "status": "open" },
+        { "id": "P2-09", "criterion": "Cloudflare-Gratis-Grenzen vor dem Einrichten geprüft; kein Bezahltarif nötig", "check": "aktuelle Cloudflare-Doku zu Workers und D1", "status": "passed", "note": "Cloudflare-Doku zu Workers und D1 (Stand 2026-10-29) am 2026-11-11 gelesen, Werte in PROGRESS.md. Konto am 2026-11-12: 1 von 10 D1-Datenbanken belegt." },
+        { "id": "P2-10", "criterion": "Export und Import des Gerätestands samt Token", "check": "Playwright: exportieren, Speicher leeren, importieren, selbe Rolle", "status": "passed", "note": "e2e/sync.spec.ts: \"Export und Import: nach geleertem Speicher dieselbe Rolle im selben Haus\"; Wettlauf beim Import und Sicherung mit ungültiger Aktion in src/lib/sync-engine.test.ts." },
         { "id": "P2-11", "criterion": "Push-Zustellung auf echtem iPhone", "check": "installierte App auf beiden iPhones", "status": "user" }
       ]
     },

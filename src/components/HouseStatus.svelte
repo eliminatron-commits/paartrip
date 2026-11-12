@@ -2,7 +2,7 @@
   // Wer im Haus ist, der Kopplungscode (solange der zweite Spieler fehlt) und der Stand des Abgleichs.
   import { formatCode } from '../../shared/limits.ts';
   import { otherSlot } from '../../shared/model.ts';
-  import { dismissRejected, session } from '../lib/session.svelte.ts';
+  import { dismissRejected, session, startOver } from '../lib/session.svelte.ts';
 
   const view = $derived(session.view);
   const me = $derived(view?.players[view.you] ?? null);
@@ -19,10 +19,28 @@
     }
   }
 
+  // Der Server kennt dieses Gerät oder sein Haus nicht mehr. Damit es nicht festhängt, lässt sich die
+  // Kopplung hier lösen – erst nach einer Rückfrage, denn wartende Aktionen gehen dabei verloren.
+  const unlinked = $derived(session.error === 'unauthorized' || session.error === 'not_found');
+  let confirming = $state(false);
+  let clearing = $state(false);
+
+  async function clear(): Promise<void> {
+    clearing = true;
+    try {
+      await startOver();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      clearing = false;
+      confirming = false;
+    }
+  }
+
   const waiting = $derived(`${session.pending} ${session.pending === 1 ? 'change' : 'changes'} waiting to be sent`);
   const status = $derived.by(() => {
     if (session.syncing) return 'Syncing…';
-    if (session.error === 'unauthorized' || session.error === 'not_found') return "This phone isn't linked to the house anymore.";
+    if (unlinked) return "This phone isn't linked to the house anymore.";
     if (session.offline) return session.pending > 0 ? `Offline. ${waiting}.` : 'Offline. Showing what was saved last.';
     if (session.error) return "Couldn't sync just now. It will try again.";
     return session.pending > 0 ? `${waiting}.` : 'Up to date.';
@@ -49,6 +67,20 @@
     {/if}
 
     <p class="note" role="status" data-testid="sync-status">{status}</p>
+    {#if unlinked}
+      {#if confirming}
+        <p>Forget the old house on this phone? Anything still waiting to be sent is lost.</p>
+        <div class="row">
+          <button type="button" disabled={clearing} onclick={clear}>Yes, start over</button>
+          <button type="button" class="quiet" disabled={clearing} onclick={() => (confirming = false)}>Cancel</button>
+        </div>
+      {:else}
+        <p class="note">You can start over here and open a new house, or move in again with a code.</p>
+        <div class="row">
+          <button type="button" class="quiet" onclick={() => (confirming = true)}>Start over</button>
+        </div>
+      {/if}
+    {/if}
     {#if session.rejected > 0}
       <div class="row">
         <p class="note" data-testid="rejected-note">Something you did no longer fit and was left out.</p>

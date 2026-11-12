@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import generated from '../generated/content-rules.json';
 import type { Action } from './actions.ts';
 import type { RulesContent } from './content-schema.ts';
@@ -60,6 +60,19 @@ describe('Aktionen anwenden', () => {
     expect(applied.state.coupons.at(-1)).toMatchObject({ kind: 'secret', id: action.id, from: 'b', to: 'a', state: 'veiled', text: 'Breakfast in bed' });
     // Der alte Stand bleibt unberührt.
     expect(state.coupons).toHaveLength(chapter.coupons.length);
+  });
+
+  it('scheitert eine Regel, gilt die Aktion als abgelehnt und der Stand bleibt – kein Abgleich hängt daran fest', () => {
+    // Ein Kapitel, das es in den Inhalten nicht gibt: Die Regel kann den Meilenstein nicht bestimmen und wirft.
+    const broken: HouseState = { ...paired(), chapter: chapter.number + 1000 };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const action = deposit('Lost in a missing chapter');
+    const applied = applyAction(broken, 'a', action, ctx);
+    expect(applied.result).toEqual({ id: action.id, outcome: 'rejected', reason: 'invalid' });
+    expect(applied.state).toBe(broken);
+    expect(applied.effects).toEqual([]);
+    expect(logged).toHaveBeenCalledOnce();
+    logged.mockRestore();
   });
 
   it('solange der zweite Spieler fehlt, wird jede Aktion abgelehnt', () => {

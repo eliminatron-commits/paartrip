@@ -1,7 +1,7 @@
 // Mitteilungen (Web Push) auf diesem Gerät ein- und ausschalten. Auf dem iPhone gibt es Push nur für
 // Apps auf dem Home-Bildschirm (ab iOS 16.4), und die Erlaubnis darf nur aus einer Nutzergeste erfragt werden.
 import { ApiFailure } from './api.ts';
-import { deviceToken, session, transport, updateSettings } from './session.svelte.ts';
+import { deviceToken, onRoleEnded, session, transport, updateSettings } from './session.svelte.ts';
 
 export const push = $state<{ supported: boolean; busy: boolean; message: string }>({ supported: false, busy: false, message: '' });
 
@@ -45,9 +45,23 @@ function explain(error: unknown): string {
   return "That didn't work. Please try again.";
 }
 
+/**
+ * Die bisherige Rolle dieses Geräts gibt es hier nicht mehr (Import, Neuanfang). Ihre Anmeldung beim
+ * Push-Dienst und beim Server wird gelöst – sonst kämen weiter Mitteilungen für sie an, obwohl die
+ * Einstellung "aus" zeigt.
+ */
+async function forgetSubscription(previousToken: string): Promise<void> {
+  push.message = '';
+  if (!push.supported) return;
+  const registration = await navigator.serviceWorker.ready;
+  await (await registration.pushManager.getSubscription())?.unsubscribe();
+  await transport.pushUnsubscribe(previousToken).catch(() => undefined);
+}
+
 export function initPush(): void {
   // Ohne Service Worker (Dev-Server) und ohne Push-Schnittstelle (iPhone-Safari außerhalb des Home-Bildschirms) geht nichts.
   push.supported = import.meta.env.PROD && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  onRoleEnded(forgetSubscription);
   // Push-Dienste tauschen Anmeldungen gelegentlich aus: beim Start still auffrischen.
   if (push.supported && session.settings.push && Notification.permission === 'granted') {
     void subscribe().catch((error: unknown) => console.error(error));

@@ -10,7 +10,7 @@ import { LIMITS } from '../../shared/limits.ts';
 import type { HouseView } from '../../shared/model.ts';
 import { ApiFailure, type FailureCode, type Transport } from './api.ts';
 import { buildDeviceFile, type DeviceFile, parseDeviceFile } from './device-file.ts';
-import { DEFAULT_SETTINGS, type DeviceRecord, type LocalStore, type Settings } from './store.ts';
+import { DEFAULT_SETTINGS, type DeviceRecord, type LocalStore, type Settings, type Stored } from './store.ts';
 
 export interface Snapshot {
   /** loading: lokale Kopie wird gelesen. unpaired: dieses Gerät gehört zu keinem Haus. */
@@ -61,6 +61,8 @@ export class SyncEngine {
   private snapshot: Snapshot = { ...INITIAL_SNAPSHOT };
   private running: Promise<void> | null = null;
   private again = false;
+  /** Das Gerät wechselt gerade seine Rolle (Import, Neuanfang): solange beginnt kein Abgleich. */
+  private switching = false;
 
   constructor(store: LocalStore, transport: Pick<Transport, 'createHouse' | 'joinHouse' | 'sync'>, onChange: (snapshot: Snapshot) => void, clock: Clock = systemClock) {
     this.store = store;
@@ -104,7 +106,7 @@ export class SyncEngine {
 
   /** Eigene Aktion: erst lokal sichern, dann einreichen. Kehrt zurück, wenn der Abgleichsversuch vorbei ist. */
   async dispatch(body: ActionBody): Promise<void> {
-    if (!this.device) throw new Error('Gerät ist nicht gekoppelt');
+    if (!this.device || this.switching) throw new Error('Gerät ist nicht gekoppelt');
     const action = { ...body, id: this.clock.id(), at: this.clock.now().toISOString() } as Action;
     await this.store.enqueue(action);
     this.queue.push(action);
@@ -114,14 +116,19 @@ export class SyncEngine {
 
   /** Reicht wartende Aktionen ein und holt die aktuelle Sicht. Läuft schon ein Abgleich, folgt danach ein weiterer. */
   sync(): Promise<void> {
-    if (!this.device) return Promise.resolve();
+    if (!this.device || this.switching) return Promise.resolve();
     if (this.running) {
       this.again = true;
       return this.running;
     }
-    this.running = this.run(this.device).finally(() => {
-      this.running = null;
-    });
+    const device = this.device;
+    // Erst merken, dann starten: `running` steht schon, bevor der Lauf seine erste Zeile ausführt.
+    // Nur so kann ein Rollenwechsel (switchDevice) sicher auf jeden begonnenen Lauf warten.
+    this.running = Promise.resolve()
+      .then(() => this.run(device))
+      .finally(() => {
+        this.running = null;
+      });
     return this.running;
   }
 
@@ -190,15 +197,35 @@ export class SyncEngine {
     return buildDeviceFile(await this.store.load(), this.clock.now());
   }
 
+  /**
+   * Ersetzt alles, was dieses Gerät ausmacht. Ein laufender Abgleich der bisherigen Rolle endet erst,
+   * ein neuer beginnt währenddessen nicht – sonst gingen Aktionen der neuen Rolle mit dem alten Token raus.
+   */
+  private async switchDevice(stored: Stored, patch: Partial<Snapshot>): Promise<void> {
+    this.switching = true;
+    try {
+      await this.running;
+      await this.store.replaceAll(stored);
+      this.device = stored.device;
+      this.queue = stored.queue;
+      this.emit({ view: stored.view, settings: stored.settings, offline: false, error: null, rejected: 0, ...patch });
+    } finally {
+      this.switching = false;
+    }
+  }
+
   /** Übernimmt einen exportierten Gerätestand und gleicht sofort ab. Wirft DeviceFileError bei unlesbarer Datei. */
   async importDevice(text: string): Promise<void> {
-    const stored = parseDeviceFile(text);
-    // Ein laufender Abgleich des bisherigen Geräts soll den neuen Stand nicht überschreiben.
-    await this.running;
-    await this.store.replaceAll(stored);
-    this.device = stored.device;
-    this.queue = stored.queue;
-    this.emit({ status: 'paired', view: stored.view, settings: stored.settings, offline: false, error: null, rejected: 0 });
+    const { stored, dropped } = parseDeviceFile(text);
+    await this.switchDevice(stored, { status: 'paired', rejected: dropped });
     await this.sync();
+  }
+
+  /**
+   * Löst die Kopplung auf diesem Gerät, etwa wenn der Server das Haus nicht mehr kennt: Token, Sicht und
+   * Warteschlange sind danach weg, das Gerät kann ein Haus anlegen oder einem beitreten.
+   */
+  async reset(): Promise<void> {
+    await this.switchDevice({ device: null, view: null, queue: [], settings: { ...DEFAULT_SETTINGS } }, { status: 'unpaired' });
   }
 }

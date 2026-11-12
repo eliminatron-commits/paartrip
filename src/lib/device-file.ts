@@ -46,11 +46,16 @@ const fileSchema = z.object({
   device: z.strictObject({ token: z.string().check(z.minLength(20), z.maxLength(200)), houseId: z.string().check(z.minLength(1)), slot }),
   // Die Sicht wird nach dem Import sofort vom Server ersetzt; hier genügt, dass sie zum Gerät gehört.
   view: z.looseObject({ houseId: z.string(), you: slot, players: z.looseObject({}), coupons: z.array(z.unknown()) }),
-  queue: z.array(actionSchema),
+  // Die einzelnen Einträge prüft parseDeviceFile.
+  queue: z.array(z.unknown()),
 });
 
-/** Liest eine Exportdatei. Einstellungen werden nicht übernommen – Mitteilungen gelten je Gerät. */
-export function parseDeviceFile(text: string): Stored {
+/**
+ * Liest eine Exportdatei. Einstellungen werden nicht übernommen – Mitteilungen gelten je Gerät.
+ * Eine wartende Aktion, die nicht (mehr) gültig ist, fällt weg und wird gezählt: Das Wertvolle an der
+ * Datei ist der Platz im Haus, und der Server nähme die Aktion ohnehin nicht an.
+ */
+export function parseDeviceFile(text: string): { stored: Stored; dropped: number } {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
@@ -59,9 +64,17 @@ export function parseDeviceFile(text: string): Stored {
   }
   const parsed = fileSchema.safeParse(raw);
   if (!parsed.success) throw new DeviceFileError("This doesn't look like a PaarTrip backup file.");
-  const { device, view, queue } = parsed.data;
+  const { device, view } = parsed.data;
   if (view.houseId !== device.houseId || view.you !== device.slot) {
     throw new DeviceFileError("This backup file is damaged: its parts don't belong together.");
   }
-  return { device, view: view as unknown as HouseView, queue, settings: { ...DEFAULT_SETTINGS } };
+  const queue: Action[] = [];
+  for (const entry of parsed.data.queue) {
+    const action = actionSchema.safeParse(entry);
+    if (action.success) queue.push(action.data);
+  }
+  return {
+    stored: { device, view: view as unknown as HouseView, queue, settings: { ...DEFAULT_SETTINGS } },
+    dropped: parsed.data.queue.length - queue.length,
+  };
 }

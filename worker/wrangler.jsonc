@@ -13,8 +13,8 @@
     {
       "binding": "DB",
       "database_name": "paartrip",
-      // Wird beim Einrichten durch die id der echten Datenbank ersetzt (kein Geheimnis).
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // id der Datenbank im Cloudflare-Konto (kein Geheimnis, ohne Anmeldung nutzlos).
+      "database_id": "02c9c90d-6e27-49a1-b29a-60d16e90db9d",
       "migrations_dir": "migrations"
     }
   ],
@@ -22,8 +22,9 @@
     // CORS: nur die Pages-Adresse der App.
     "ALLOWED_ORIGIN": "https://eliminatron-commits.github.io",
     "MAX_HOUSES": "20",
-    // Öffentlicher Schlüssel; wird beim Einrichten gesetzt. Leer = Push ist aus.
-    "VAPID_PUBLIC_KEY": "",
+    // Öffentlicher VAPID-Schlüssel (darf jeder sehen). Der private dazu liegt nur als Secret bei Cloudflare.
+    // Leer = Push ist aus.
+    "VAPID_PUBLIC_KEY": "BGzZbOo41gzm299T_atoUmYvN7VwDDeiPmuv9o20hmxw8H83B2EsnK0kBzZJkeTvHcBxjROZuyC6BVb6XjSLu3U",
     "VAPID_SUBJECT": "https://eliminatron-commits.github.io/paartrip/",
     // Push-Dienste von Apple, Google, Mozilla und Microsoft.
     "PUSH_HOSTS": "push.apple.com,fcm.googleapis.com,push.services.mozilla.com,notify.windows.com",

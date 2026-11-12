@@ -11,6 +11,8 @@ import {
   type HouseState,
   type HouseView,
   type IsoTime,
+  type KnowMeAnswer,
+  type KnowMeSubmission,
   otherSlot,
   type Slot,
   type TaskProgress,
@@ -27,6 +29,32 @@ export interface ViewContext {
   pairingCode: string;
 }
 
+function answerView(answer: KnowMeAnswer): KnowMeAnswer {
+  return answer.kind === 'choice' ? { kind: 'choice', option: answer.option } : { kind: 'text', text: answer.text };
+}
+
+function submissionView(submission: KnowMeSubmission | undefined): KnowMeSubmission | null {
+  return submission ? { own: answerView(submission.own), guess: answerView(submission.guess) } : null;
+}
+
+/** Erledigte Aufgabe: von beiden abgeschlossen und damit für beide aufgedeckt – trotzdem Feld für Feld. */
+function doneProgressView(progress: TaskProgress): TaskProgress {
+  switch (progress.type) {
+    case 'puzzle':
+      return { type: 'puzzle', solvedBy: progress.solvedBy };
+    case 'reallife':
+      return { type: 'reallife', confirmedBy: [...progress.confirmedBy] };
+    case 'knowme': {
+      const submissions: Partial<Record<Slot, KnowMeSubmission>> = {};
+      for (const slot of ['a', 'b'] as const) {
+        const submission = submissionView(progress.submissions[slot]);
+        if (submission) submissions[slot] = submission;
+      }
+      return { type: 'knowme', submissions, hearts: [...progress.hearts] };
+    }
+  }
+}
+
 function progressView(progress: TaskProgress, you: Slot): TaskProgressView {
   switch (progress.type) {
     case 'puzzle':
@@ -34,8 +62,8 @@ function progressView(progress: TaskProgress, you: Slot): TaskProgressView {
     case 'reallife':
       return { type: 'reallife', confirmedBy: [...progress.confirmedBy] };
     case 'knowme': {
-      const mine = progress.submissions[you] ?? null;
-      const theirs = progress.submissions[otherSlot(you)] ?? null;
+      const mine = submissionView(progress.submissions[you]);
+      const theirs = submissionView(progress.submissions[otherSlot(you)]);
       // Aufgedeckt wird erst, wenn beide abgegeben haben – vorher bleibt nur die Tatsache der Abgabe.
       const revealed = mine !== null && theirs !== null;
       return {
@@ -91,8 +119,7 @@ export function deriveView(state: HouseState, you: Slot, ctx: ViewContext): Hous
     task: state.task ? taskView(state.task, you) : null,
     // Die Tagesregel kommt mit dem Aufgabenablauf (Phase 4).
     nextTaskOn: null,
-    // Erledigte Aufgaben sind von beiden abgeschlossen und damit für beide aufgedeckt.
-    done: state.done.map((d) => ({ taskId: d.taskId, completedAt: d.completedAt, progress: d.progress })),
+    done: state.done.map((d) => ({ taskId: d.taskId, completedAt: d.completedAt, progress: doneProgressView(d.progress) })),
     buildTurns: state.buildTurns.map((t) => ({ n: t.n, chooser: t.chooser, offer: [...t.offer], chosen: t.chosen, placedAt: t.placedAt })),
     placements: state.placements.map((p) => ({ pieceId: p.pieceId, spotId: p.spotId })),
     milestones: state.milestones.map((m) => ({ at: m.at, reachedAt: m.reachedAt, decoPiece: m.decoPiece, seenBy: [...m.seenBy] })),

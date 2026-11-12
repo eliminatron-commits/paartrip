@@ -12,7 +12,7 @@ import { deriveView } from '../../shared/view.ts';
 import { syncSchema } from '../../shared/wire.ts';
 import { ApiFailure, type Transport } from './api.ts';
 import { DeviceFileError } from './device-file.ts';
-import { openStore } from './store.ts';
+import { type LocalStore, openStore } from './store.ts';
 import { type Snapshot, SyncEngine } from './sync-engine.ts';
 
 const content = generated as unknown as RulesContent;
@@ -98,10 +98,13 @@ beforeEach(() => {
   ids = 0;
 });
 
-/** Ein Gerät: eigener Speicher (Name der Datenbank), eigener Abgleich. Derselbe Name = dasselbe Gerät nach Neustart. */
-async function device(name: string) {
+/**
+ * Ein Gerät: eigener Speicher (Name der Datenbank), eigener Abgleich. Derselbe Name = dasselbe Gerät nach Neustart.
+ * `wrap` hängt sich in den Speicher, um Abläufe mitten im Schreiben nachzustellen.
+ */
+async function device(name: string, wrap: (store: LocalStore) => LocalStore = (store) => store) {
   const snapshots: Snapshot[] = [];
-  const store = await openStore(name, idb);
+  const store = wrap(await openStore(name, idb));
   const engine = new SyncEngine(store, server.transport(), (s) => snapshots.push(s), {
     now: () => new Date(NOW),
     id: () => `action-${name}-${String(++ids).padStart(4, '0')}`,
@@ -286,6 +289,38 @@ describe('Export und Import des Gerätestands', () => {
     expect(restarted.last).toMatchObject({ status: 'paired', view: { you: 'a' } });
   });
 
+  it('ein Abgleich, der mitten im Import beginnt, läuft nicht mehr unter der bisherigen Rolle', async () => {
+    const { a } = await pairedDevices();
+    server.online = false;
+    await a.engine.dispatch({ type: 'coupon.deposit', text: 'from the backup' });
+    const file = JSON.stringify(await a.engine.exportDevice());
+    server.online = true;
+
+    // Auf Baos Telefon wird Adas Sicherung eingespielt. Während der Speicher ersetzt wird, kehrt die App
+    // in den Vordergrund zurück und stößt einen Abgleich an.
+    let interrupt: (() => void) | null = null;
+    const phone = await device('phone-b', (store) => ({
+      ...store,
+      replaceAll: async (stored) => {
+        interrupt?.();
+        await store.replaceAll(stored);
+      },
+    }));
+    expect(phone.last.view?.you).toBe('b');
+    let interrupted = false;
+    interrupt = () => {
+      interrupted = true;
+      void phone.engine.sync();
+    };
+    await phone.engine.importDevice(file);
+
+    expect(interrupted).toBe(true);
+    expect(phone.last).toMatchObject({ status: 'paired', pending: 0, syncing: false, view: { you: 'a' } });
+    // Die wartende Aktion aus der Sicherung kam unter Adas Rolle an – nicht unter Baos.
+    expect(server.state?.coupons.filter((c) => c.kind === 'secret')).toEqual([expect.objectContaining({ from: 'a', text: 'from the backup' })]);
+    expect(await phone.store.load()).toMatchObject({ device: { slot: 'a' }, view: { you: 'a' }, queue: [] });
+  });
+
   it('eine fremde oder beschädigte Datei wird abgelehnt und ändert nichts', async () => {
     const { a, b } = await pairedDevices();
     const good = await b.engine.exportDevice();
@@ -295,15 +330,63 @@ describe('Export und Import des Gerätestands', () => {
       JSON.stringify({ ...good, format: 'something-else' }),
       JSON.stringify({ ...good, device: { ...good.device, token: '' } }),
       JSON.stringify({ ...good, view: { ...good.view, you: 'a' } }),
-      JSON.stringify({ ...good, queue: [{ type: 'house.burn' }] }),
+      JSON.stringify({ ...good, queue: 'not a list' }),
     ];
     for (const text of bad) await expect(a.engine.importDevice(text), text.slice(0, 40)).rejects.toBeInstanceOf(DeviceFileError);
     expect(a.last).toMatchObject({ status: 'paired', view: { you: 'a' } });
     expect((await a.store.load()).device?.slot).toBe('a');
   });
 
+  it('eine wartende Aktion, die nicht mehr gültig ist, macht die Sicherung nicht unbrauchbar', async () => {
+    const { a } = await pairedDevices();
+    const good = await a.engine.exportDevice();
+    // Etwa nach einem Update: Eine alte wartende Aktion passt nicht mehr zum Schema, eine andere schon.
+    const stillFine = { type: 'coupon.deposit', text: 'still fine', id: 'action-kept-0001', at: NOW };
+    const file = JSON.stringify({ ...good, queue: [{ type: 'house.burn' }, stillFine] });
+
+    const fresh = await device('new-phone');
+    await fresh.engine.importDevice(file);
+    // Der Platz im Haus ist übernommen, die gültige Aktion nachgereicht, die ungültige gemeldet.
+    expect(fresh.last).toMatchObject({ status: 'paired', pending: 0, rejected: 1, view: { you: 'a', houseId: 'house-1' } });
+    expect(fresh.engine.token).toBe(a.engine.token);
+    expect(server.secretTexts()).toEqual(['still fine']);
+  });
+
   it('ohne Haus gibt es nichts zu exportieren', async () => {
     const a = await device('phone-a');
     await expect(a.engine.exportDevice()).rejects.toBeInstanceOf(DeviceFileError);
+  });
+});
+
+describe('Neuanfang', () => {
+  it('kennt der Server das Gerät nicht mehr, lässt sich die Kopplung lösen und ein neues Haus beginnen', async () => {
+    const { a } = await pairedDevices();
+    server.tokens.clear();
+    await a.engine.dispatch({ type: 'coupon.deposit', text: 'never arrives' });
+    expect(a.last).toMatchObject({ status: 'paired', error: 'unauthorized', pending: 1 });
+
+    await a.engine.reset();
+    expect(a.last).toMatchObject({ status: 'unpaired', view: null, pending: 0, error: null, offline: false });
+    expect(a.engine.token).toBeNull();
+    expect(await a.store.load()).toMatchObject({ device: null, view: null, queue: [] });
+
+    // Auch nach einem Neustart ist das Gerät frei – und kann von vorn beginnen.
+    const restarted = await device('phone-a');
+    expect(restarted.last).toMatchObject({ status: 'unpaired', pending: 0 });
+    await restarted.engine.createHouse('Ada');
+    expect(restarted.last).toMatchObject({ status: 'paired', view: { you: 'a', players: { b: null } } });
+  });
+
+  it('ein Abgleich, der noch läuft, schreibt nach dem Neuanfang nichts zurück', async () => {
+    const { a } = await pairedDevices();
+    let reset: Promise<void> | null = null;
+    server.duringSync = () => {
+      server.duringSync = null;
+      reset = a.engine.reset();
+    };
+    await a.engine.dispatch({ type: 'coupon.deposit', text: 'last one' });
+    await reset;
+    expect(a.last).toMatchObject({ status: 'unpaired', view: null, pending: 0, syncing: false });
+    expect(await a.store.load()).toMatchObject({ device: null, view: null, queue: [] });
   });
 });

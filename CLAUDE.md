@@ -11,14 +11,17 @@ PowerShell `$env:Path = "C:\Program Files\nodejs;" + $env:Path` · Bash `export 
 
 | Befehl | Zweck |
 | --- | --- |
-| `npm run dev` | Dev-Server (ohne Service Worker) |
-| `npm run typecheck` | svelte-check für `src/` + `shared/`, tsc für Skripte, Tests und Konfiguration |
-| `npm test` | Vitest (Logik) |
-| `npm run test:e2e` | baut zwei Versionen nach `dist-e2e/`, dann Playwright in WebKit bei 440×956 |
-| `npm run build` | Produktions-Build nach `dist/` |
-| `npm run content` | prüft `content/` gegen das Schema und baut `generated/content.json` |
+| `npm run dev` | Dev-Server (ohne Service Worker); spricht mit dem Worker aus `npm run dev:api` |
+| `npm run dev:api` | der echte Worker lokal (workerd, frische leere D1) auf Port 8787 |
+| `npm run typecheck` | svelte-check für `src/` + `shared/`, tsc für Skripte, Tests, Konfiguration und Worker |
+| `npm test` | Vitest: Logik und der Worker in lokalem workerd |
+| `npm run test:e2e` | baut zwei Versionen nach `dist-e2e/`, startet den lokalen Worker (Port 8788), dann Playwright in WebKit bei 440×956 |
+| `npm run build` | Produktions-Build nach `dist/`; bricht ohne `VITE_API_URL` ab (steht in `.env.production`) |
+| `npm run content` | prüft `content/` gegen das Schema und baut `generated/content.json` (App) und `generated/content-rules.json` (Worker) |
 
 Einzelner Test: `npx vitest run shared/content-schema.test.ts` bzw. `npx playwright test e2e/update.spec.ts` (vorher einmal `npm run test:e2e`, damit `dist-e2e/` existiert).
+
+Worker von Hand: `npx wrangler deploy --dry-run --config worker/wrangler.jsonc` baut nur das Bündel. Veröffentlicht wird er im Workflow; ein Deploy von Hand ist ein Schritt nach außen und braucht die Zustimmung des Nutzers.
 
 Eine Änderung gilt erst als erledigt, wenn ein echter Check sie belegt (Typecheck, Tests, Build oder der geänderte Befehl selbst).
 
@@ -33,15 +36,22 @@ shared/             von App und Worker gemeinsam genutzt, ohne DOM- oder Worker-
   model.ts            HouseState (Server) und HouseView (Sicht eines Spielers)
   actions.ts          Aktionen und ihre Ergebnisse
   api.ts              Routen, Anfragen, Antworten, Push-Nutzlast
+  rules.ts            Spielregeln: Stand + Aktion → neuer Stand und Push-Auslöser
+  view.ts             deriveView: die eine Stelle, die Verborgenes herausfiltert
+  wire.ts             Prüfung eingehender Anfragen (zod/mini), limits.ts: Längen und Code-Alphabet
 src/                Svelte-App
   lib/                Logik ohne Oberfläche (*.svelte.ts nur, wenn Runen nötig sind)
   components/         wiederverwendbare Oberfläche
   screens/            ab Phase 3: ein Ordner je Bildschirm
-  sw.ts               eigener Service Worker
-worker/             ab Phase 2: Cloudflare Worker + D1
+  sw.ts               eigener Service Worker (Precache, Update, Push-Empfang)
+worker/             Cloudflare Worker "paartrip-api" + D1
+  src/                index.ts (Routen), store.ts (D1), push.ts + webpush.ts (VAPID, Verschlüsselung)
+  migrations/         D1-Schema, fortlaufend nummeriert
+  test/               Tests gegen den echten Worker, local-api.ts startet ihn
+  wrangler.jsonc      Konfiguration ohne Secrets
 scripts/            Build-Helfer (Inhalte bündeln, Icons erzeugen)
-e2e/                Playwright-Tests und Testserver
-generated/          erzeugt, nicht im Repo (content.json)
+e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Worker mit Hilfsroute /__test/forget-house)
+generated/          erzeugt, nicht im Repo (content.json, content-rules.json)
 public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 ```
 
@@ -55,7 +65,10 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - **Rollen:** Spieler `a` legt das Haus an, `b` tritt bei. Inhalte beziehen sich auf diese Slots (feste Gutscheine sind `from: a`, also legt Alex das Haus an).
 - **Inhalte:** `scripts/build-content.ts` prüft jede Datei unter `content/` gegen `shared/content-schema.ts`, hängt `.svg`-Dateien als Inline-SVG an und schreibt `generated/content.json`. App und Worker lesen nur dieses Bündel. Neue Kapitel und Einträge brauchen keine Codeänderung; fehlerhafte Inhalte brechen Typecheck, Tests und Build ab. Setzungen (Meilenstein-Abstände, Zuordnung der festen Gutscheine, Parameter des Bauzugs) stehen in `content/chapter-N/` und sind dort änderbar.
 - **Update-Funktion** (`src/lib/update.svelte.ts`, `src/sw.ts`): bei Rückkehr in die App `registration.update()`, höchstens einmal pro Minute; wartet ein neuer Worker, erscheint "New version – Update"; erst auf Tippen `skipWaiting`, bei `controllerchange` lädt die Seite neu. Versionszeile "Version · Build-Zeit · Commit" und Knopf "Check for updates" mit Ergebnis. Die Build-Zeit steckt im Bundle, damit jeder Deploy als neue Version erkannt wird.
-- **Hosting:** GitHub Pages unter `/paartrip/`. `base` (Vite), `scope` und `start_url` (Manifest) kommen aus der einen Konstante `BASE` in `vite.config.ts`. Workflow bei Push auf `main`: Typecheck → Tests → Build → Deploy.
+- **Worker** (`worker/`): ein Cloudflare Worker mit D1 im Gratis-Tarif. Je Haus eine Zeile mit dem `HouseState` als JSON. Jedes Gerät weist sich mit seinem Token aus (`Authorization: Bearer`, gespeichert ist nur der SHA-256-Hash). Geschrieben wird mit Prüfung der Spalte `rev` statt mit einer Sperre; bei Andrang antwortet der Worker `busy` und das Gerät reicht aus der Warteschlange nach. Jede Route außer `GET /` verlangt den `Origin` der App (`ALLOWED_ORIGIN`). Der Worker importiert `shared/` und `generated/content-rules.json` (Inhalte ohne Bilder und Story). `shared/wire.ts` nutzt `zod/mini`, damit das Bündel klein bleibt (10 ms CPU je Anfrage).
+- **Push:** Web Push ohne Bibliothek (`worker/src/webpush.ts`, WebCrypto). Regeln geben Push-Auslöser als `PushEffect[]` zurück, der Worker verschickt sie nach dem Speichern. Der private VAPID-Schlüssel ist ein Worker-Secret (`VAPID_PRIVATE_KEY`), der öffentliche steht in `worker/wrangler.jsonc`.
+- **Worker-Tests** laufen über `createTestHarness` aus wrangler gegen echtes workerd mit echter D1 (`worker/test/local-api.ts`); `@cloudflare/vitest-pool-workers` unterstützt Vitest 5 nicht. Schlüssel entstehen bei jedem Testlauf neu.
+- **Hosting:** GitHub Pages unter `/paartrip/`. `base` (Vite), `scope` und `start_url` (Manifest) kommen aus der einen Konstante `BASE` in `vite.config.ts`. Workflow bei Push auf `main`: Typecheck → Tests → Build → Worker (Migrationen, Deploy) → Pages. Der Worker kommt zuerst; installierte Apps sprechen bis zum Tippen auf "Update" mit dem neueren Worker – Änderungen an der Schnittstelle müssen die vorige App-Version aushalten.
 
 ## Benennung
 
@@ -103,6 +116,8 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - **SVG-Dateien unter `content/`:** Räume und Stücke liegen als `.svg` neben ihrer `.json` und werden beim Build inline ins Bündel gesetzt (kein Laden zur Laufzeit). So bleiben sie Inhalt statt Code und Kapitel 2 braucht keine Codeänderung. `parseSvg` lehnt Skripte, externe Verweise und Rasterbilder ab.
 - **PNG-Icons:** iOS und das Manifest verlangen PNG. Sie werden bei jedem Build aus `public/icon.svg` erzeugt und liegen nicht im Repo.
 - **Feste Gutscheine** stehen in `content/` und damit im App-Bündel beider Geräte; sie sind nur in der Oberfläche verhüllt. Die serverseitige Geheimhaltung gilt für das, was Spieler selbst eingeben.
+- **Der Schutz hängt am Token, nicht am Origin:** Die Origin-Prüfung des Workers hält nur fremde Webseiten im Browser ab; außerhalb des Browsers lässt sich der Kopf frei setzen. `https://eliminatron-commits.github.io` ist außerdem die Herkunft aller Pages-Seiten dieses GitHub-Kontos, und IndexedDB gilt je Herkunft – jede dieser Seiten könnte das Token lesen. Unter diesem Konto deshalb keine Pages-Seite betreiben, die fremde Inhalte oder Skripte ausführt. `MAX_HOUSES` ist eine Bremse, kein Schutz: Wer die Adresse kennt, kann die Grenze füllen; bestehende Häuser berührt das nicht.
+- **Rollenwechsel auf dem Gerät** (Import einer Sicherung, "Start over") laufen über `SyncEngine.switchDevice`: Solange wartet oder ruht der Abgleich, damit nie eine Aktion mit dem Token der vorigen Rolle hinausgeht. "Start over" gibt es nur, wenn der Server das Gerät nicht mehr kennt (`unauthorized` / `not_found`).
 - **TypeScript 6 statt 7:** svelte-check unterstützt TypeScript 7 noch nicht.
 - **Name:** voller Name "Nhà Mình – PaarTrip", unter dem Icon "PaarTrip" (dort passen nur rund zwölf Zeichen).
 

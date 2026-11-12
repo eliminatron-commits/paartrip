@@ -81,6 +81,17 @@ export function milestoneForDeposit(state: HouseState, chapter: RulesChapter): n
  * derselbe Stand zurück. Dass jede id höchstens einmal hier ankommt, stellt der Worker sicher.
  */
 export function applyAction(state: HouseState, slot: Slot, action: Action, ctx: RuleContext): Applied {
+  try {
+    return applyRule(state, slot, action, ctx);
+  } catch (error) {
+    // Scheitert eine Regel an dieser einen Aktion, darf sie nicht jeden weiteren Abgleich blockieren:
+    // Die Aktion gilt als abgelehnt und verlässt die Warteschlange, der Stand bleibt, wie er war.
+    console.error(`Regel für ${action.type} ist gescheitert`, error);
+    return { state, result: { id: action.id, outcome: 'rejected', reason: 'invalid' }, effects: [] };
+  }
+}
+
+function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleContext): Applied {
   const reject = (reason: RejectReason): Applied => ({
     state,
     result: { id: action.id, outcome: 'rejected', reason },
