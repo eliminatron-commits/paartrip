@@ -51,7 +51,7 @@ Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für
 
 Der Nutzer meldete von den iPhones: Hat der andere etwas getan, musste man die App schließen und neu öffnen, um es zu sehen. Gebaut wie von ihm vorgeschlagen: ein Knopf oben neben den Einstellungen (nur mit Haus), der den Stand holt (`src/components/TopBar.svelte`, ruft `syncNow`). Das Symbol dreht sich mindestens 0,7 s und wird blasser (bleibt sichtbar, wenn Bewegung abgeschaltet ist); ohne Netz sagt der Streifen darunter, woran es liegt. Keine Änderung am Worker oder an der Schnittstelle.
 
-Belegt: Typecheck 0 Fehler, 284 Vitest-Tests, 47 Browser-Tests in WebKit – neu `e2e/sync.spec.ts`, '"Refresh" in der Kopfleiste holt den Schritt des anderen, ohne dass die App verlassen wird' –, Produktions-Build, Bildschirmfoto `screenshots/07-today.png` angesehen. Lokal committet; hochladen nur mit Zustimmung des Nutzers. Auf dem iPhone noch nicht geprüft.
+Belegt: Typecheck 0 Fehler, 284 Vitest-Tests, 47 Browser-Tests in WebKit – neu `e2e/sync.spec.ts`, '"Refresh" in der Kopfleiste holt den Schritt des anderen, ohne dass die App verlassen wird' –, Produktions-Build, Bildschirmfoto `screenshots/07-today.png` angesehen. Lokal committet. Der Nutzer hat entschieden: hochgeladen wird er erst zusammen mit Phase 5. Auf dem iPhone noch nicht geprüft.
 
 ## Phase 3/6 – Haus und Gutscheine: abgeschlossen am 2026-11-12
 
