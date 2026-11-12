@@ -1,0 +1,18 @@
+{
+  "id": "living-room",
+  "name": "Living room",
+  "spots": [
+    { "id": "living-room-wall-1", "kind": "wall", "x": 50, "y": 100, "size": 56 },
+    { "id": "living-room-wall-2", "kind": "wall", "x": 112, "y": 100, "size": 56 },
+    { "id": "living-room-wall-3", "kind": "wall", "x": 288, "y": 100, "size": 56 },
+    { "id": "living-room-wall-4", "kind": "wall", "x": 350, "y": 100, "size": 56 },
+    { "id": "living-room-shelf-1", "kind": "surface", "x": 62, "y": 150, "size": 44 },
+    { "id": "living-room-shelf-2", "kind": "surface", "x": 118, "y": 150, "size": 44 },
+    { "id": "living-room-shelf-3", "kind": "surface", "x": 282, "y": 150, "size": 44 },
+    { "id": "living-room-shelf-4", "kind": "surface", "x": 338, "y": 150, "size": 44 },
+    { "id": "living-room-floor-1", "kind": "floor", "x": 62, "y": 264, "size": 88 },
+    { "id": "living-room-floor-2", "kind": "floor", "x": 154, "y": 264, "size": 88 },
+    { "id": "living-room-floor-3", "kind": "floor", "x": 246, "y": 264, "size": 88 },
+    { "id": "living-room-floor-4", "kind": "floor", "x": 338, "y": 264, "size": 88 }
+  ]
+}

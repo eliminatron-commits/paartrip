@@ -2,8 +2,9 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
-import { loadEnv } from 'vite';
+import { loadEnv, type Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { SPLASH_SCREENS, splashFile, splashMedia } from './scripts/splash-sizes.ts';
 
 // Repo-Pfad auf GitHub Pages: https://<user>.github.io/paartrip/
 // base, scope und start_url müssen übereinstimmen, sonst laden Assets und Service Worker nicht.
@@ -23,6 +24,19 @@ function commit(): string {
   }
 }
 
+/** Setzt je iPhone-Größe den Verweis auf ihr Startbild in die Seite (Bilder: scripts/gen-assets.ts). */
+function startupImages(): Plugin {
+  return {
+    name: 'paartrip-startup-images',
+    transformIndexHtml: () =>
+      SPLASH_SCREENS.map((screen) => ({
+        tag: 'link',
+        attrs: { rel: 'apple-touch-startup-image', media: splashMedia(screen), href: BASE + splashFile(screen) },
+        injectTo: 'head' as const,
+      })),
+  };
+}
+
 export default defineConfig(({ command, mode }) => {
   // Ohne Adresse des Workers wäre ein veröffentlichter Build nutzlos – lieber gar nicht bauen.
   if (command === 'build' && !loadEnv(mode, process.cwd(), 'VITE_').VITE_API_URL) {
@@ -38,6 +52,7 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins: [
       svelte(),
+      startupImages(),
       // In Vitest wird kein Service Worker gebaut.
       ...(process.env.VITEST
         ? []
@@ -69,6 +84,8 @@ export default defineConfig(({ command, mode }) => {
               injectManifest: {
                 rollupFormat: 'iife',
                 globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+                // Startbilder holt iOS beim Ablegen auf dem Home-Bildschirm; im Precache wären sie nur Ballast.
+                globIgnores: ['splash/**'],
               },
             }),
           ]),

@@ -18,6 +18,8 @@ export interface Snapshot {
   view: HouseView | null;
   /** Eigene Aktionen, die der Server noch nicht bestätigt hat. */
   pending: number;
+  /** Dieselben Aktionen im Einzelnen – damit die Oberfläche zeigen kann, was schon unterwegs ist, statt es noch einmal anzubieten. */
+  queued: Action[];
   syncing: boolean;
   /** Der letzte Abgleich hat den Server nicht erreicht. */
   offline: boolean;
@@ -32,6 +34,7 @@ export const INITIAL_SNAPSHOT: Snapshot = {
   status: 'loading',
   view: null,
   pending: 0,
+  queued: [],
   syncing: false,
   offline: false,
   error: null,
@@ -77,7 +80,7 @@ export class SyncEngine {
   }
 
   private emit(patch: Partial<Snapshot>): void {
-    this.snapshot = { ...this.snapshot, ...patch, pending: this.queue.length };
+    this.snapshot = { ...this.snapshot, ...patch, pending: this.queue.length, queued: [...this.queue] };
     this.onChange(this.snapshot);
   }
 

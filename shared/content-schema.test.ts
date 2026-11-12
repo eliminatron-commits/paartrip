@@ -25,7 +25,7 @@ function sample(): Content {
         taskOrder: ['t1'],
         milestones: [1, 2],
         build: { offerSize: 3, firstChooser: 'a' },
-        rooms: [{ id: 'room', name: 'Room', art, spots: [{ id: 'room-1', kind: 'floor', x: 1, y: 2 }] }],
+        rooms: [{ id: 'room', name: 'Room', art, spots: [{ id: 'room-1', kind: 'floor', x: 1, y: 2, size: 3 }] }],
         tasks: [{ id: 't1', type: 'reallife', title: 'T', text: 'Do it.', doer: 'both' }],
         story: [{ id: 's1', milestone: 1, title: 'S', text: words(60) }],
         pieces: [{ id: 'chair', name: 'Chair', nameVi: 'Ghế', fits: ['floor'], art }],
@@ -155,7 +155,7 @@ describe('checkContent', () => {
     const content = sample();
     const chapter = content.chapters[0]!;
     chapter.taskOrder = ['t1', 't1'];
-    chapter.rooms[0]!.spots.push({ id: 'room-1', kind: 'floor', x: 5, y: 5 });
+    chapter.rooms[0]!.spots.push({ id: 'room-1', kind: 'floor', x: 5, y: 5, size: 3 });
     chapter.milestones = [2, 1];
     expect(checkContent(content)).toHaveLength(3);
   });

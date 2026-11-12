@@ -44,6 +44,8 @@ export async function startLocalApi(options: { origin: string; vars?: Record<str
           // Der Push-Dienst der Tests ist ein lokaler Server.
           PUSH_HOSTS: '127.0.0.1',
           PUSH_TEST_DELAY_MS: '0',
+          // Test-Aufgaben: Bauzug, Meilenstein und Gutscheine lassen sich so ohne Aufgabenablauf durchspielen.
+          TEST_ACTIONS: '1',
           ...options.vars,
         },
         secrets: { VAPID_PRIVATE_KEY: vapid.privateKey },

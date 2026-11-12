@@ -2,7 +2,7 @@
   "number": 1,
   "title": "Moving In",
   "titleVi": "Dọn về nhà mới",
-  "rooms": ["kitchen"],
+  "rooms": ["living-room", "kitchen", "garden"],
   "taskOrder": ["example-split-code", "example-knowme", "example-reallife"],
   "milestones": [5, 10, 15, 20, 25, 30],
   "build": { "offerSize": 3, "firstChooser": "a" }

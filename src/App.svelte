@@ -1,109 +1,96 @@
 <script lang="ts">
-  import AboutUpdates from './components/AboutUpdates.svelte';
-  import DeviceSettings from './components/DeviceSettings.svelte';
-  import HouseStatus from './components/HouseStatus.svelte';
+  // Gerüst der App: Kopfleiste, der Bildschirm des gewählten Reiters, untere Leiste. Über allem liegen
+  // der Update-Hinweis und – wenn ein Meilenstein erreicht ist – dessen Szene.
   import Pairing from './components/Pairing.svelte';
-  import SecretGifts from './components/SecretGifts.svelte';
+  import SyncNotice from './components/SyncNotice.svelte';
+  import TabBar from './components/TabBar.svelte';
+  import TopBar from './components/TopBar.svelte';
   import UpdateBanner from './components/UpdateBanner.svelte';
   import { content } from './lib/content.ts';
+  import { awaitsMyConfirm, chapterFor, myTurn, nextMove, openMoves, unseenMilestone } from './lib/house.ts';
   import { session } from './lib/session.svelte.ts';
+  import { ui } from './lib/ui.svelte.ts';
+  import GiftsScreen from './screens/gifts/GiftsScreen.svelte';
+  import HomeScreen from './screens/home/HomeScreen.svelte';
+  import MilestoneScene from './screens/milestone/MilestoneScene.svelte';
+  import SettingsScreen from './screens/settings/SettingsScreen.svelte';
+  import TodayScreen from './screens/today/TodayScreen.svelte';
 
-  // Phase 2: Koppeln, Abgleich und Einstellungen in einer einfachen Abfolge.
-  // Navigation, Haus und Geschenke-Seite folgen in Phase 3.
-  const chapter = content.chapters[0];
+  const view = $derived(session.status === 'paired' ? session.view : null);
+  const chapter = $derived(view ? chapterFor(view, content) : null);
+  const moves = $derived(view ? openMoves(view, session.queued) : []);
+  const move = $derived(nextMove(moves));
+  const milestone = $derived(view ? unseenMilestone(view, session.queued) : null);
+  const waiting = $derived({
+    home: myTurn(moves),
+    today: false,
+    gifts: view ? view.coupons.some((c) => awaitsMyConfirm(c, view.you)) : false,
+  });
+
+  // Ein neuer Bildschirm beginnt oben.
+  let main = $state<HTMLElement | null>(null);
+  $effect(() => {
+    void ui.tab;
+    void ui.settings;
+    main?.scrollTo(0, 0);
+  });
 </script>
 
 <div class="app">
-  <header class="top">
-    <h1>Nhà Mình</h1>
-    <p class="sub">PaarTrip</p>
-  </header>
+  <TopBar />
+  <SyncNotice />
 
-  <main>
-    {#if session.status === 'unpaired'}
-      <Pairing />
-    {:else if session.status === 'paired'}
-      <HouseStatus />
-      <SecretGifts />
+  <main bind:this={main}>
+    {#if ui.settings}
+      <SettingsScreen />
+    {:else if session.status === 'unpaired'}
+      <div class="page"><Pairing /></div>
+    {:else if view && chapter}
+      {#if ui.tab === 'home'}
+        <HomeScreen {view} {chapter} {move} />
+      {:else if ui.tab === 'today'}
+        <TodayScreen {view} {chapter} {move} />
+      {:else}
+        <GiftsScreen {view} {chapter} />
+      {/if}
+    {:else if view}
+      <div class="page">
+        <p>This house is further along than this version of the app. Please update it in the settings.</p>
+      </div>
     {/if}
-
-    {#if chapter}
-      <section class="card">
-        <p class="eyebrow">Chapter {chapter.number}</p>
-        <h2>{chapter.title}</h2>
-        <p class="vi" lang="vi">{chapter.titleVi}</p>
-        <p class="lead">The house is still empty. Soon the two of you will fill it, one small task at a time.</p>
-      </section>
-    {/if}
-
-    {#if session.status === 'paired'}
-      <DeviceSettings />
-    {/if}
-    <AboutUpdates />
   </main>
 
-  <UpdateBanner />
+  {#if view && !ui.settings}
+    <TabBar {waiting} />
+  {:else}
+    <!-- Ohne untere Leiste endet der Inhalt über dem Home-Indikator. -->
+    <div class="floor"></div>
+  {/if}
+  <UpdateBanner raised={view !== null && !ui.settings} />
+
+  {#if view && chapter && milestone && view.players.b}
+    {#key milestone.at}
+      <MilestoneScene {view} {chapter} {milestone} />
+    {/key}
+  {/if}
 </div>
 
 <style>
   .app {
-    min-height: 100dvh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-  }
-
-  .top {
-    /* Die dunkle Leiste liegt unter Uhr und Dynamic Island; der Text beginnt erst unterhalb der Safe Area. */
-    padding: calc(var(--safe-top) + 10px) calc(var(--safe-right) + 20px) 14px calc(var(--safe-left) + 20px);
-    background: var(--petrol);
-  }
-
-  .top h1 {
-    color: var(--cream);
-    font-size: 1.6rem;
-  }
-
-  .sub {
-    color: var(--cream-deep);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
 
   main {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 24px calc(var(--safe-right) + 20px) calc(var(--safe-bottom) + 96px) calc(var(--safe-left) + 20px);
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
   }
 
-  .card {
-    padding: 24px 20px;
-    border-radius: var(--radius);
-    background: var(--cream-deep);
-  }
-
-  .eyebrow {
-    color: var(--sage-deep);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .card h2 {
-    margin-top: 4px;
-    font-size: 1.9rem;
-  }
-
-  .vi {
-    font-family: var(--font-title);
-    color: var(--terracotta);
-  }
-
-  .lead {
-    margin-top: 14px;
+  .floor {
+    flex: none;
+    height: var(--safe-bottom);
   }
 </style>

@@ -27,6 +27,8 @@ export interface ViewContext {
   now: IsoTime;
   /** Kopplungscode des Hauses; in die Sicht kommt er nur für a und nur, solange b fehlt. */
   pairingCode: string;
+  /** Der Server nimmt Test-Aufgaben an (Bauphase). */
+  testActions?: boolean;
 }
 
 function answerView(answer: KnowMeAnswer): KnowMeAnswer {
@@ -124,5 +126,6 @@ export function deriveView(state: HouseState, you: Slot, ctx: ViewContext): Hous
     placements: state.placements.map((p) => ({ pieceId: p.pieceId, spotId: p.spotId })),
     milestones: state.milestones.map((m) => ({ at: m.at, reachedAt: m.reachedAt, decoPiece: m.decoPiece, seenBy: [...m.seenBy] })),
     coupons: state.coupons.map((c) => couponView(c, you, fixedTexts)),
+    testActions: ctx.testActions === true,
   };
 }

@@ -81,12 +81,20 @@ const spot = z.strictObject({
   id,
   /** Frei benannte Platzart (z. B. floor, wall, surface, ground); ein Stück passt, wenn sie in dessen `fits` steht. */
   kind: id,
-  /** Position im Koordinatensystem der Raum-SVG. */
+  /** Position im Koordinatensystem der Raum-SVG: Mitte der Unterkante des Stücks, das hier steht oder hängt. */
   x: z.number(),
   y: z.number(),
+  /** Kantenlänge des Felds, in das ein Stück gezeichnet wird (seine SVG füllt ein Quadrat dieser Größe). */
+  size: z.number().positive(),
 });
 
-export const roomFileSchema = z.strictObject({ id, name: text, spots: z.array(spot).min(1) });
+export const roomFileSchema = z.strictObject({
+  id,
+  name: text,
+  /** Draußen: Der Raum steht für sich, unterhalb des Hauses (z. B. der Garten). */
+  outdoor: z.boolean().optional(),
+  spots: z.array(spot).min(1),
+});
 export const roomSchema = roomFileSchema.extend({ art: svgArtSchema });
 export type Room = z.infer<typeof roomSchema>;
 

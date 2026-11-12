@@ -35,6 +35,7 @@ export const actionSchema: z.ZodMiniType<Action> = z.discriminatedUnion('type', 
   z.strictObject({ ...meta, type: z.literal('coupon.deposit'), text: trimmed(LIMITS.couponTextLength) }),
   z.strictObject({ ...meta, type: z.literal('coupon.requestRedeem'), couponId: ref }),
   z.strictObject({ ...meta, type: z.literal('coupon.confirmRedeem'), couponId: ref }),
+  z.strictObject({ ...meta, type: z.literal('test.completeTask') }),
 ]);
 
 export const createHouseSchema: z.ZodMiniType<CreateHouseRequest> = z.strictObject({ name: trimmed(LIMITS.nameLength) });

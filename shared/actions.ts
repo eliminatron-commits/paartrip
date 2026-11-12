@@ -17,7 +17,11 @@ export type ActionBody =
   // Geheimen Gutschein hinterlegen; die id der Aktion wird zur id des Gutscheins.
   | { type: 'coupon.deposit'; text: string }
   | { type: 'coupon.requestRedeem'; couponId: string }
-  | { type: 'coupon.confirmRedeem'; couponId: string };
+  | { type: 'coupon.confirmRedeem'; couponId: string }
+  // Nur für die Bauphase: erledigt die nächste Aufgabe ohne Spiel, damit Bauzug, Meilenstein und Gutscheine
+  // schon ohne Aufgabenablauf laufen. Der Server nimmt sie nur an, wenn Test-Aktionen eingeschaltet sind
+  // (Worker-Variable TEST_ACTIONS). Entfällt mit dem Aufgabenablauf in Phase 4.
+  | { type: 'test.completeTask' };
 
 export type Action = ActionBody & {
   /** Auf dem Gerät erzeugt (crypto.randomUUID). Macht die Aktion wiederholt anwendbar. */

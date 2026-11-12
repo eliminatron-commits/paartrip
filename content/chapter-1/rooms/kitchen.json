@@ -2,7 +2,16 @@
   "id": "kitchen",
   "name": "Kitchen",
   "spots": [
-    { "id": "kitchen-counter-1", "kind": "surface", "x": 130, "y": 160 },
-    { "id": "kitchen-wall-1", "kind": "wall", "x": 310, "y": 75 }
+    { "id": "kitchen-wall-1", "kind": "wall", "x": 50, "y": 100, "size": 56 },
+    { "id": "kitchen-wall-2", "kind": "wall", "x": 222, "y": 100, "size": 56 },
+    { "id": "kitchen-wall-3", "kind": "wall", "x": 286, "y": 100, "size": 56 },
+    { "id": "kitchen-wall-4", "kind": "wall", "x": 350, "y": 100, "size": 56 },
+    { "id": "kitchen-counter-1", "kind": "surface", "x": 52, "y": 170, "size": 44 },
+    { "id": "kitchen-counter-2", "kind": "surface", "x": 108, "y": 170, "size": 44 },
+    { "id": "kitchen-counter-3", "kind": "surface", "x": 164, "y": 170, "size": 44 },
+    { "id": "kitchen-shelf-1", "kind": "surface", "x": 284, "y": 150, "size": 44 },
+    { "id": "kitchen-shelf-2", "kind": "surface", "x": 346, "y": 150, "size": 44 },
+    { "id": "kitchen-floor-1", "kind": "floor", "x": 258, "y": 264, "size": 80 },
+    { "id": "kitchen-floor-2", "kind": "floor", "x": 342, "y": 264, "size": 80 }
   ]
 }

@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-test('die App startet und zeigt Namen, Kapitel und Versionszeile', async ({ page }) => {
+test('die App startet und zeigt Namen und Versionszeile', async ({ page }) => {
   await page.goto('./');
   await expect(page).toHaveTitle('Nhà Mình – PaarTrip');
   await expect(page.getByRole('heading', { level: 1, name: 'Nhà Mình' })).toBeVisible();
-  // Kapiteltitel kommt aus content/ – belegt den Weg von der Inhaltsdatei bis in die App.
-  await expect(page.getByText('Dọn về nhà mới')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+  // Die Versionszeile steht in den Einstellungen – erreichbar, auch bevor ein Haus existiert.
+  // (Dass Inhalte aus content/ in der App ankommen, belegt e2e/house.spec.ts am Kapiteltitel und an den Räumen.)
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByTestId('version-line')).toHaveText(/^Version \d+\.\d+\.\d+ · \d{4}-\d{2}-\d{2} \d{2}:\d{2} · e2e0001$/);
 });
 

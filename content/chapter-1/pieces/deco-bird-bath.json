@@ -1,0 +1,6 @@
+{
+  "id": "deco-bird-bath",
+  "name": "Bird bath",
+  "fits": ["ground"],
+  "milestone": 25
+}

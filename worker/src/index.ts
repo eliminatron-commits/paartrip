@@ -6,7 +6,7 @@ import type { ApiError, ApiErrorCode, EnterHouseResponse, OkResponse, PushKeyRes
 import type { RulesContent } from '../../shared/content-schema.ts';
 import type { HouseState } from '../../shared/model.ts';
 import { applyAction, createHouse, joinHouse, type PushEffect, type RuleContext } from '../../shared/rules.ts';
-import { deriveView } from '../../shared/view.ts';
+import { deriveView, type ViewContext } from '../../shared/view.ts';
 import { CODE_LENGTH, normalizeCode } from '../../shared/limits.ts';
 import { createHouseSchema, joinHouseSchema, pushSubscribeSchema, syncSchema } from '../../shared/wire.ts';
 import { deliver, pushKeys, sendTest } from './push.ts';
@@ -43,6 +43,8 @@ export interface Env {
   PUSH_HOSTS: string;
   /** Wartezeit vor der Probe-Mitteilung, damit man die App vorher schließen kann. */
   PUSH_TEST_DELAY_MS: string;
+  /** "1": Test-Aktionen annehmen (Bauphase und lokale Tests). Fehlt die Variable, lehnt der Server sie ab. */
+  TEST_ACTIONS?: string;
 }
 
 // Beim Bauen geprüft (scripts/build-content.ts); hier genügt die Typzuweisung.
@@ -92,6 +94,11 @@ async function requireDevice(request: Request, env: Env): Promise<Device> {
   return device;
 }
 
+/** Die Sicht entsteht aus denselben Inhalten und derselben Serverzeit wie die Regeln. */
+function viewContext(rules: RuleContext, pairingCode: string): ViewContext {
+  return { content: rules.content, now: rules.now, pairingCode, testActions: rules.testActions };
+}
+
 // ---------------------------------------------------------------- Koppeln
 
 async function handleCreateHouse(request: Request, env: Env, rules: RuleContext): Promise<EnterHouseResponse> {
@@ -105,7 +112,7 @@ async function handleCreateHouse(request: Request, env: Env, rules: RuleContext)
   for (let attempt = 0; attempt < WRITE_ATTEMPTS; attempt++) {
     const code = newCode();
     if (await insertHouse(env.DB, state, code, tokenHash, rules.now)) {
-      return { token, view: deriveView(state, 'a', { content, now: rules.now, pairingCode: code }) };
+      return { token, view: deriveView(state, 'a', viewContext(rules, code)) };
     }
   }
   throw new HttpError(503, 'busy', 'Please try again.');
@@ -122,7 +129,7 @@ async function handleJoinHouse(request: Request, env: Env, rules: RuleContext): 
     if (!next) throw new HttpError(409, 'house_full', 'This house already has two people.');
     const token = newToken();
     if (await addSecondDevice(env.DB, house, next, await hashToken(token), rules.now)) {
-      return { token, view: deriveView(next, 'b', { content, now: rules.now, pairingCode: house.code }) };
+      return { token, view: deriveView(next, 'b', viewContext(rules, house.code)) };
     }
     await pauseBeforeRetry();
   }
@@ -166,7 +173,7 @@ async function handleSync(request: Request, env: Env, ctx: ExecutionContext, rul
     if (saved) {
       if (effects.length > 0) ctx.waitUntil(deliver(env, state, effects));
       // Die Sicht ist das Einzige, was das Gerät vom Stand erfährt.
-      return { view: deriveView(state, device.slot, { content, now: rules.now, pairingCode: house.code }), results };
+      return { view: deriveView(state, device.slot, viewContext(rules, house.code)), results };
     }
     await pauseBeforeRetry();
   }
@@ -201,7 +208,7 @@ async function handlePushTest(request: Request, env: Env, ctx: ExecutionContext)
 
 async function route(request: Request, env: Env, ctx: ExecutionContext): Promise<{ status: number; body: unknown }> {
   const { pathname } = new URL(request.url);
-  const rules: RuleContext = { content, now: new Date().toISOString() };
+  const rules: RuleContext = { content, now: new Date().toISOString(), testActions: env.TEST_ACTIONS === '1' };
   const key = `${request.method} ${pathname}`;
   switch (key) {
     case 'POST /houses':

@@ -166,4 +166,6 @@ export interface HouseView {
   placements: Placement[];
   milestones: ReachedMilestone[];
   coupons: CouponView[];
+  /** Der Server nimmt Test-Aufgaben an (Bauphase). Fehlt in Sichten älterer Stände. */
+  testActions?: boolean;
 }

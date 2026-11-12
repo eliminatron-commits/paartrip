@@ -1,67 +1,24 @@
-// Zwei Geräte gegen den lokal gestarteten Worker: je Gerät ein eigener Browser-Kontext mit eigenem Speicher.
+// Zwei Geräte gegen den lokal gestarteten Worker: Koppeln, Abgleich, Offline-Warteschlange, Export und Import.
 import { readFile } from 'node:fs/promises';
-import { type Browser, type BrowserContext, expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import {
+  closePhones,
+  closeSettings,
+  giftsForMe,
+  giftsFromMe,
+  LOCAL_API,
+  moveIn,
+  openSettings,
+  openTab,
+  pair,
+  phone,
+  returnToApp,
+  startHouse,
+  syncStatus,
+  wrapGift,
+} from './phones.ts';
 
-interface Phone {
-  context: BrowserContext;
-  page: Page;
-}
-
-/** Der lokal gestartete Worker (Port wie in playwright.config.ts und e2e/build-versions.ts). */
-const LOCAL_API = 'http://localhost:8788';
-
-const phones: BrowserContext[] = [];
-
-async function phone(browser: Browser): Promise<Phone> {
-  const context = await browser.newContext();
-  phones.push(context);
-  const page = await context.newPage();
-  await page.goto('./');
-  return { context, page };
-}
-
-test.afterEach(async () => {
-  for (const context of phones.splice(0)) await context.close();
-});
-
-/** Rückkehr in die App: iOS lädt die Seite nicht neu, es meldet nur visibilitychange. */
-const returnToApp = (page: Page) => page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-
-async function startHouse(page: Page, name: string): Promise<string> {
-  await page.getByLabel('Your first name').fill(name);
-  await page.getByRole('button', { name: 'Open the door' }).click();
-  const code = await page.getByTestId('pairing-code').innerText();
-  expect(code).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}$/);
-  return code;
-}
-
-async function moveIn(page: Page, name: string, code: string): Promise<void> {
-  await page.getByRole('button', { name: 'I have a code' }).click();
-  await page.getByLabel('Your first name').fill(name);
-  await page.getByLabel('Code from your partner').fill(code);
-  await page.getByRole('button', { name: 'Move in' }).click();
-}
-
-/** Ada (Gerät A) legt an, Bao (Gerät B) zieht ein. */
-async function pair(browser: Browser): Promise<{ a: Phone; b: Phone; code: string }> {
-  const a = await phone(browser);
-  const code = await startHouse(a.page, 'Ada');
-  const b = await phone(browser);
-  await moveIn(b.page, 'Bao', code);
-  await expect(b.page.getByTestId('house-names')).toHaveText('Bao & Ada');
-  await returnToApp(a.page);
-  await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
-  return { a, b, code };
-}
-
-async function wrapGift(page: Page, text: string): Promise<void> {
-  await page.getByLabel('Your promise').fill(text);
-  await page.getByRole('button', { name: 'Wrap it up' }).click();
-}
-
-// Geheime Gutscheine (die festen aus den Inhalten stehen in derselben Liste).
-const giftsFromMe = (page: Page) => page.locator('[data-testid="gift"][data-kind="secret"][data-from="me"]');
-const wrappedForMe = (page: Page) => page.locator('[data-testid="gift"][data-kind="secret"][data-from="partner"]');
+test.afterEach(closePhones);
 
 test('zwei Geräte koppeln sich; ein dritter Beitritt wird abgelehnt', async ({ browser }) => {
   const a = await phone(browser);
@@ -72,6 +29,7 @@ test('zwei Geräte koppeln sich; ein dritter Beitritt wird abgelehnt', async ({ 
   const b = await phone(browser);
   await moveIn(b.page, 'Bao', code.replace('-', '').toLowerCase());
   await expect(b.page.getByTestId('house-names')).toHaveText('Bao & Ada');
+  await openSettings(b.page);
   await expect(b.page.getByTestId('pairing-status')).toContainText('Linked as Bao. You share the house with Ada.');
 
   // A erfährt es bei der Rückkehr in die App; der Code ist dann verschwunden.
@@ -88,6 +46,7 @@ test('zwei Geräte koppeln sich; ein dritter Beitritt wird abgelehnt', async ({ 
   // Der Stand übersteht das Neuladen.
   await a.page.reload();
   await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
+  await openSettings(a.page);
   await expect(a.page.getByTestId('pairing-status')).toContainText('Linked as Ada.');
 });
 
@@ -108,14 +67,15 @@ test('eine Aktion von A erscheint bei B nach dem Abgleich – der Text bleibt f�
   });
 
   await wrapGift(a.page, secret);
-  await expect(giftsFromMe(a.page)).toHaveText([new RegExp(`^${secret}`)]);
-  await expect(a.page.getByTestId('sync-status')).toHaveText('Up to date.');
+  await expect(giftsFromMe(a.page)).toHaveText([new RegExp(`^\\s*${secret}`)]);
+  await expect(syncStatus(a.page)).toHaveText('Up to date.');
 
   // B hat noch nichts davon – erst die Rückkehr in die App gleicht ab.
-  await expect(wrappedForMe(b.page)).toHaveCount(0);
+  await openTab(b.page, 'Gifts');
+  await expect(giftsForMe(b.page)).toHaveCount(0);
   await returnToApp(b.page);
-  await expect(wrappedForMe(b.page)).toHaveCount(1);
-  await expect(wrappedForMe(b.page)).toContainText('A wrapped gift from Ada');
+  await expect(giftsForMe(b.page)).toHaveCount(1);
+  await expect(giftsForMe(b.page)).toContainText('A wrapped gift from Ada');
 
   // Der Text ist weder zu sehen noch je bei B angekommen.
   await expect(b.page.getByText(secret)).toHaveCount(0);
@@ -131,22 +91,25 @@ test('eine offline erzeugte Aktion wird nachgereicht', async ({ browser }) => {
 
   await a.context.setOffline(true);
   await wrapGift(a.page, 'Made without a signal');
-  await expect(a.page.getByTestId('sync-status')).toHaveText('Offline. 1 change waiting to be sent.');
+  await expect(syncStatus(a.page)).toHaveText('Offline. 1 change waiting to be sent.');
+  await expect(syncStatus(a.page)).toBeInViewport();
   // Nichts wird vorauseilend angezeigt: Was gilt, sagt der Server.
   await expect(giftsFromMe(a.page)).toHaveCount(0);
 
   // Die App wird ohne Netz beendet und neu geöffnet: Haus und wartende Aktion sind noch da.
   await a.page.reload();
   await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
-  await expect(a.page.getByTestId('sync-status')).toHaveText('Offline. 1 change waiting to be sent.');
+  await expect(syncStatus(a.page)).toHaveText('Offline. 1 change waiting to be sent.');
 
   await a.context.setOffline(false);
   await returnToApp(a.page);
-  await expect(a.page.getByTestId('sync-status')).toHaveText('Up to date.');
-  await expect(giftsFromMe(a.page)).toHaveText([/^Made without a signal/]);
+  await expect(syncStatus(a.page)).toHaveText('Up to date.');
+  await openTab(a.page, 'Gifts');
+  await expect(giftsFromMe(a.page)).toHaveText([/^\s*Made without a signal/]);
 
+  await openTab(b.page, 'Gifts');
   await returnToApp(b.page);
-  await expect(wrappedForMe(b.page)).toHaveCount(1);
+  await expect(giftsForMe(b.page)).toHaveCount(1);
 });
 
 test('kennt der Server das Gerät nicht mehr, führt "Start over" zurück zum Anfang', async ({ browser, request }) => {
@@ -159,12 +122,12 @@ test('kennt der Server das Gerät nicht mehr, führt "Start over" zurück zum An
   const forgotten = await request.post(`${LOCAL_API}/__test/forget-house?code=${code.replace('-', '')}`);
   expect(forgotten.status()).toBe(204);
   await returnToApp(a.page);
-  await expect(a.page.getByTestId('sync-status')).toHaveText("This phone isn't linked to the house anymore.");
+  await expect(syncStatus(a.page)).toHaveText("This phone isn't linked to the house anymore.");
 
   // Erst nach der Rückfrage wird die Kopplung gelöst.
   await a.page.getByRole('button', { name: 'Start over' }).click();
   await a.page.getByRole('button', { name: 'Cancel' }).click();
-  await expect(a.page.getByTestId('pairing-status')).toContainText('Linked as Ada.');
+  await expect(a.page.getByTestId('house-names')).toHaveText('The door is open, Ada');
   await a.page.getByRole('button', { name: 'Start over' }).click();
   await a.page.getByRole('button', { name: 'Yes, start over' }).click();
   await expect(a.page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
@@ -173,7 +136,7 @@ test('kennt der Server das Gerät nicht mehr, führt "Start over" zurück zum An
   await a.page.reload();
   await expect(a.page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
   await startHouse(a.page, 'Ada');
-  await expect(a.page.getByTestId('sync-status')).toHaveText('Up to date.');
+  await expect(syncStatus(a.page)).toHaveText('Up to date.');
 });
 
 test('Export und Import: nach geleertem Speicher dieselbe Rolle im selben Haus', async ({ browser }) => {
@@ -181,6 +144,7 @@ test('Export und Import: nach geleertem Speicher dieselbe Rolle im selben Haus',
   await wrapGift(a.page, 'Before the new phone');
   await expect(giftsFromMe(a.page)).toHaveCount(1);
 
+  await openSettings(a.page);
   const [download] = await Promise.all([a.page.waitForEvent('download'), a.page.getByRole('button', { name: 'Save a backup file' }).click()]);
   expect(download.suggestedFilename()).toMatch(/^paartrip-backup-\d{4}-\d{2}-\d{2}\.json$/);
   const file = { name: download.suggestedFilename(), mimeType: 'application/json', buffer: await readFile(await download.path()) };
@@ -192,16 +156,21 @@ test('Export und Import: nach geleertem Speicher dieselbe Rolle im selben Haus',
 
   // Dieselbe Rolle (Ada, Spielerin a) im selben Haus – samt dem, was nur sie sehen darf.
   await expect(fresh.page.getByTestId('house-names')).toHaveText('Ada & Bao');
+  await openSettings(fresh.page);
   await expect(fresh.page.getByTestId('pairing-status')).toContainText('Linked as Ada.');
-  await expect(giftsFromMe(fresh.page)).toHaveText([/^Before the new phone/]);
+  await closeSettings(fresh.page);
+  await openTab(fresh.page, 'Gifts');
+  await expect(giftsFromMe(fresh.page)).toHaveText([/^\s*Before the new phone/]);
 
   // Das wiederhergestellte Gerät kann handeln: Sein Gutschein kommt bei B an.
   await wrapGift(fresh.page, 'From the new phone');
   await expect(giftsFromMe(fresh.page)).toHaveCount(2);
+  await openTab(b.page, 'Gifts');
   await returnToApp(b.page);
-  await expect(wrappedForMe(b.page)).toHaveCount(2);
+  await expect(giftsForMe(b.page)).toHaveCount(2);
 
   // Auf einem schon gekoppelten Gerät fragt der Import erst nach.
+  await openSettings(b.page);
   await b.page.getByLabel('Backup file').setInputFiles(file);
   await expect(b.page.getByText("Replace what's on this phone with the backup?")).toBeVisible();
   await b.page.getByRole('button', { name: 'Cancel' }).click();

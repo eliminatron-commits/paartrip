@@ -1,23 +1,7 @@
 <script lang="ts">
-  // Wer im Haus ist, der Kopplungscode (solange der zweite Spieler fehlt) und der Stand des Abgleichs.
-  import { formatCode } from '../../shared/limits.ts';
-  import { otherSlot } from '../../shared/model.ts';
+  // Stand des Abgleichs. Solange alles stimmt, bleibt der Streifen unsichtbar (für Vorlesehilfen ist der
+  // Text da); er erscheint, wenn etwas zu sagen ist: offline, Wartendes, ein Fehler, ein gelöstes Gerät.
   import { dismissRejected, session, startOver } from '../lib/session.svelte.ts';
-
-  const view = $derived(session.view);
-  const me = $derived(view?.players[view.you] ?? null);
-  const partner = $derived(view ? view.players[otherSlot(view.you)] : null);
-
-  let copied = $state(false);
-
-  async function copy(code: string): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(formatCode(code));
-      copied = true;
-    } catch {
-      // Ohne Zwischenablage bleibt der Code zum Abtippen sichtbar.
-    }
-  }
 
   // Der Server kennt dieses Gerät oder sein Haus nicht mehr. Damit es nicht festhängt, lässt sich die
   // Kopplung hier lösen – erst nach einer Rückfrage, denn wartende Aktionen gehen dabei verloren.
@@ -45,28 +29,13 @@
     if (session.error) return "Couldn't sync just now. It will try again.";
     return session.pending > 0 ? `${waiting}.` : 'Up to date.';
   });
+  // Während des Abgleichs bleibt stehen, was vorher galt – sonst blitzt der Streifen bei jeder Aktion auf.
+  const calm = $derived(!unlinked && !session.offline && !session.error && (session.pending === 0 || session.syncing));
 </script>
 
-{#if view && me}
-  <section class="panel" aria-labelledby="house-title">
-    {#if partner}
-      <h2 id="house-title" data-testid="house-names">{me.name} &amp; {partner.name}</h2>
-      <p>You're both in. The house is yours.</p>
-    {:else}
-      <h2 id="house-title" data-testid="house-names">The door is open, {me.name}</h2>
-      {#if view.pairingCode}
-        <p>Give this code to your partner. They choose "I have a code" on their phone.</p>
-        <p class="code" data-testid="pairing-code">{formatCode(view.pairingCode)}</p>
-        <div class="row">
-          <button type="button" class="quiet" onclick={() => view.pairingCode && copy(view.pairingCode)}>{copied ? 'Copied' : 'Copy code'}</button>
-        </div>
-        <p class="note">The code works once. After your partner has moved in, the house is closed to everyone else.</p>
-      {:else}
-        <p>Waiting for the other half of this house.</p>
-      {/if}
-    {/if}
-
-    <p class="note" role="status" data-testid="sync-status">{status}</p>
+{#if session.status === 'paired'}
+  <div class="notice" class:calm={calm && session.rejected === 0}>
+    <p class:sr-only={calm} role="status" data-testid="sync-status">{status}</p>
     {#if unlinked}
       {#if confirming}
         <p>Forget the old house on this phone? Anything still waiting to be sent is lost.</p>
@@ -83,21 +52,26 @@
     {/if}
     {#if session.rejected > 0}
       <div class="row">
-        <p class="note" data-testid="rejected-note">Something you did no longer fit and was left out.</p>
+        <p data-testid="rejected-note">Something you did no longer fit and was left out.</p>
         <button type="button" class="quiet" onclick={dismissRejected}>OK</button>
       </div>
     {/if}
-  </section>
+  </div>
 {/if}
 
 <style>
-  .code {
-    font-family: var(--font-title);
-    font-size: 2.1rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--terracotta);
-    font-variant-numeric: lining-nums;
+  .notice {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px calc(var(--safe-right) + 20px) 10px calc(var(--safe-left) + 20px);
+    background: var(--cream-deep);
+    box-shadow: 0 1px 0 rgb(35 55 60 / 0.12);
+    font-size: 0.95rem;
+  }
+
+  .notice.calm {
+    display: contents;
   }
 
   .row {

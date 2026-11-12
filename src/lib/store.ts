@@ -14,9 +14,11 @@ export interface DeviceRecord {
 export interface Settings {
   /** Der Nutzer hat Mitteilungen auf diesem Gerät eingeschaltet. */
   push: boolean;
+  /** Klänge beim Platzieren, Lösen und Enthüllen. */
+  sound: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { push: false };
+export const DEFAULT_SETTINGS: Settings = { push: false, sound: true };
 
 export interface Stored {
   device: DeviceRecord | null;

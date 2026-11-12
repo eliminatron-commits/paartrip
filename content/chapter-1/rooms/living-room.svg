@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Wand und Sockelleiste -->
+  <rect width="400" height="252" fill="#EFE1C8"/>
+  <rect y="240" width="400" height="12" fill="#E2CFAE"/>
+  <!-- Dielenboden -->
+  <rect y="252" width="400" height="48" fill="#B98A5E"/>
+  <rect y="267" width="400" height="2" fill="#A87B50"/>
+  <rect y="283" width="400" height="2" fill="#A87B50"/>
+  <!-- Teppich -->
+  <ellipse cx="200" cy="279" rx="124" ry="14" fill="#C96A45"/>
+  <ellipse cx="200" cy="279" rx="100" ry="9" fill="#D98A66"/>
+  <!-- Fenster mit Blick ins Grüne -->
+  <rect x="156" y="34" width="88" height="112" rx="8" fill="#FAF3E7"/>
+  <rect x="164" y="42" width="72" height="96" rx="4" fill="#C7DED6"/>
+  <path d="M164 138v-26q18-14 36-4t36-10v40z" fill="#8FA68A"/>
+  <circle cx="218" cy="62" r="9" fill="#F2C76B"/>
+  <rect x="197" y="42" width="6" height="96" fill="#FAF3E7"/>
+  <rect x="164" y="87" width="72" height="6" fill="#FAF3E7"/>
+  <!-- Vorhänge und Stange -->
+  <path d="M150 30h22q-2 62-20 112h-2z" fill="#C96A45"/>
+  <path d="M250 30h-22q2 62 20 112h2z" fill="#C96A45"/>
+  <rect x="144" y="25" width="112" height="6" rx="3" fill="#8C5A3C"/>
+  <!-- Wandborde mit Konsolen -->
+  <path d="M42 157h10v12zM124 157h10l-10 12z" fill="#73492F"/>
+  <path d="M266 157h10v12zM348 157h10l-10 12z" fill="#73492F"/>
+  <rect x="30" y="150" width="116" height="7" rx="2" fill="#8C5A3C"/>
+  <rect x="254" y="150" width="116" height="7" rx="2" fill="#8C5A3C"/>
+  <!-- Hauswände und Deckenbalken -->
+  <rect width="10" height="300" fill="#1F4E5A"/>
+  <rect x="390" width="10" height="300" fill="#1F4E5A"/>
+  <rect width="400" height="8" fill="#17414B"/>
+</svg>

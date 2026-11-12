@@ -1,0 +1,5 @@
+{
+  "id": "bird-house",
+  "name": "Bird house",
+  "fits": ["fence"]
+}

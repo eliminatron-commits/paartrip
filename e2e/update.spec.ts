@@ -17,10 +17,16 @@ test.beforeEach(() => {
   server.deploy('dist-e2e/v1');
 });
 
-/** Lädt die App und wartet, bis der Service Worker die Seite steuert – der Zustand nach der Installation. */
+/** Versionszeile und "Check for updates" stehen in den Einstellungen. */
+async function openSettings(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+}
+
+/** Lädt die App, wartet, bis der Service Worker die Seite steuert (der Zustand nach der Installation), und öffnet die Einstellungen. */
 async function openInstalled(page: Page): Promise<void> {
   await page.goto(server.url);
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await openSettings(page);
 }
 
 test('zweiter Deploy: Hinweis erscheint bei Rückkehr in die App, Tippen aktualisiert', async ({ page }) => {
@@ -39,8 +45,11 @@ test('zweiter Deploy: Hinweis erscheint bei Rückkehr in die App, Tippen aktuali
   await expect(versionLine).toContainText('e2e0001');
 
   await banner.getByRole('button', { name: 'Update' }).click();
-  await expect(versionLine).toContainText('e2e0002');
+  // Die Seite lädt neu und beginnt wieder auf dem Startbildschirm.
+  await expect(page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
   await expect(banner).toBeHidden();
+  await openSettings(page);
+  await expect(versionLine).toContainText('e2e0002');
 });
 
 test('"Check for updates" meldet den aktuellen Stand und eine gefundene Version', async ({ page }) => {

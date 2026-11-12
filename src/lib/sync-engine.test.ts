@@ -173,6 +173,8 @@ describe('Aktionen und Warteschlange', () => {
     await a.engine.dispatch({ type: 'coupon.deposit', text: 'Made offline' });
 
     expect(a.last).toMatchObject({ pending: 1, offline: true });
+    // Die Oberfläche erfährt, was wartet – damit sie es nicht noch einmal anbietet.
+    expect(a.last.queued).toMatchObject([{ type: 'coupon.deposit', text: 'Made offline' }]);
     // Kein vorauseilendes Umschreiben: Die Sicht bleibt, wie der Server sie zuletzt geschickt hat.
     expect(a.last.view).toEqual(viewBefore);
     expect((await a.store.load()).queue.map((x) => x.type)).toEqual(['coupon.deposit']);
@@ -182,8 +184,9 @@ describe('Aktionen und Warteschlange', () => {
     server.online = true;
     const restarted = await device('phone-a');
     expect(restarted.last.pending).toBe(1);
+    expect(restarted.last.queued).toMatchObject([{ type: 'coupon.deposit', text: 'Made offline' }]);
     await restarted.engine.sync();
-    expect(restarted.last).toMatchObject({ pending: 0, offline: false });
+    expect(restarted.last).toMatchObject({ pending: 0, queued: [], offline: false });
     expect(server.secretTexts()).toEqual(['Made offline']);
     expect((await restarted.store.load()).queue).toEqual([]);
   });

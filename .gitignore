@@ -3,6 +3,7 @@ dist/
 dist-e2e/
 generated/
 public/icons/
+public/splash/
 test-results/
 playwright-report/
 .wrangler/
@@ -10,3 +11,4 @@ playwright-report/
 *.local
 .claude/settings.local.json
 HANDOFF.md
+screenshots/

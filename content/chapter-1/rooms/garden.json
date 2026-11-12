@@ -1,0 +1,18 @@
+{
+  "id": "garden",
+  "name": "Garden",
+  "outdoor": true,
+  "spots": [
+    { "id": "garden-fence-1", "kind": "fence", "x": 240, "y": 138, "size": 52 },
+    { "id": "garden-fence-2", "kind": "fence", "x": 300, "y": 138, "size": 52 },
+    { "id": "garden-fence-3", "kind": "fence", "x": 360, "y": 138, "size": 52 },
+    { "id": "garden-back-1", "kind": "ground", "x": 56, "y": 214, "size": 76 },
+    { "id": "garden-back-2", "kind": "ground", "x": 140, "y": 214, "size": 76 },
+    { "id": "garden-back-3", "kind": "ground", "x": 224, "y": 214, "size": 76 },
+    { "id": "garden-back-4", "kind": "ground", "x": 308, "y": 214, "size": 76 },
+    { "id": "garden-front-1", "kind": "ground", "x": 64, "y": 290, "size": 88 },
+    { "id": "garden-front-2", "kind": "ground", "x": 160, "y": 290, "size": 88 },
+    { "id": "garden-front-3", "kind": "ground", "x": 256, "y": 290, "size": 88 },
+    { "id": "garden-front-4", "kind": "ground", "x": 346, "y": 290, "size": 88 }
+  ]
+}

@@ -9,6 +9,8 @@
   --petrol: #1f4e5a;
   --ink: #23373c;
   --ink-soft: #4e6166;
+  --wall: #e8d8bb; /* Wand der Galerie unter dem Dach; Text darauf nur in --ink */
+  --wood: #8c5a3c; /* Bilderrahmen; nur Dekor */
 
   --font-title: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Nunito Variable', system-ui, sans-serif;
@@ -36,7 +38,9 @@ html {
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  /* Die App füllt genau den Bildschirm; gescrollt wird nur im Inhaltsbereich zwischen Kopf- und Fußleiste. */
+  height: 100dvh;
+  overflow: hidden;
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-body);
@@ -153,6 +157,58 @@ label {
 button:focus-visible {
   outline: 3px solid var(--petrol);
   outline-offset: 3px;
+}
+
+/* Knopf ohne eigenes Aussehen: für Karten, Plätze im Haus und Symbole. Die Mindestgröße bleibt. */
+button.plain {
+  padding: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+}
+
+/* Inhalt eines Bildschirms mit Rand; Hintergründe (das Haus) dürfen ohne diese Klasse bis an den Rand laufen. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px calc(var(--safe-right) + 20px) 28px calc(var(--safe-left) + 20px);
+}
+
+.page > h2 {
+  font-size: 1.7rem;
+}
+
+.eyebrow {
+  color: var(--sage-deep);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Vietnamesischer Zweitname. */
+.vi {
+  font-family: var(--font-title);
+  color: var(--terracotta);
+}
+
+/* Nur für Vorlesehilfen: im Dokument, aber nicht zu sehen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.note:empty,
+.problem:empty {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

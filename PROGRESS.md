@@ -11,6 +11,25 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
+## Phase 3/6 – Haus und Gutscheine: in Arbeit (Stand 2026-11-12, unterbrochen am Nutzungslimit)
+
+Läuft auf Fable 5.2 statt Sonnet 5.5. Subagenten bisher: `builder` (Sonnet 5.5) für `src/lib/sound.ts`, `fliessband` (Haiku 5.5) für 18 Platzhalter-Stücke und 5 Platzhalter-Szenen.
+
+**Gebaut und belegt** (Typecheck grün, 183 Vitest-Tests; Playwright: 26 Tests grün im letzten vollen Lauf plus `screens.spec.ts` und `settings.spec.ts` danach einzeln grün):
+- Regeln in `shared/rules.ts`: `completeTask` (Bauzug, Meilenstein, Freischalten), `build.choose`, `build.place`, `piece.move`, `milestone.seen`, Einlösen. Test-Aufgaben über `test.completeTask`, nur wenn der Worker `TEST_ACTIONS=1` hat (lokal an; entfällt mit Phase 4).
+- Inhalte: drei Räume mit 34 Plätzen (wall 8, surface 9, floor 6, ground 8, fence 3), Platz mit `size`, Raum mit `outdoor`.
+- Oberfläche: Navigation (`TopBar`, `TabBar`, `SyncNotice`), `src/screens/` (home, today, gifts, milestone, settings), Ton, Einstellungen.
+- Startbilder: `scripts/splash-sizes.ts`, `scripts/gen-assets.ts`, Verweise über `vite.config.ts`; Build geprüft (13 Bilder, nicht im Precache).
+
+**Noch offen in dieser Phase:**
+1. `e2e/install.spec.ts` für P3-08 schreiben (Startbild je Größe im richtigen Pixelmaß; Precache enthält Hülle, Schriften, Inhalte, keine Startbilder).
+2. Voller Lauf `npm run test:e2e` nach den letzten Änderungen (Safe-Area-Boden, Startbilder).
+3. Entscheiden und mit dem Nutzer klären: `TEST_ACTIONS` in `worker/wrangler.jsonc` für die echten iPhones einschalten (dann ist der Bauzug dort ausprobierbar) oder nicht.
+4. Review durch `pruefer`, Befunde beheben.
+5. `CLAUDE.md` (Ordner `screens/`, Platz-Schema, Test-Aktionen, Setzungen), `tests.json` (P3-01 bis P3-09), Commit "Phase 3: Haus und Gutscheine".
+6. Setzungen festhalten: Dekostück stellt auf, wer zuerst kommt (`piece.move`); nach dem letzten Meilenstein ist das Hinterlegen geschlossen; Push `partner_done` beim Wählen im Bauzug.
+7. P2-11 (Probe-Mitteilung auf dem iPhone) ist weiter unbestätigt – der Nutzer hat nur das Update auf `a45b30d` bestätigt.
+
 ## Phase 2/6 – Abgleich und Push: abgeschlossen am 2026-11-12
 
 Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), eingerichtet am 2026-11-12, ebenfalls auf Fable 5.2. Das Review durch `pruefer` (Opus 5.5) lief am 2026-11-12.

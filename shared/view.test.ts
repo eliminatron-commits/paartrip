@@ -107,8 +107,13 @@ describe('Aufbau der Sicht', () => {
     const state = { ...paired(), internalNote: 'nur-fuer-den-server' } as HouseState;
     expect(wire(state, 'a')).not.toContain('nur-fuer-den-server');
     expect(Object.keys(deriveView(state, 'a', ctx)).sort()).toEqual(
-      ['buildTurns', 'chapter', 'coupons', 'done', 'houseId', 'milestones', 'nextTaskOn', 'pairingCode', 'placements', 'players', 'task', 'today', 'you'].sort(),
+      ['buildTurns', 'chapter', 'coupons', 'done', 'houseId', 'milestones', 'nextTaskOn', 'pairingCode', 'placements', 'players', 'task', 'testActions', 'today', 'you'].sort(),
     );
+  });
+
+  it('ob der Server Test-Aufgaben annimmt, steht in der Sicht – ohne Angabe nicht', () => {
+    expect(deriveView(paired(), 'a', ctx).testActions).toBe(false);
+    expect(deriveView(paired(), 'a', { ...ctx, testActions: true }).testActions).toBe(true);
   });
 
   it('gilt auch in der Tiefe: Zusatzfelder in Aufgaben, Abgaben, Bauzügen, Meilensteinen und Gutscheinen bleiben zurück', () => {

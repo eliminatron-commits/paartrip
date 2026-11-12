@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Himmel -->
+  <rect width="400" height="180" fill="#E3EDE3"/>
+  <circle cx="330" cy="40" r="16" fill="#F2C76B"/>
+  <!-- Hecke links -->
+  <path d="M0 180V98q12-20 34-10 14-22 40-10 18-16 40-2 20-14 42 0 18-10 34 2 12 8 16 24v78z" fill="#46614B"/>
+  <circle cx="44" cy="124" r="14" fill="#557A5C"/>
+  <circle cx="112" cy="110" r="16" fill="#557A5C"/>
+  <circle cx="172" cy="130" r="12" fill="#557A5C"/>
+  <!-- Zaun rechts -->
+  <rect x="206" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
+  <rect x="230" y="80" width="20" height="100" rx="5" fill="#C29669"/>
+  <rect x="254" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
+  <rect x="278" y="80" width="20" height="100" rx="5" fill="#C29669"/>
+  <rect x="302" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
+  <rect x="326" y="80" width="20" height="100" rx="5" fill="#C29669"/>
+  <rect x="350" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
+  <rect x="374" y="80" width="26" height="100" rx="5" fill="#C29669"/>
+  <rect x="204" y="146" width="196" height="8" fill="#8C5A3C"/>
+  <!-- Rasen -->
+  <rect y="172" width="400" height="128" fill="#8FA68A"/>
+  <ellipse cx="96" cy="236" rx="70" ry="10" fill="#9DB398"/>
+  <ellipse cx="300" cy="262" rx="84" ry="12" fill="#9DB398"/>
+  <ellipse cx="210" cy="196" rx="60" ry="7" fill="#839C7F"/>
+  <!-- Gänseblümchen -->
+  <circle cx="22" cy="258" r="3" fill="#FAF3E7"/>
+  <circle cx="204" cy="244" r="3" fill="#FAF3E7"/>
+  <circle cx="386" cy="222" r="3" fill="#FAF3E7"/>
+  <circle cx="112" cy="194" r="3" fill="#FAF3E7"/>
+  <circle cx="264" cy="190" r="3" fill="#FAF3E7"/>
+</svg>

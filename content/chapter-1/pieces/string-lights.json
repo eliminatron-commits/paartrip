@@ -1,0 +1,5 @@
+{
+  "id": "string-lights",
+  "name": "String lights",
+  "fits": ["fence", "wall"]
+}

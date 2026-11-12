@@ -1,0 +1,6 @@
+{
+  "id": "deco-paper-lantern",
+  "name": "Paper lantern",
+  "fits": ["wall", "fence"],
+  "milestone": 15
+}

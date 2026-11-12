@@ -1,0 +1,131 @@
+// Gemeinsame Handgriffe der Zwei-Geräte-Tests: je Gerät ein eigener Browser-Kontext mit eigenem Speicher,
+// alle gegen den lokal gestarteten Worker.
+import { type Browser, type BrowserContext, expect, type Locator, type Page } from '@playwright/test';
+
+export interface Phone {
+  context: BrowserContext;
+  page: Page;
+}
+
+/** Der lokal gestartete Worker (Port wie in playwright.config.ts und e2e/build-versions.ts). */
+export const LOCAL_API = 'http://localhost:8788';
+
+/** Safe Area der großen iPhones im Hochformat: oben Uhr und Dynamic Island, unten der Home-Indikator. */
+export const SAFE_AREA = { top: 59, bottom: 34 };
+
+const open: BrowserContext[] = [];
+
+/** Neues Gerät mit leerem Speicher. `safeArea` stellt die Ränder eines echten iPhones nach. */
+export async function phone(browser: Browser, options: { safeArea?: boolean } = {}): Promise<Phone> {
+  const context = await browser.newContext();
+  open.push(context);
+  if (options.safeArea) {
+    // Desktop-Browser kennen env(safe-area-inset-*) nur als 0; die App liest die Ränder deshalb aus diesen Variablen.
+    await context.addInitScript(({ top, bottom }) => {
+      const apply = () => {
+        const style = document.createElement('style');
+        style.textContent = `:root{--safe-top:${top}px !important;--safe-bottom:${bottom}px !important}`;
+        document.documentElement.append(style);
+      };
+      // Das Skript läuft, bevor es ein Dokument gibt: warten, bis das Wurzelelement da ist.
+      if (document.documentElement) apply();
+      else {
+        const watcher = new MutationObserver(() => {
+          if (!document.documentElement) return;
+          watcher.disconnect();
+          apply();
+        });
+        watcher.observe(document, { childList: true });
+      }
+    }, SAFE_AREA);
+  }
+  const page = await context.newPage();
+  await page.goto('./');
+  return { context, page };
+}
+
+/** Nach jedem Test aufrufen (test.afterEach). */
+export async function closePhones(): Promise<void> {
+  for (const context of open.splice(0)) await context.close();
+}
+
+/** Rückkehr in die App: iOS lädt die Seite nicht neu, es meldet nur visibilitychange. Danach wird abgeglichen. */
+export async function returnToApp(page: Page): Promise<void> {
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+}
+
+export async function startHouse(page: Page, name: string): Promise<string> {
+  await page.getByLabel('Your first name').fill(name);
+  await page.getByRole('button', { name: 'Open the door' }).click();
+  const code = await page.getByTestId('pairing-code').innerText();
+  expect(code).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}$/);
+  return code;
+}
+
+export async function moveIn(page: Page, name: string, code: string): Promise<void> {
+  await page.getByRole('button', { name: 'I have a code' }).click();
+  await page.getByLabel('Your first name').fill(name);
+  await page.getByLabel('Code from your partner').fill(code);
+  await page.getByRole('button', { name: 'Move in' }).click();
+}
+
+/** Ada (Gerät A) legt an, Bao (Gerät B) zieht ein. */
+export async function pair(browser: Browser, options: { safeArea?: boolean } = {}): Promise<{ a: Phone; b: Phone; code: string }> {
+  const a = await phone(browser, options);
+  const code = await startHouse(a.page, 'Ada');
+  const b = await phone(browser, options);
+  await moveIn(b.page, 'Bao', code);
+  await expect(b.page.getByTestId('house-names')).toHaveText('Bao & Ada');
+  await returnToApp(a.page);
+  await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
+  return { a, b, code };
+}
+
+// ---------------------------------------------------------------- Navigation
+
+export type TabName = 'Home' | 'Today' | 'Gifts';
+
+export async function openTab(page: Page, name: TabName): Promise<void> {
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name }).click();
+}
+
+export async function openSettings(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Settings', level: 2 })).toBeVisible();
+}
+
+export async function closeSettings(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Close settings' }).click();
+}
+
+/** Der Stand des Abgleichs – auch dann lesbar, wenn der Streifen nicht zu sehen ist. */
+export const syncStatus = (page: Page): Locator => page.getByTestId('sync-status');
+
+// ---------------------------------------------------------------- Geschenke
+
+export async function wrapGift(page: Page, text: string): Promise<void> {
+  await openTab(page, 'Gifts');
+  await page.getByLabel('Your promise').fill(text);
+  await page.getByRole('button', { name: 'Wrap it up' }).click();
+}
+
+// Geheime Gutscheine (die festen aus den Inhalten stehen in denselben Listen).
+export const giftsFromMe = (page: Page): Locator => page.locator('[data-testid="gift"][data-kind="secret"][data-from="me"]');
+export const giftsForMe = (page: Page): Locator => page.locator('[data-testid="gift"][data-kind="secret"][data-from="partner"]');
+
+// ---------------------------------------------------------------- Haus
+
+/** Erledigt eine Test-Aufgabe (nur möglich, weil der lokale Worker Test-Aktionen annimmt) und wartet auf den Abgleich. */
+export async function finishTestTask(page: Page): Promise<void> {
+  await openTab(page, 'Today');
+  const progress = page.getByTestId('today-progress');
+  const before = Number((await progress.innerText()).split(' ')[0]);
+  await page.getByTestId('test-task').click();
+  await expect(progress).toHaveText(new RegExp(`^${before + 1} of `));
+}
+
+/** Die Karte mit dem nächsten Schritt im Haus (Home). */
+export const moveCard = (page: Page): Locator => page.getByTestId('move');
+
+/** Ein Stück, das im Haus steht. */
+export const pieceInHouse = (page: Page, pieceId: string): Locator => page.locator(`svg[data-piece="${pieceId}"]`);
