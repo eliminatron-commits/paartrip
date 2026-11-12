@@ -1,0 +1,6 @@
+{
+  "id": "wind-chime",
+  "name": "Wind chime",
+  "nameVi": "Chuông gió",
+  "fits": ["fence", "wall"]
+}

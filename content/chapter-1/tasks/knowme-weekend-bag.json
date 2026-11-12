@@ -1,0 +1,9 @@
+{
+  "id": "knowme-weekend-bag",
+  "type": "knowme",
+  "question": "What is the first thing you pack for a weekend away?",
+  "answer": {
+    "kind": "text",
+    "maxLength": 40
+  }
+}

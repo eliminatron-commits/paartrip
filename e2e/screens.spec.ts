@@ -15,6 +15,7 @@ import {
   openTask,
   pair,
   passMilestone,
+  type Phone,
   phone,
   returnToApp,
   SAFE_AREA,
@@ -220,10 +221,23 @@ test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die R
   await check(page, 'home-no-free-spot');
 });
 
-test('Aufgaben-Bildschirme: jede Rätselart in beiden Rollen, Fragen und Aufgaben im echten Leben – nichts in den Rändern, Tap-Ziele groß genug', async ({ browser }) => {
-  test.setTimeout(240_000);
+/**
+ * Vom Erklärbildschirm zum Rätsel: Die Erklärung einer Rätselart erscheint nur vor ihrem ersten Start –
+ * bei der zweiten Variante steht das Rätsel gleich da.
+ */
+async function pastIntro(phones: Phone[], kind: string, explained: Set<string>): Promise<void> {
+  for (const { page } of phones) {
+    if (explained.has(kind)) await expect(page.getByTestId('puzzle-intro')).toHaveCount(0);
+    else await page.getByRole('button', { name: 'Got it' }).click();
+    await expect(page.getByTestId('puzzle')).toBeVisible();
+  }
+  explained.add(kind);
+}
+
+test('Aufgaben-Bildschirme: jede Rätselvariante in beiden Rollen, Fragen und Aufgaben im echten Leben – nichts in den Rändern, Tap-Ziele groß genug', async ({ browser }) => {
+  test.setTimeout(360_000);
   await mkdir('screenshots', { recursive: true });
-  shot = 50;
+  shot = 100;
   const { a, b } = await pair(browser, { safeArea: SAFE_AREA });
 
   /** Der Bildschirm von oben und – wenn er länger ist – noch einmal vom Ende. */
@@ -236,20 +250,21 @@ test('Aufgaben-Bildschirme: jede Rätselart in beiden Rollen, Fragen und Aufgabe
     }
   };
 
+  const explained = new Set<string>();
   for (const task of chapter.tasks) {
     await openTask([a, b], task.id);
     if (task.type === 'puzzle') {
       const lead = task.lead === 'a' ? a : b;
       const partner = task.lead === 'a' ? b : a;
-      await both(lead.page, `task-${task.kind}-intro`);
-      for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
-      await both(lead.page, `task-${task.kind}-lead`);
-      await both(partner.page, `task-${task.kind}-partner`);
+      if (!explained.has(task.kind)) await both(lead.page, `task-${task.kind}-intro`);
+      await pastIntro([a, b], task.kind, explained);
+      await both(lead.page, `task-${task.id}-lead`);
+      await both(partner.page, `task-${task.id}-partner`);
     } else if (task.type === 'knowme') {
-      await both(a.page, `task-knowme-${task.answer.kind}`);
+      await both(a.page, `task-${task.id}`);
     } else {
-      await both(a.page, `task-reallife-${task.doer}-a`);
-      await both(b.page, `task-reallife-${task.doer}-b`);
+      await both(a.page, `task-${task.id}-a`);
+      await both(b.page, `task-${task.id}-b`);
     }
   }
 
@@ -264,39 +279,40 @@ test('Aufgaben-Bildschirme: jede Rätselart in beiden Rollen, Fragen und Aufgabe
 });
 
 test('Aufgaben im Querformat: kein waagerechtes Rollen, Ränder frei', async ({ browser }) => {
-  test.setTimeout(120_000);
-  shot = 150;
+  test.setTimeout(240_000);
+  shot = 300;
   const { a, b } = await pair(browser, { safeArea: SAFE_AREA_LANDSCAPE });
   for (const { page } of [a, b]) await page.setViewportSize({ width: 956, height: 440 });
+  const explained = new Set<string>();
   for (const task of chapter.tasks.filter((t) => t.type === 'puzzle')) {
     await openTask([a, b], task.id);
-    for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
+    await pastIntro([a, b], task.kind, explained);
     for (const [phone, role] of [[a, 'a'], [b, 'b']] as const) {
       const overflow = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `${task.id} ${role}`).toBeLessThanOrEqual(0);
       const inner = await phone.page.locator('main').evaluate((main) => main.scrollWidth - main.clientWidth);
       expect(inner, `${task.id} ${role} im Inhaltsbereich`).toBeLessThanOrEqual(0);
-      await check(phone.page, `landscape-task-${task.kind}-${role}`, SAFE_AREA_LANDSCAPE);
+      await check(phone.page, `landscape-task-${task.id}-${role}`, SAFE_AREA_LANDSCAPE);
     }
   }
 });
 
 test('Rätsel auf dem schmalsten iPhone (375 px breit): Tap-Ziele groß genug, kein waagerechtes Rollen', async ({ browser }) => {
-  test.setTimeout(120_000);
-  shot = 200;
+  test.setTimeout(240_000);
+  shot = 400;
   const { a, b } = await pair(browser, { safeArea: SAFE_AREA });
   // iPhone SE und iPhone mini; schmaler ist kein iPhone, auf dem die App läuft.
   for (const { page } of [a, b]) await page.setViewportSize({ width: 375, height: 812 });
+  const explained = new Set<string>();
   for (const task of chapter.tasks.filter((t) => t.type === 'puzzle')) {
     await openTask([a, b], task.id);
-    for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
+    await pastIntro([a, b], task.kind, explained);
     for (const [phone, role] of [[a, 'a'], [b, 'b']] as const) {
-      await expect(phone.page.getByTestId('puzzle')).toBeVisible();
       const overflow = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `${task.id} ${role}`).toBeLessThanOrEqual(0);
       const inner = await phone.page.locator('main').evaluate((main) => main.scrollWidth - main.clientWidth);
       expect(inner, `${task.id} ${role} im Inhaltsbereich`).toBeLessThanOrEqual(0);
-      await check(phone.page, `narrow-task-${task.kind}-${role}`);
+      await check(phone.page, `narrow-task-${task.id}-${role}`);
     }
   }
 });

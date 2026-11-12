@@ -1,0 +1,14 @@
+{
+  "id": "knowme-coffee",
+  "type": "knowme",
+  "question": "How do you take your coffee?",
+  "answer": {
+    "kind": "choice",
+    "options": [
+      "Black",
+      "With milk",
+      "Cà phê sữa đá, please",
+      "I'll have tea, thanks"
+    ]
+  }
+}

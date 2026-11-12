@@ -1,0 +1,6 @@
+{
+  "id": "rice-cooker",
+  "name": "Rice cooker",
+  "nameVi": "Nồi cơm điện",
+  "fits": ["surface"]
+}

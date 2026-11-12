@@ -225,6 +225,31 @@ describe('Reihenfolge', () => {
     }
   });
 
+  it('zählt, wie viele Schritte aus einer Lage umzustecken sind', () => {
+    expect(sequence.movesToSolve([0, 1, 2, 3, 4])).toBe(0);
+    expect(sequence.movesToSolve([1, 2, 3, 4, 0])).toBe(1);
+    // Drei Schritte stehen schon richtig zueinander: Mit zwei Handgriffen wäre es gelöst.
+    expect(sequence.movesToSolve([4, 1, 0, 2, 3])).toBe(2);
+    expect(sequence.movesToSolve([4, 3, 2, 1, 0])).toBe(4);
+  });
+
+  it('die Anfangslage liegt weit weg von der Lösung: kein Schritt an seinem Platz, mindestens drei Handgriffe nötig', () => {
+    const lists = [
+      data.steps,
+      ['x1', 'x2', 'x3', 'x4', 'x5', 'x6'],
+      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      // Jede Reihenfolge-Variante der Inhalte.
+      ...puzzles.flatMap((p) => (p.kind === 'sequence' ? [p.data.steps] : [])),
+    ];
+    expect(lists.length).toBeGreaterThan(3);
+    for (const steps of lists) {
+      const order = sequence.startOrder({ steps, hints: [] });
+      expect([...order].sort((x, y) => x - y), steps.join()).toEqual(steps.map((_, index) => index));
+      expect(order.filter((step, place) => step === place), steps.join()).toEqual([]);
+      expect(sequence.movesToSolve(order), steps.join()).toBeGreaterThanOrEqual(sequence.MIN_START_MOVES);
+    }
+  });
+
   it('gelöst ist es nur in der richtigen Abfolge', () => {
     expect(sequence.isSolved(data, [0, 1, 2, 3, 4])).toBe(true);
     expect(sequence.isSolved(data, [0, 1, 3, 2, 4])).toBe(false);

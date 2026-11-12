@@ -1,0 +1,5 @@
+{
+  "id": "world-map",
+  "name": "World map with two pins",
+  "fits": ["wall"]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "split-code-1",
+  "type": "puzzle",
+  "kind": "split-code",
+  "variant": 1,
+  "title": "The pantry lock",
+  "lead": "a",
+  "data": {
+    "row": [
+      "wave",
+      "moon",
+      "leaf",
+      "sun",
+      "star"
+    ],
+    "code": [
+      {
+        "pick": "place",
+        "n": 3
+      },
+      {
+        "pick": "left-of",
+        "of": "moon"
+      },
+      {
+        "pick": "from-end",
+        "n": 1
+      }
+    ]
+  }
+}

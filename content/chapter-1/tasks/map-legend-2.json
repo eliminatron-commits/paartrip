@@ -1,0 +1,59 @@
+{
+  "id": "map-legend-2",
+  "type": "puzzle",
+  "kind": "map-legend",
+  "variant": 2,
+  "title": "Four spare keys",
+  "lead": "a",
+  "data": {
+    "plan": [
+      "######",
+      "#1a.2#",
+      "#3..b#",
+      "#.c4.#",
+      "#5..6#",
+      "#d7.8#",
+      "#9..e#",
+      "######"
+    ],
+    "landmarks": [
+      {
+        "key": "a",
+        "glyph": "star",
+        "name": "the fridge"
+      },
+      {
+        "key": "b",
+        "glyph": "drop",
+        "name": "the sofa"
+      },
+      {
+        "key": "c",
+        "glyph": "bell",
+        "name": "the dining table"
+      },
+      {
+        "key": "d",
+        "glyph": "cloud",
+        "name": "the bookshelf"
+      },
+      {
+        "key": "e",
+        "glyph": "wave",
+        "name": "the back door"
+      }
+    ],
+    "clues": [
+      "One is right beside the dining table.",
+      "Two are beside the bookshelf: the one above it and the one below it on the plan.",
+      "The fourth is beside the sofa.",
+      "Nothing is hidden next to the fridge or the back door."
+    ],
+    "treasures": [
+      "2",
+      "4",
+      "5",
+      "9"
+    ]
+  }
+}

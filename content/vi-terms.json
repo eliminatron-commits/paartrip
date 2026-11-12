@@ -11,7 +11,76 @@
   },
   {
     "term": "Cà phê phin",
-    "meaning": "Vietnamese drip-filter coffee",
-    "where": ["content/chapter-1/pieces/ca-phe-phin.json: nameVi"]
+    "meaning": "Vietnamese drip-filter coffee; the phin is the small metal filter",
+    "where": ["content/chapter-1/pieces/ca-phe-phin.json: nameVi", "content/chapter-1/story/scene-20.json: text (\"the phin\")"]
+  },
+  {
+    "term": "Cà phê sữa đá",
+    "meaning": "iced coffee with sweetened condensed milk",
+    "where": ["content/chapter-1/tasks/knowme-coffee.json: answer option"]
+  },
+  {
+    "term": "Phở",
+    "meaning": "noodle soup with beef or chicken",
+    "where": [
+      "content/chapter-1/tasks/knowme-rainy-day.json: answer option",
+      "content/chapter-1/tasks/reallife-same-dish.json: text",
+      "content/chapter-1/pieces/pho-bowls.json: name"
+    ]
+  },
+  {
+    "term": "Tô phở",
+    "meaning": "bowl of phở (southern word for bowl; in the north: bát phở)",
+    "where": ["content/chapter-1/pieces/pho-bowls.json: nameVi"]
+  },
+  {
+    "term": "Nồi cơm điện",
+    "meaning": "electric rice cooker",
+    "where": ["content/chapter-1/pieces/rice-cooker.json: nameVi"]
+  },
+  {
+    "term": "Nón lá",
+    "meaning": "conical leaf hat",
+    "where": ["content/chapter-1/pieces/non-la.json: nameVi"]
+  },
+  {
+    "term": "Tranh sơn mài",
+    "meaning": "lacquer painting",
+    "where": ["content/chapter-1/pieces/lacquer-painting.json: nameVi"]
+  },
+  {
+    "term": "Đèn lồng",
+    "meaning": "lantern",
+    "where": ["content/chapter-1/pieces/deco-paper-lantern.json: nameVi"]
+  },
+  {
+    "term": "Cây quất",
+    "meaning": "kumquat tree, put up for the new year (northern word; in the south: cây tắc)",
+    "where": ["content/chapter-1/pieces/kumquat-tree.json: nameVi"]
+  },
+  {
+    "term": "Ghế nhựa",
+    "meaning": "plastic stool, as found at every street-food stall",
+    "where": ["content/chapter-1/pieces/little-stool.json: nameVi"]
+  },
+  {
+    "term": "Hồ sen",
+    "meaning": "lotus pond",
+    "where": ["content/chapter-1/pieces/lotus-pond.json: nameVi"]
+  },
+  {
+    "term": "Rau thơm",
+    "meaning": "fresh herbs",
+    "where": ["content/chapter-1/pieces/herb-patch.json: nameVi"]
+  },
+  {
+    "term": "Võng",
+    "meaning": "hammock",
+    "where": ["content/chapter-1/pieces/hammock.json: nameVi"]
+  },
+  {
+    "term": "Chuông gió",
+    "meaning": "wind chime",
+    "where": ["content/chapter-1/pieces/wind-chime.json: nameVi"]
   }
 ]

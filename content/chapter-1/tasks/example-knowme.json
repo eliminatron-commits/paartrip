@@ -1,6 +1,0 @@
-{
-  "id": "example-knowme",
-  "type": "knowme",
-  "question": "A free Sunday morning. What do you reach for first?",
-  "answer": { "kind": "choice", "options": ["Coffee", "My phone", "The pillow, again", "Something to eat"] }
-}

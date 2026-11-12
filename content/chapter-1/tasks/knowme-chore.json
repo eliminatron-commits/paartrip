@@ -1,0 +1,15 @@
+{
+  "id": "knowme-chore",
+  "type": "knowme",
+  "question": "Which chore would you gladly never do again?",
+  "answer": {
+    "kind": "choice",
+    "options": [
+      "Washing up",
+      "Ironing",
+      "Taking out the rubbish",
+      "Cleaning the bathroom",
+      "Vacuuming"
+    ]
+  }
+}

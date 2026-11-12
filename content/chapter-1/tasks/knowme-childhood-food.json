@@ -1,0 +1,9 @@
+{
+  "id": "knowme-childhood-food",
+  "type": "knowme",
+  "question": "What did you love to eat most as a child?",
+  "answer": {
+    "kind": "text",
+    "maxLength": 40
+  }
+}

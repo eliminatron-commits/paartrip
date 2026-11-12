@@ -1,0 +1,48 @@
+{
+  "id": "spot-difference-2",
+  "type": "puzzle",
+  "kind": "spot-difference",
+  "variant": 2,
+  "title": "Two cupboards, almost the same",
+  "lead": "a",
+  "data": {
+    "cols": 4,
+    "rows": 3,
+    "scene": [
+      "cup",
+      "leaf",
+      null,
+      "bell",
+      "fish",
+      "star",
+      "heart",
+      "key",
+      "tree",
+      null,
+      "boat",
+      "sun"
+    ],
+    "changes": [
+      {
+        "cell": 2,
+        "glyph": "flower"
+      },
+      {
+        "cell": 4,
+        "glyph": "star"
+      },
+      {
+        "cell": 5,
+        "glyph": "fish"
+      },
+      {
+        "cell": 6,
+        "glyph": null
+      },
+      {
+        "cell": 11,
+        "glyph": "moon"
+      }
+    ]
+  }
+}

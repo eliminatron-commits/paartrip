@@ -281,16 +281,36 @@ function duplicates(values: string[]): string[] {
   return [...new Set(values.filter((v, i) => values.indexOf(v) !== i))];
 }
 
+/** Alle Texte in einem Stück Inhalt, wie tief sie auch liegen. */
+function textsIn(value: unknown): string[] {
+  if (typeof value === 'string') return [value];
+  if (Array.isArray(value)) return value.flatMap(textsIn);
+  if (value !== null && typeof value === 'object') return Object.values(value).flatMap(textsIn);
+  return [];
+}
+
+/** Die Wörter eines Texts, klein geschrieben und in einheitlicher Zeichenform. */
+const wordsOf = (s: string) => s.normalize('NFC').toLowerCase().match(/[\p{L}\p{M}]+/gu) ?? [];
+/** Ein Wort mit Buchstaben außerhalb von a–z: In den englischen Texten sind das die vietnamesischen Einsprengsel. */
+const isForeign = (word: string) => /[^a-z]/.test(word);
+
 /**
  * Bezüge zwischen den Inhaltsdateien. Liefert eine Liste von Problemen (leer = in Ordnung).
- * Ob ein Kapitel vollständig ist (Anzahl Aufgaben, kein Meilenstein hinter der letzten Aufgabe, Szene je
- * Meilenstein …), prüft Phase 5 getrennt – bis dahin hat Kapitel 1 erst seine Test-Aufgaben.
+ * Ob ein Kapitel vollständig ist, prüft `checkComplete`.
  */
 export function checkContent(content: Content): string[] {
   const problems: string[] = [];
   const terms = new Set(content.viTerms.map((t) => t.term));
   const needTerm = (term: string, where: string) => {
     if (!terms.has(term)) problems.push(`${where}: "${term}" fehlt in vi-terms.json`);
+  };
+  // Vietnamesisches mitten im Text (ein Gericht in einer Frage, ein Wort in einer Szene): Jedes Wort mit
+  // Sonderbuchstaben muss in einem Begriff der Liste vorkommen.
+  const termWords = new Set(content.viTerms.flatMap((t) => wordsOf(t.term)));
+  const needWords = (value: unknown, where: string) => {
+    for (const word of new Set(textsIn(value).flatMap(wordsOf).filter(isForeign))) {
+      if (!termWords.has(word)) problems.push(`${where}: das Wort "${word}" steht in keinem Begriff von vi-terms.json`);
+    }
   };
 
   for (const dup of duplicates(content.chapters.map((c) => String(c.number)))) problems.push(`Kapitelnummer ${dup} doppelt`);
@@ -319,6 +339,39 @@ export function checkContent(content: Content): string[] {
       if (piece.milestone !== undefined) needMilestone(piece.milestone, `Stück "${piece.id}"`);
       if (piece.nameVi) needTerm(piece.nameVi, `${at} Stück "${piece.id}" nameVi`);
       if (!piece.fits.some((kind) => spotKinds.has(kind))) problems.push(`${at}: Stück "${piece.id}" passt auf keinen Platz`);
+      needWords(piece.name, `${at} Stück "${piece.id}"`);
+    }
+
+    needWords(chapter.title, `${at} title`);
+    for (const task of chapter.tasks) needWords(task, `${at} Aufgabe "${task.id}"`);
+    for (const scene of chapter.story) needWords([scene.title, scene.text], `${at} Szene "${scene.id}"`);
+    for (const coupon of chapter.coupons) needWords(coupon.text, `${at} Gutschein "${coupon.id}"`);
+    for (const room of chapter.rooms) needWords(room.name, `${at} Raum "${room.id}"`);
+  }
+  return problems;
+}
+
+/**
+ * Vollständigkeit eines Kapitels: Alles, was an einem Meilenstein hängt, muss erreichbar sein und dort etwas
+ * bereithalten. Liefert eine Liste von Problemen (leer = in Ordnung). Wie viele Aufgaben, Plätze und Stücke
+ * ein Kapitel haben soll, ist seine eigene Sache und steht nicht hier.
+ */
+export function checkComplete(content: Content): string[] {
+  const problems: string[] = [];
+  for (const chapter of content.chapters) {
+    const at = `Kapitel ${chapter.number}`;
+    for (const milestone of chapter.milestones) {
+      const where = `${at}: Meilenstein ${milestone}`;
+      // Gezählt werden erledigte Aufgaben: Was hinter der letzten liegt, erreicht kein Haus je.
+      if (milestone > chapter.taskOrder.length) problems.push(`${where} liegt hinter der letzten Aufgabe (${chapter.taskOrder.length} Aufgaben)`);
+      const scenes = chapter.story.filter((scene) => scene.milestone === milestone).length;
+      if (scenes !== 1) problems.push(`${where} braucht genau eine Story-Szene, hat ${scenes}`);
+      // Im Geschenk liegt ein fester Gutschein oder – wenn auch kein geheimer hinterlegt wurde – ein Dekostück.
+      const decos = chapter.pieces.filter((piece) => piece.milestone === milestone).length;
+      const fixed = chapter.coupons.some((coupon) => coupon.milestone === milestone);
+      if (decos > 1) problems.push(`${where} hat ${decos} Dekostücke – nur eines käme je ins Geschenk`);
+      if (decos > 0 && fixed) problems.push(`${where} hat einen festen Gutschein und ein Dekostück – das Dekostück käme nie ins Geschenk`);
+      if (decos === 0 && !fixed) problems.push(`${where} hat weder einen festen Gutschein noch ein Dekostück – das Geschenk wäre leer`);
     }
   }
   return problems;

@@ -1,0 +1,14 @@
+{
+  "id": "knowme-evening-at-home",
+  "type": "knowme",
+  "question": "What does a perfect evening at home look like for you?",
+  "answer": {
+    "kind": "choice",
+    "options": [
+      "A film on the sofa",
+      "Cooking something that takes hours",
+      "Friends around the table",
+      "Early to bed with a book"
+    ]
+  }
+}

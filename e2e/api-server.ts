@@ -102,7 +102,10 @@ async function finishTask(code: string): Promise<boolean> {
   return true;
 }
 
-/** Spielt so weit, bis die Aufgabe `task` die laufende, offene ist. */
+/**
+ * Spielt so weit, bis die Aufgabe `task` die laufende, offene ist. Die Meilensteine auf dem Weg dorthin gelten
+ * als von beiden gesehen – wer zu einer späten Aufgabe will, müsste sonst auf jedem Gerät erst durch jede Szene.
+ */
 async function openTask(code: string, params: URLSearchParams): Promise<boolean> {
   const row = await load(code);
   const wanted = params.get('task');
@@ -116,6 +119,12 @@ async function openTask(code: string, params: URLSearchParams): Promise<boolean>
     if (state === finished) return false;
   }
   if (state.task.completedAt !== null) return false;
+  for (const milestone of state.milestones) {
+    for (const slot of ['a', 'b'] as const) {
+      if (milestone.seenBy.includes(slot)) continue;
+      state = applyAction(state, slot, { type: 'milestone.seen', milestone: milestone.at, id: crypto.randomUUID(), at: ctx.now }, ctx).state;
+    }
+  }
   await save(row, state);
   return true;
 }

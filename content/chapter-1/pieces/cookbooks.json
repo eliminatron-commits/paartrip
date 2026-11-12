@@ -1,0 +1,5 @@
+{
+  "id": "cookbooks",
+  "name": "Stack of cookbooks",
+  "fits": ["surface"]
+}

@@ -1,6 +1,7 @@
 {
   "id": "deco-paper-lantern",
   "name": "Paper lantern",
+  "nameVi": "Đèn lồng",
   "fits": ["wall", "fence"],
   "milestone": 15
 }

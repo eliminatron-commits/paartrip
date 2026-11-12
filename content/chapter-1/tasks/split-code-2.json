@@ -1,0 +1,42 @@
+{
+  "id": "split-code-2",
+  "type": "puzzle",
+  "kind": "split-code",
+  "variant": 2,
+  "title": "The garden shed lock",
+  "lead": "b",
+  "data": {
+    "row": [
+      "key",
+      "cloud",
+      "fish",
+      "heart",
+      "tree",
+      "cup",
+      "bell"
+    ],
+    "code": [
+      {
+        "pick": "between",
+        "a": "cloud",
+        "b": "heart"
+      },
+      {
+        "pick": "right-of",
+        "of": "tree"
+      },
+      {
+        "pick": "from-end",
+        "n": 1
+      },
+      {
+        "pick": "left-of",
+        "of": "cloud"
+      },
+      {
+        "pick": "place",
+        "n": 4
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "knowme-hour-alone",
+  "type": "knowme",
+  "question": "You get one hour all to yourself. Where do we find you?",
+  "answer": {
+    "kind": "choice",
+    "options": [
+      "Fast asleep",
+      "Out for a walk",
+      "In the kitchen",
+      "On the sofa with a screen",
+      "Tidying something that was fine already"
+    ]
+  }
+}

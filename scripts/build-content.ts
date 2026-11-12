@@ -8,6 +8,7 @@ import type { z } from 'zod';
 import {
   type Chapter,
   chapterFileSchema,
+  checkComplete,
   checkContent,
   type Content,
   couponsFileSchema,
@@ -117,8 +118,8 @@ const viTerms = (await readJson(viTermsFileSchema, join(ROOT, 'vi-terms.json')))
 const content: Content = { chapters, viTerms };
 
 if (chapters.length === 0) problems.push(`${ROOT}: kein Kapitel gefunden`);
-// Bezüge zwischen den Dateien erst prüfen, wenn jede Datei für sich stimmt.
-if (problems.length === 0) problems.push(...checkContent(content));
+// Bezüge zwischen den Dateien und Vollständigkeit erst prüfen, wenn jede Datei für sich stimmt.
+if (problems.length === 0) problems.push(...checkContent(content), ...checkComplete(content));
 
 if (problems.length > 0) {
   console.error(`Inhalte fehlerhaft (${problems.length}):\n${problems.map((p) => `  - ${p}`).join('\n')}`);

@@ -1,0 +1,14 @@
+{
+  "id": "knowme-rainy-day",
+  "type": "knowme",
+  "question": "A grey, rainy day and you are hungry. What sounds best?",
+  "answer": {
+    "kind": "choice",
+    "options": [
+      "A steaming bowl of phở",
+      "Schnitzel with potato salad",
+      "Pizza, no discussion",
+      "Whatever is left in the fridge"
+    ]
+  }
+}

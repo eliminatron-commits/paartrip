@@ -1,14 +1,20 @@
 {
-  "id": "example-sequence",
+  "id": "sequence-1",
   "type": "puzzle",
   "kind": "sequence",
   "variant": 1,
   "title": "The secret handshake",
   "lead": "a",
   "data": {
-    "steps": ["Tap elbows", "Clap twice", "Spin around once", "High five", "Take a bow"],
+    "steps": [
+      "Bump elbows",
+      "Clap twice",
+      "Spin around once",
+      "High five",
+      "Bow deeply"
+    ],
     "hints": [
-      "It starts with the elbows and ends with a bow.",
+      "It starts with the elbows and ends with a deep bow.",
       "The clapping comes before the spin.",
       "The high five is the last thing before the bow."
     ]

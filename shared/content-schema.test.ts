@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import generated from '../generated/content.json';
 import {
+  checkComplete,
   checkContent,
   type Content,
   contentSchema,
@@ -184,5 +185,69 @@ describe('checkContent', () => {
     const content = sample();
     content.chapters[0]!.pieces[0]!.fits = ['ceiling'];
     expect(checkContent(content)).toEqual([expect.stringContaining('passt auf keinen Platz')]);
+  });
+
+  it('meldet Vietnamesisches mitten im Text, das in keinem Begriff der Liste vorkommt', () => {
+    const content = sample();
+    const chapter = content.chapters[0]!;
+    chapter.tasks = [{ id: 't1', type: 'knowme', question: 'Tea or coffee?', answer: { kind: 'choice', options: ['Cà phê sữa đá', 'Tea'] } }];
+    chapter.story[0]!.text = `${words(59)} phở`;
+    chapter.pieces[0]!.name = 'Ghế chair';
+    // "Ghế" steht in der Liste – auch klein geschrieben und als Teil eines längeren Namens.
+    const problems = checkContent(content);
+    expect(problems.filter((p) => p.includes('Aufgabe "t1"'))).toHaveLength(4);
+    expect(problems.filter((p) => p.includes('Szene "s1"'))).toEqual([expect.stringContaining('"phở"')]);
+    expect(problems).toHaveLength(5);
+
+    content.viTerms.push({ term: 'Cà phê sữa đá', meaning: 'iced coffee', where: ['t1'] }, { term: 'Phở', meaning: 'noodle soup', where: ['s1'] });
+    expect(checkContent(content)).toEqual([]);
+  });
+});
+
+describe('checkComplete', () => {
+  /** Das Beispiel, ergänzt um alles, was an seinen beiden Meilensteinen hängt. */
+  function complete(): Content {
+    const content = sample();
+    const chapter = content.chapters[0]!;
+    chapter.taskOrder = ['t1', 't2'];
+    chapter.tasks.push({ id: 't2', type: 'reallife', title: 'T2', text: 'Do it again.', doer: 'a' });
+    chapter.story.push({ id: 's2', milestone: 2, title: 'S2', text: words(60) });
+    chapter.pieces.push({ id: 'lamp', name: 'Lamp', fits: ['floor'], milestone: 1, art: chapter.pieces[0]!.art });
+    return content;
+  }
+
+  it('findet im vollständigen Beispiel nichts', () => {
+    expect(checkContent(complete())).toEqual([]);
+    expect(checkComplete(complete())).toEqual([]);
+  });
+
+  it('meldet einen Meilenstein, der hinter der letzten Aufgabe liegt', () => {
+    const content = complete();
+    const chapter = content.chapters[0]!;
+    chapter.taskOrder = ['t1'];
+    chapter.tasks = [chapter.tasks[0]!];
+    expect(checkComplete(content)).toEqual([expect.stringContaining('Meilenstein 2 liegt hinter der letzten Aufgabe')]);
+  });
+
+  it('meldet einen Meilenstein ohne Szene oder mit zweien', () => {
+    const content = complete();
+    const chapter = content.chapters[0]!;
+    chapter.story[1]!.milestone = 1;
+    expect(checkComplete(content)).toEqual([expect.stringContaining('Meilenstein 1 braucht genau eine Story-Szene, hat 2'), expect.stringContaining('Meilenstein 2 braucht genau eine Story-Szene, hat 0')]);
+  });
+
+  it('meldet ein Geschenk, das leer wäre, und ein Dekostück, das nie an die Reihe käme', () => {
+    const empty = complete();
+    empty.chapters[0]!.pieces.pop();
+    expect(checkComplete(empty)).toEqual([expect.stringContaining('Meilenstein 1 hat weder einen festen Gutschein noch ein Dekostück')]);
+
+    const twice = complete();
+    twice.chapters[0]!.pieces[0]!.milestone = 1;
+    expect(checkComplete(twice)).toEqual([expect.stringContaining('Meilenstein 1 hat 2 Dekostücke')]);
+
+    // Am Meilenstein 2 wartet schon der feste Gutschein.
+    const unused = complete();
+    unused.chapters[0]!.pieces[0]!.milestone = 2;
+    expect(checkComplete(unused)).toEqual([expect.stringContaining('Meilenstein 2 hat einen festen Gutschein und ein Dekostück')]);
   });
 });

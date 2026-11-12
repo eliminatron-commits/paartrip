@@ -1,0 +1,37 @@
+{
+  "id": "describe-arrange-2",
+  "type": "puzzle",
+  "kind": "describe-arrange",
+  "variant": 2,
+  "title": "The spice rack, just so",
+  "lead": "b",
+  "data": {
+    "cols": 4,
+    "rows": 3,
+    "tiles": [
+      "cup",
+      "key",
+      "bell",
+      "fish",
+      "tree",
+      "cloud",
+      "drop",
+      "house",
+      "flower"
+    ],
+    "target": [
+      5,
+      null,
+      0,
+      null,
+      2,
+      7,
+      null,
+      3,
+      null,
+      8,
+      1,
+      null
+    ]
+  }
+}

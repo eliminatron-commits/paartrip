@@ -2,19 +2,53 @@
   "number": 1,
   "title": "Moving In",
   "titleVi": "Dọn về nhà mới",
-  "rooms": ["living-room", "kitchen", "garden"],
-  "taskOrder": [
-    "example-split-code",
-    "example-knowme",
-    "example-reallife",
-    "example-map-legend",
-    "example-knowme-text",
-    "example-describe-arrange",
-    "example-reallife-song",
-    "example-spot-difference",
-    "example-sequence",
-    "example-blind-maze"
+  "rooms": [
+    "living-room",
+    "kitchen",
+    "garden"
   ],
-  "milestones": [5, 10, 15, 20, 25, 30],
-  "build": { "offerSize": 3, "firstChooser": "a" }
+  "taskOrder": [
+    "split-code-1",
+    "knowme-sunday-morning",
+    "reallife-song",
+    "map-legend-1",
+    "knowme-everyday-dish",
+    "describe-arrange-1",
+    "reallife-window-view",
+    "knowme-evening-at-home",
+    "spot-difference-1",
+    "reallife-three-good-things",
+    "knowme-hour-alone",
+    "sequence-1",
+    "knowme-weekend-bag",
+    "blind-maze-1",
+    "reallife-same-dish",
+    "split-code-2",
+    "knowme-chore",
+    "map-legend-2",
+    "reallife-little-note",
+    "knowme-childhood-food",
+    "describe-arrange-2",
+    "knowme-rainy-day",
+    "reallife-old-photo",
+    "spot-difference-2",
+    "knowme-coffee",
+    "sequence-2",
+    "reallife-new-word",
+    "knowme-next-trip",
+    "blind-maze-2",
+    "reallife-toast"
+  ],
+  "milestones": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "build": {
+    "offerSize": 3,
+    "firstChooser": "a"
+  }
 }

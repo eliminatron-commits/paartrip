@@ -1,0 +1,26 @@
+{
+  "id": "sequence-2",
+  "type": "puzzle",
+  "kind": "sequence",
+  "variant": 2,
+  "title": "The kitchen dance",
+  "lead": "b",
+  "data": {
+    "steps": [
+      "Two steps to the left",
+      "Snap your fingers",
+      "Turn to the fridge",
+      "Wiggle your shoulders",
+      "One step back",
+      "Clap over your head",
+      "Point at your partner"
+    ],
+    "hints": [
+      "The last move is pointing at your partner.",
+      "The shoulder wiggle is the fourth move.",
+      "The finger snap comes directly between the steps to the left and the turn to the fridge.",
+      "The dance does not begin with a turn.",
+      "The clap over the head comes some time after the step back."
+    ]
+  }
+}

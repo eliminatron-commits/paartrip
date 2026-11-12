@@ -1,0 +1,19 @@
+{
+  "id": "blind-maze-2",
+  "type": "puzzle",
+  "kind": "blind-maze",
+  "variant": 2,
+  "title": "Through the garden at night",
+  "lead": "a",
+  "data": {
+    "maze": [
+      "S..#...",
+      "##.#.#.",
+      "...#.#.",
+      ".###.#.",
+      ".....#.",
+      "####.#.",
+      "G....#."
+    ]
+  }
+}

@@ -22,15 +22,38 @@ function hash(text: string): number {
   return h >>> 0;
 }
 
+/** So viele Schritte muss man aus der Anfangslage mindestens herausnehmen und woanders einfügen, um zu lösen. */
+export const MIN_START_MOVES = 3;
+
+/**
+ * Wie viele Schritte man mindestens herausnehmen und woanders einfügen muss, damit die Reihenfolge stimmt:
+ * alle außer der längsten Folge von Schritten, die schon richtig zueinander stehen.
+ */
+export function movesToSolve(order: SequenceAttempt): number {
+  const longest: number[] = [];
+  order.forEach((step, place) => {
+    longest[place] = 1 + Math.max(0, ...order.slice(0, place).map((earlier, at) => (earlier < step ? (longest[at] ?? 0) : 0)));
+  });
+  return order.length - Math.max(0, ...longest);
+}
+
 /**
  * Die Reihenfolge, in der Rolle 1 die Schritte zu Beginn sieht: fest durch den Wortlaut der Schritte
- * bestimmt (kein Zufall, also auf jedem Gerät und nach jedem Neustart gleich) und nie schon die Lösung.
+ * bestimmt (kein Zufall, also auf jedem Gerät und nach jedem Neustart gleich) und weit weg von der Lösung –
+ * kein Schritt steht an seinem Platz, und mit ein, zwei Handgriffen ist es nicht getan. Sonst ließe sich das
+ * Rätsel aus der Anfangslage heraus allein lösen.
  */
 export function startOrder(data: SequenceData): SequenceAttempt {
-  const order = data.steps.map((_, index) => index).sort((x, y) => hash(data.steps[x] ?? '') - hash(data.steps[y] ?? '') || x - y);
-  // Steht zufällig schon alles richtig, rückt der erste Schritt ans Ende.
-  if (order.every((step, place) => step === place)) order.push(order.shift() ?? 0);
-  return order;
+  const mixed = (salt: number) =>
+    data.steps.map((_, index) => index).sort((x, y) => hash(`${salt}:${data.steps[x] ?? ''}`) - hash(`${salt}:${data.steps[y] ?? ''}`) || x - y);
+  const far = (order: SequenceAttempt) => order.every((step, place) => step !== place) && movesToSolve(order) >= Math.min(MIN_START_MOVES, order.length - 1);
+  // Anders gemischt, bis es passt. Bei den verlangten fünf und mehr Schritten findet sich das nach wenigen Anläufen.
+  for (let salt = 0; salt < 500; salt++) {
+    const order = mixed(salt);
+    if (far(order)) return order;
+  }
+  // Nur bei sehr kurzen Listen (die die Inhaltsprüfung ohnehin ablehnt): rückwärts ist nie die Lösung.
+  return data.steps.map((_, index) => index).reverse();
 }
 
 /** Wie viele Reihenfolgen es für so viele Schritte gibt. */
