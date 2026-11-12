@@ -40,19 +40,21 @@ shared/             von App und Worker gemeinsam genutzt, ohne DOM- oder Worker-
   view.ts             deriveView: die eine Stelle, die Verborgenes herausfiltert
   wire.ts             Prüfung eingehender Anfragen (zod/mini), limits.ts: Längen und Code-Alphabet
 src/                Svelte-App
-  lib/                Logik ohne Oberfläche (*.svelte.ts nur, wenn Runen nötig sind)
-  components/         wiederverwendbare Oberfläche
-  screens/            ab Phase 3: ein Ordner je Bildschirm
+  lib/                Logik ohne Oberfläche (*.svelte.ts nur, wenn Runen nötig sind); house.ts leitet aus der Sicht ab, was die Oberfläche zeigt
+  components/         wiederverwendbare Oberfläche (Kopfleiste, untere Leiste, Abgleich-Hinweis, Blatt, Stück-Zeichnung)
+  screens/            ein Ordner je Bildschirm: home (Haus, Bauzug, Erinnerungsstücke), today, gifts, milestone, settings
   sw.ts               eigener Service Worker (Precache, Update, Push-Empfang)
 worker/             Cloudflare Worker "paartrip-api" + D1
   src/                index.ts (Routen), store.ts (D1), push.ts + webpush.ts (VAPID, Verschlüsselung)
   migrations/         D1-Schema, fortlaufend nummeriert
   test/               Tests gegen den echten Worker, local-api.ts startet ihn
   wrangler.jsonc      Konfiguration ohne Secrets
-scripts/            Build-Helfer (Inhalte bündeln, Icons erzeugen)
-e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Worker mit Hilfsroute /__test/forget-house)
+scripts/            Build-Helfer (Inhalte bündeln, Icons und iPhone-Startbilder erzeugen; splash-sizes.ts: die eine Liste der Gerätegrößen)
+e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Worker mit Hilfsroute /__test/forget-house; phones.ts: gemeinsame Handgriffe der Zwei-Geräte-Tests)
 generated/          erzeugt, nicht im Repo (content.json, content-rules.json)
 public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
+public/splash/      erzeugt, nicht im Repo (Startbilder je iPhone-Größe)
+screenshots/        erzeugt, nicht im Repo (e2e/screens.spec.ts legt dort jeden Bildschirm zur Sichtprüfung ab)
 ```
 
 ## Architektur
@@ -62,6 +64,8 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - **Abgleich** beim Öffnen, bei Rückkehr in die App und nach jeder eigenen Aktion: `POST /sync` reicht Aktionen ein und liefert die neue Sicht.
 - **Verborgenes bleibt auf dem Server:** Kennst-du-mich-Antworten vor beidseitiger Abgabe und der Text geheimer Gutscheine vor dem Freischalten stehen in keiner Antwort an das andere Gerät. Die Filterung geschieht an genau einer Stelle (Sicht aus dem Stand ableiten) und ist per Test belegt.
 - **Spielregeln sind reine Funktionen in `shared/`** (Stand + Aktion + Inhalte + Serverzeit → neuer Stand), damit Vitest sie ohne Worker prüfen kann. Zeitregeln rechnen mit der Serverzeit und `DAY_TIMEZONE` (Europe/Berlin), nie mit der Gerätezeit.
+- **Erledigte Aufgabe → Bauzug → Meilenstein** läuft über die eine Funktion `completeTask` in `shared/rules.ts`: Sie zählt die Aufgabe, legt den Bauzug an (Angebot aus dem Katalog, abhängig nur von Haus-id und Zugnummer – kein Zufall, die Regel bleibt rein) und öffnet am Meilenstein das Geschenk. Der Aufgabenablauf (Phase 4) ruft sie auf. Bis dahin gibt es die Aktion `test.completeTask`; der Server nimmt sie nur an, wenn die Worker-Variable `TEST_ACTIONS` auf `1` steht (lokal und in den Tests an), und sagt das der App in `HouseView.testActions`.
+- **Die Oberfläche leitet ab und schreibt nichts um:** `src/lib/house.ts` macht aus der Sicht den nächsten Schritt im Haus, Geschenk-Listen und Erinnerungsstücke. Wartende eigene Aktionen (`session.queued`) dienen nur dazu, schon Abgeschicktes nicht noch einmal anzubieten – ein Stück erscheint im Haus erst, wenn der Server es bestätigt hat.
 - **Rollen:** Spieler `a` legt das Haus an, `b` tritt bei. Inhalte beziehen sich auf diese Slots (feste Gutscheine sind `from: a`, also legt Alex das Haus an).
 - **Inhalte:** `scripts/build-content.ts` prüft jede Datei unter `content/` gegen `shared/content-schema.ts`, hängt `.svg`-Dateien als Inline-SVG an und schreibt `generated/content.json`. App und Worker lesen nur dieses Bündel. Neue Kapitel und Einträge brauchen keine Codeänderung; fehlerhafte Inhalte brechen Typecheck, Tests und Build ab. Setzungen (Meilenstein-Abstände, Zuordnung der festen Gutscheine, Parameter des Bauzugs) stehen in `content/chapter-N/` und sind dort änderbar.
 - **Update-Funktion** (`src/lib/update.svelte.ts`, `src/sw.ts`): bei Rückkehr in die App `registration.update()`, höchstens einmal pro Minute; wartet ein neuer Worker, erscheint "New version – Update"; erst auf Tippen `skipWaiting`, bei `controllerchange` lädt die Seite neu. Versionszeile "Version · Build-Zeit · Commit" und Knopf "Check for updates" mit Ergebnis. Die Build-Zeit steckt im Bundle, damit jeder Deploy als neue Version erkannt wird.
@@ -74,7 +78,8 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 
 - Dateien: Svelte-Komponenten `PascalCase.svelte`, alles andere `kebab-case.ts`; Tests daneben als `*.test.ts` (Vitest) bzw. in `e2e/*.spec.ts` (Playwright).
 - Relative Importe immer mit Dateiendung (`./model.ts`, `./Banner.svelte`). `shared/` und `scripts/` laufen auch direkt in Node, das die Endung verlangt.
-- Inhalts-ids: `kebab-case`, gleich dem Dateinamen. Platz-ids beginnen mit der Raum-id (`kitchen-counter-1`).
+- Inhalts-ids: `kebab-case`, gleich dem Dateinamen. Platz-ids beginnen mit der Raum-id (`kitchen-counter-1`); der Rest wird in der App als Name des Platzes vorgelesen.
+- Plätze (`rooms/*.json`): `x`, `y` = Mitte der Unterkante des Felds im Koordinatensystem der Raum-SVG (400 breit), `size` = Kantenlänge des Felds, `kind` = Platzart. Platzarten in Kapitel 1: `wall`, `surface`, `floor`, `ground`, `fence`. Ein Stück (`pieces/*.svg`, viewBox `0 0 100 100`) füllt das Feld und steht bzw. hängt mit seiner Unterkante bei y ≈ 96–100. Innenräume zeichnen ihre Hauswände selbst (10 Einheiten links und rechts); `outdoor: true` stellt einen Raum unter das Haus.
 - Aktionstypen `bereich.verb` (`build.place`), Routen in `shared/api.ts` → `ROUTES`.
 - Tests heißen auf Deutsch, was sie belegen (`'ein dritter Beitritt wird abgelehnt'`). In der Oberfläche `data-testid` nur, wo Rolle und Text nicht reichen.
 
@@ -105,10 +110,12 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - Warme, flächige Vektorillustration, vollständig als SVG, keine Verläufe-Orgien, keine Konturlinien-Optik. Das Haus als Querschnitt (Puppenhaus), vertikal scrollbar, Plätze als Tippflächen.
 - Palette als Tokens in `src/app.css`: Creme `--cream` als Grund, `--cream-deep` für Flächen, Terrakotta `--terracotta`, Salbeigrün `--sage-deep`, tiefes Petrol `--petrol` als Akzent, Text `--ink` / `--ink-soft`. `--terracotta-soft` und `--sage` sind nur Dekor, nicht für Text. Neue Farben nur als Token und mit geprüftem Kontrast (WCAG AA).
 - Schrift: Fraunces für Titel (`--font-title`), Nunito für Fließtext (`--font-body`), als Paket lokal eingebunden und im Precache. Nur aufrechte Schnitte – kein Kursiv, sonst erzeugt der Browser falsche Schrägen.
-- Navigation ab Phase 3: untere Leiste mit Home, Today, Gifts; Einstellungen über ein Symbol oben.
-- Safe Area ausschließlich über `--safe-top/right/bottom/left` (in `app.css` aus `env(safe-area-inset-*)` gesetzt), damit Tests sie simulieren können. Hintergründe laufen bis an den Rand, Bedienbares bleibt innerhalb.
+- Navigation: untere Leiste mit Home, Today, Gifts; Einstellungen über ein Symbol oben. Ein Punkt am Reiter zeigt, wo etwas auf diesen Spieler wartet.
+- Die App füllt genau den Bildschirm (`100dvh`); gescrollt wird nur im Inhaltsbereich zwischen Kopf- und Fußleiste. Kein Scrollbereich reicht unter den Home-Indikator.
+- Safe Area ausschließlich über `--safe-top/right/bottom/left` (in `app.css` aus `env(safe-area-inset-*)` gesetzt), damit Tests sie simulieren können. Hintergründe laufen bis an den Rand, Bedienbares und Text bleiben innerhalb.
 - Tap-Ziele mindestens 44 px (`--tap`), `prefers-reduced-motion` beachten, Hochformat; Querformat darf nicht brechen.
-- Sichtprüfung je Bildschirm per Screenshot bei 440×956 mit simulierter Safe Area (oben 59 px, unten 34 px).
+- Farben in Komponenten nur über die Tokens aus `app.css` (`scripts/contrast.test.ts` prüft Kontraste und dass keine Komponente eigene Farbwerte setzt). `--wall` und `--wood` gehören zur Galerie unter dem Dach.
+- Sichtprüfung je Bildschirm per Screenshot bei 440×956 mit simulierter Safe Area (oben 59 px, unten 34 px): `e2e/screens.spec.ts` legt die Bilder nach `screenshots/` und prüft dabei, dass in den Rändern weder Text noch Bedienbares liegt.
 
 ## Begründete Abweichungen und Setzungen
 
@@ -118,6 +125,12 @@ public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 - **Feste Gutscheine** stehen in `content/` und damit im App-Bündel beider Geräte; sie sind nur in der Oberfläche verhüllt. Die serverseitige Geheimhaltung gilt für das, was Spieler selbst eingeben.
 - **Der Schutz hängt am Token, nicht am Origin:** Die Origin-Prüfung des Workers hält nur fremde Webseiten im Browser ab; außerhalb des Browsers lässt sich der Kopf frei setzen. `https://eliminatron-commits.github.io` ist außerdem die Herkunft aller Pages-Seiten dieses GitHub-Kontos, und IndexedDB gilt je Herkunft – jede dieser Seiten könnte das Token lesen. Unter diesem Konto deshalb keine Pages-Seite betreiben, die fremde Inhalte oder Skripte ausführt. `MAX_HOUSES` ist eine Bremse, kein Schutz: Wer die Adresse kennt, kann die Grenze füllen; bestehende Häuser berührt das nicht.
 - **Rollenwechsel auf dem Gerät** (Import einer Sicherung, "Start over") laufen über `SyncEngine.switchDevice`: Solange wartet oder ruht der Abgleich, damit nie eine Aktion mit dem Token der vorigen Rolle hinausgeht. "Start over" gibt es nur, wenn der Server das Gerät nicht mehr kennt (`unauthorized` / `not_found`).
+- **Dekostück im Meilenstein-Geschenk:** Es bekommt keinen eigenen Bauzug. Wer zuerst kommt, stellt es mit `piece.move` auf einen passenden freien Platz; danach lässt es sich wie jedes Stück umstellen.
+- **Geheime Gutscheine nach dem letzten Meilenstein:** Hinterlegen ist dann geschlossen (es gibt keinen nächsten Meilenstein im Kapitel); die Gifts-Seite sagt das.
+- **Push im Bauzug:** Hat einer gewählt, bekommt der andere die Mitteilung "partner_done" – er ist mit Platzieren an der Reihe. Allgemein gilt: Wer eine Aktion selbst ausgelöst hat, bekommt dazu keine Mitteilung (`applyRule` in `shared/rules.ts`).
+- **Mehr Plätze als Bauzüge:** Kapitel 1 hat 34 Plätze für 30 Bauzüge und bis zu 3 Dekostücke. Ist für kein Stück mehr ein Platz frei, entfällt der Bauzug; die Aufgabe zählt trotzdem.
+- **Startbilder nicht im Precache:** iOS holt sie beim Ablegen auf dem Home-Bildschirm; im Precache wären sie nur Ballast.
+- **Ton im Test:** Der Test-Browser hat kein Audio (der Konstruktor von `AudioContext` wirft dort). `e2e/settings.spec.ts` setzt deshalb einen Zähler mit derselben Schnittstelle ein und prüft den Weg von der Geste bis zum Ton; wie es klingt, lässt sich nur auf dem Gerät beurteilen.
 - **TypeScript 6 statt 7:** svelte-check unterstützt TypeScript 7 noch nicht.
 - **Name:** voller Name "Nhà Mình – PaarTrip", unter dem Icon "PaarTrip" (dort passen nur rund zwölf Zeichen).
 

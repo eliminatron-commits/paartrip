@@ -340,13 +340,17 @@ describe('Meilenstein', () => {
     expect(state.milestones).toEqual([]);
     expect(state.coupons.every((c) => c.state === 'veiled')).toBe(true);
 
-    const reached = applyAction(state, 'a', act({ type: 'test.completeTask' }), testCtx);
+    const reached = applyAction(state, 'b', act({ type: 'test.completeTask' }), testCtx);
     expect(reached.state.milestones).toEqual([{ at: free, reachedAt: ctx.now, decoPiece: null, seenBy: [] }]);
     expect(reached.state.coupons.find((c) => c.id === secret.id)).toMatchObject({ state: 'unlocked' });
     // Nur was an diesem Meilenstein liegt, geht auf.
     expect(reached.state.coupons.filter((c) => c.milestone !== free).every((c) => c.state === 'veiled')).toBe(true);
-    // Der Beschenkte bekommt die Mitteilung.
+    // Die Beschenkte bekommt die Mitteilung …
     expect(reached.effects).toEqual([{ to: 'a', kind: 'coupon_unlocked' }]);
+    // … es sei denn, sie hat den Meilenstein selbst ausgelöst: Dann sieht sie das Geschenk schon in der App.
+    const byHerself = applyAction(state, 'a', act({ type: 'test.completeTask' }), testCtx);
+    expect(byHerself.state.coupons.find((c) => c.id === secret.id)).toMatchObject({ state: 'unlocked' });
+    expect(byHerself.effects).toEqual([]);
   });
 
   it('ein fester Gutschein wird an seinem Meilenstein freigeschaltet', () => {

@@ -245,7 +245,8 @@ function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleConte
   const apply = (next: HouseState, effects: PushEffect[] = []): Applied => ({
     state: next,
     result: { id: action.id, outcome: 'applied' },
-    effects,
+    // Wer die Aktion selbst ausgelöst hat, sieht das Ergebnis in der App – eine Mitteilung an ihn wäre nur Lärm.
+    effects: effects.filter((effect) => effect.to !== slot),
   });
 
   // Gespielt wird erst zu zweit.

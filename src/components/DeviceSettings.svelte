@@ -1,6 +1,6 @@
 <script lang="ts">
   // Einstellungen dieses Geräts: Kopplungsstatus, Mitteilungen, Sichern und Wiederherstellen.
-  // Zieht in Phase 3 hinter das Einstellungs-Symbol.
+  // Teil des Bildschirms "Settings".
   import { otherSlot } from '../../shared/model.ts';
   import { disablePush, enablePush, push, sendTestPush } from '../lib/push.svelte.ts';
   import { exportDevice, session } from '../lib/session.svelte.ts';

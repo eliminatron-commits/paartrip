@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Versionszeile und "Check for updates". Zieht in Phase 3 in die Einstellungen um.
+  // Versionszeile und "Check for updates". Teil des Bildschirms "Settings".
   import { CHECK_MESSAGES } from '../lib/update-logic.ts';
   import { checkForUpdate, updates } from '../lib/update.svelte.ts';
   import { versionLine } from '../lib/version.ts';
