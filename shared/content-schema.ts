@@ -31,17 +31,18 @@ function checked<S extends z.ZodType>(schema: S, validate: (data: z.output<S>) =
 }
 
 const glyph = z.enum(GLYPHS);
-/** Raster aus Zeichen: höchstens 8 breit, damit jedes Feld auf dem iPhone mindestens 44 px misst. */
-const charGrid = z.array(z.string().min(4).max(8)).min(4).max(9);
+/** Raster aus Zeichen, eine Zeile je Reihe, höchstens `width` breit. */
+const charGrid = (width: number) => z.array(z.string().min(4).max(width)).min(4).max(9);
 const gridSide = z.int().min(2).max(5);
 
 const puzzleData = {
   'map-legend': checked(
     z.strictObject({
-      plan: charGrid,
+      // Verstecke werden angetippt: Bei mehr als 6 Spalten wären die Felder auf einem schmalen iPhone (375 px) kleiner als 44 px.
+      plan: charGrid(6),
       landmarks: z.array(z.strictObject({ key: z.string().regex(/^[a-z]$/), glyph, name: text })).min(3),
       clues: z.array(text).min(2).max(5),
-      treasure: z.string().regex(/^[1-9]$/),
+      treasures: z.array(z.string().regex(/^[1-9]$/)).min(2).max(5),
     }),
     mapLegend.validate,
   ),
@@ -81,8 +82,9 @@ const puzzleData = {
     }),
     spotDifference.validate,
   ),
-  sequence: checked(z.strictObject({ steps: z.array(text).min(4).max(7), hints: z.array(text).min(2).max(6) }), sequence.validate),
-  'blind-maze': checked(z.strictObject({ maze: charGrid }), blindMaze.validate),
+  sequence: checked(z.strictObject({ steps: z.array(text).min(5).max(7), hints: z.array(text).min(2).max(6) }), sequence.validate),
+  // Das Labyrinth wird nur angesehen, gesteuert wird über eigene Knöpfe: Hier dürfen es 8 Spalten sein.
+  'blind-maze': checked(z.strictObject({ maze: charGrid(8) }), blindMaze.validate),
 } satisfies Record<PuzzleKind, z.ZodType>;
 
 // Gemeinsame Felder aller Rätsel. `lead` übernimmt Rolle 1 der Rätselart, der andere Rolle 2
@@ -281,7 +283,8 @@ function duplicates(values: string[]): string[] {
 
 /**
  * Bezüge zwischen den Inhaltsdateien. Liefert eine Liste von Problemen (leer = in Ordnung).
- * Ob ein Kapitel vollständig ist (Anzahl Aufgaben, Szene je Meilenstein …), prüft Phase 5 getrennt.
+ * Ob ein Kapitel vollständig ist (Anzahl Aufgaben, kein Meilenstein hinter der letzten Aufgabe, Szene je
+ * Meilenstein …), prüft Phase 5 getrennt – bis dahin hat Kapitel 1 erst seine Test-Aufgaben.
  */
 export function checkContent(content: Content): string[] {
   const problems: string[] = [];

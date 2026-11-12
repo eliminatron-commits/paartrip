@@ -3,45 +3,45 @@
   "type": "puzzle",
   "kind": "map-legend",
   "variant": 1,
-  "title": "Where is the spare key?",
+  "title": "Three hidden chocolates",
   "lead": "b",
   "data": {
     "plan": [
-      "########",
-      "#a.1..b#",
-      "#..##..#",
-      "#2.##.3#",
-      "#..5...#",
-      "#c.4.6d#",
-      "########"
+      "######",
+      "#a12b#",
+      "#3..4#",
+      "#.##.#",
+      "#5..6#",
+      "#c78d#",
+      "######"
     ],
     "landmarks": [
       {
         "key": "a",
-        "glyph": "sun",
+        "glyph": "boat",
         "name": "the stove"
       },
       {
         "key": "b",
-        "glyph": "cloud",
+        "glyph": "fish",
         "name": "the window"
       },
       {
         "key": "c",
-        "glyph": "leaf",
+        "glyph": "bell",
         "name": "the big plant"
       },
       {
         "key": "d",
-        "glyph": "key",
+        "glyph": "moon",
         "name": "the front door"
       }
     ],
     "clues": [
-      "Whoever hid it wanted to grab it on the way out.",
-      "It lies right beside the front door.",
-      "The big plant is at the other end of that wall."
+      "One is right next to the stove, on the wall the stove shares with the window.",
+      "One is next to the front door, but not on the wall the door shares with the big plant.",
+      "One is next to the big plant, on the side that faces the stove."
     ],
-    "treasure": "6"
+    "treasures": ["1", "5", "6"]
   }
 }

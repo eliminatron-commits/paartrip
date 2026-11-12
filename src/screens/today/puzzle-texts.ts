@@ -16,10 +16,10 @@ const both = (text: (partner: string) => string): PuzzleTexts['role'] => ({ lead
 export const PUZZLE_TEXTS: Record<PuzzleKind, PuzzleTexts> = {
   'map-legend': {
     name: 'Map and legend',
-    idea: 'Something is hidden in a room. One of you has the floor plan, the other one the legend and the clues.',
+    idea: 'A few things are hidden in a room. One of you has the floor plan, the other one the legend and the clues.',
     role: {
-      lead: (p) => `You see the floor plan, but not what the symbols stand for. ${p} has the legend and the clues. Describe what you see, then tap the hiding place.`,
-      partner: (p) => `You have the legend and the clues. ${p} sees the floor plan and taps the hiding place. Ask what is where, and lead the way.`,
+      lead: (p) => `You see the floor plan, but not what the symbols stand for. ${p} has the legend and the clues. Describe what you see, then mark all the hiding places.`,
+      partner: (p) => `You have the legend and the clues. ${p} sees the floor plan and marks the hiding places. Ask what is where, and lead the way.`,
     },
   },
   'split-code': {

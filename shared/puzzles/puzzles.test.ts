@@ -71,35 +71,60 @@ describe('Geteilter Code', () => {
 
 describe('Karte und Legende', () => {
   const data: mapLegend.MapLegendData = {
-    plan: ['#####', '#a1.#', '#2.3#', '#.4b#', '#####'],
+    plan: ['######', '#a1.2#', '#3..4#', '#5..6#', '#7.8b#', '######'],
     landmarks: [
       { key: 'a', glyph: 'sun', name: 'the stove' },
-      { key: 'b', glyph: 'key', name: 'the door' },
+      { key: 'b', glyph: 'wave', name: 'the door' },
     ],
-    clues: ['Next to the door.', 'Not by the stove.'],
-    treasure: '4',
+    clues: ['One is next to the door.', 'Two are by the stove.'],
+    treasures: ['8', '1', '3'],
   };
 
-  it('nur das richtige Versteck gilt', () => {
+  it('nur die ganze Auswahl gilt: genau die richtigen Verstecke, in beliebiger Reihenfolge', () => {
     expect(mapLegend.validate(data)).toEqual([]);
-    expect(mapLegend.isSolved(data, '4')).toBe(true);
-    for (const other of ['1', '2', '3']) expect(mapLegend.isSolved(data, other)).toBe(false);
+    expect(mapLegend.solution(data)).toEqual(['1', '3', '8']);
+    expect(mapLegend.isSolved(data, ['3', '8', '1'])).toBe(true);
+    // Eines zu wenig, eines zu viel, eines daneben – und alles zu markieren ist auch keine Lösung.
+    expect(mapLegend.isSolved(data, ['1', '3'])).toBe(false);
+    expect(mapLegend.isSolved(data, ['1', '3', '8', '2'])).toBe(false);
+    expect(mapLegend.isSolved(data, ['1', '3', '7'])).toBe(false);
+    expect(mapLegend.isSolved(data, ['1', '2', '3', '4', '5', '6', '7', '8'])).toBe(false);
+    expect(mapLegend.isSolved(data, [])).toBe(false);
+    for (const single of ['1', '3', '8']) expect(mapLegend.isSolved(data, [single])).toBe(false);
   });
 
   it('der Grundriss wird Feld für Feld gelesen', () => {
-    expect(mapLegend.planCells(data)[1]).toEqual([{ kind: 'wall' }, { kind: 'landmark', key: 'a' }, { kind: 'spot', key: '1' }, { kind: 'floor' }, { kind: 'wall' }]);
+    expect(mapLegend.planCells(data)[1]).toEqual([
+      { kind: 'wall' },
+      { kind: 'landmark', key: 'a' },
+      { kind: 'spot', key: '1' },
+      { kind: 'floor' },
+      { kind: 'spot', key: '2' },
+      { kind: 'wall' },
+    ]);
   });
 
-  it('Widersprüche zwischen Grundriss, Legende und Versteck fallen auf', () => {
+  it('Widersprüche zwischen Grundriss, Legende und Verstecken fallen auf', () => {
     const problems = (change: Partial<mapLegend.MapLegendData>) => mapLegend.validate({ ...data, ...change }).join(' | ');
-    expect(problems({ treasure: '9' })).toContain('Versteck "9" fehlt');
-    expect(problems({ plan: ['#####', '#a1.#', '#2..#', '#.4b#', '#####'], treasure: '4' })).toContain('mindestens vier');
+    expect(problems({ treasures: ['1', '3', '9'] })).toContain('Versteck "9" fehlt');
+    expect(problems({ treasures: ['1', '3', '3'] })).toContain('Versteck "3" doppelt');
     expect(problems({ landmarks: data.landmarks.slice(0, 1) })).toContain('"b" fehlt in landmarks');
-    expect(problems({ plan: ['#####', '#.1.#', '#2.3#', '#.4b#', '#####'] })).toContain('"a" fehlt im Grundriss');
-    expect(problems({ plan: ['#####', '#a1.#', '#2.3#', '#.4b#', '####'] })).toContain('nicht gleich lang');
-    expect(problems({ plan: ['#####', '#a1.#', '#2?3#', '#.4b#', '#####'] })).toContain('unbekanntes Zeichen');
+    expect(problems({ plan: ['######', '#.1.2#', '#3..4#', '#5..6#', '#7.8b#', '######'] })).toContain('"a" fehlt im Grundriss');
+    expect(problems({ plan: ['######', '#a1.2#', '#3..4#', '#5..6#', '#7.8b#', '#####'] })).toContain('nicht gleich lang');
+    expect(problems({ plan: ['######', '#a1.2#', '#3?.4#', '#5..6#', '#7.8b#', '######'] })).toContain('unbekanntes Zeichen');
     // Zwei Zeichen, die gleich aussehen, lassen sich am Telefon nicht unterscheiden.
     expect(problems({ landmarks: [data.landmarks[0]!, { ...data.landmarks[1]!, glyph: 'sun' }] })).toContain('sieht zweimal gleich aus');
+  });
+
+  it('was sich ohne Partner lösen ließe, fällt auf: zu wenige Auswahlen und Zeichen, die ihre Bedeutung verraten', () => {
+    const problems = (change: Partial<mapLegend.MapLegendData>) => mapLegend.validate({ ...data, ...change }).join(' | ');
+    // Ein einzelnes Versteck unter acht wäre mit acht Versuchen gefunden, zwei unter acht mit 28.
+    expect(problems({ treasures: ['8'] })).toContain('nur 8 Auswahlen');
+    expect(problems({ treasures: ['8', '1'] })).toContain('nur 28 Auswahlen');
+    // Drei unter sieben sind 35, drei unter acht 56.
+    expect(problems({ plan: ['######', '#a1.2#', '#3..4#', '#5..6#', '#..8b#', '######'] })).toContain('nur 35 Auswahlen');
+    expect(problems({})).toBe('');
+    expect(problems({ landmarks: [data.landmarks[0]!, { key: 'b', glyph: 'key', name: 'The Key hook' }] })).toContain('verrät, wofür es steht');
   });
 });
 
@@ -157,6 +182,12 @@ describe('Zwei Bilder vergleichen', () => {
     expect(spotDifference.validate({ ...data, changes: data.changes.slice(0, 1) }).join()).toContain('mindestens zwei');
     expect(spotDifference.validate({ ...data, changes: [...data.changes.slice(0, 2), { cell: 9, glyph: null }] }).join()).toContain('gibt es nicht');
   });
+
+  it('ein Regal mit so wenigen Feldern, dass Durchprobieren genügt, fällt auf', () => {
+    const small: spotDifference.SpotDifferenceData = { cols: 2, rows: 2, scene: [sun, moon, null, sun], changes: [{ cell: 0, glyph: moon }, { cell: 2, glyph: sun }] };
+    expect(spotDifference.validate(small).join()).toContain('nur 16 Markierungen');
+    expect(spotDifference.validate({ ...small, cols: 3, scene: [...small.scene, moon, null] })).toEqual([]);
+  });
 });
 
 describe('Reihenfolge', () => {
@@ -180,7 +211,13 @@ describe('Reihenfolge', () => {
   });
 
   it('zwei gleichlautende Schritte fallen auf', () => {
-    expect(sequence.validate({ ...data, steps: ['One', 'Two', 'one ', 'Four'] })).toHaveLength(1);
+    expect(sequence.validate(data)).toEqual([]);
+    expect(sequence.validate({ ...data, steps: ['One', 'Two', 'one ', 'Four', 'Five'] }).join()).toContain('doppelt');
+  });
+
+  it('so wenige Schritte, dass Durchprobieren genügt, fallen auf', () => {
+    // Vier Schritte haben 24 Reihenfolgen, fünf 120.
+    expect(sequence.validate({ ...data, steps: data.steps.slice(0, 4) }).join()).toContain('nur 24 Reihenfolgen');
   });
 });
 

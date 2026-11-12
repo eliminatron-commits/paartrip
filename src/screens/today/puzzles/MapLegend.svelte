@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Karte und Legende. Rolle 1 (lead) sieht den Grundriss mit Zeichen ohne Namen und tippt das Versteck an,
+  // Karte und Legende. Rolle 1 (lead) sieht den Grundriss mit Zeichen ohne Namen und markiert die Verstecke,
   // Rolle 2 hat die Legende und die Hinweise. Namen und Hinweise stehen nur in der Ansicht von Rolle 2 im DOM;
-  // geprüft wird hier auf dem Gerät von Rolle 1.
+  // geprüft wird hier auf dem Gerät von Rolle 1 – und nur die ganze Auswahl, nie ein einzelnes Versteck.
   import type { PuzzleRole } from '../../../../shared/puzzles/kinds.ts';
   import { isSolved, type MapLegendData, planCells } from '../../../../shared/puzzles/map-legend.ts';
   import Glyph from '../../../components/Glyph.svelte';
@@ -28,21 +28,28 @@
   const glyphOf = (key: string) => data.landmarks.find((landmark) => landmark.key === key)?.glyph;
   const spotKeys = $derived(cells.flat().flatMap((cell) => (cell.kind === 'spot' ? cell.key : [])));
 
-  // Nur ein Versteck, das es im Grundriss gibt, gilt als gesicherter Stand; alles andere beginnt leer.
-  const restored = (): string | null => (typeof saved === 'string' && spotKeys.includes(saved) ? saved : null);
+  /** So viele Verstecke sind gesucht. */
+  const wanted = $derived(data.treasures.length);
 
-  let chosen = $state<string | null>(restored());
+  // Nur Verstecke, die es im Grundriss gibt, gelten als gesicherter Stand; alles andere beginnt leer.
+  const restored = (): string[] => (Array.isArray(saved) ? spotKeys.filter((key) => saved.includes(key)) : []);
+
+  let chosen = $state<string[]>(restored());
   let feedback = $state('');
+  // Wie viele markiert sind – nie, ob eines davon stimmt.
+  const count = $derived(
+    `${chosen.length} of ${wanted} hiding places marked.${chosen.length > wanted ? ' That is too many – tap one again to unmark it.' : ''}`,
+  );
 
-  function choose(key: string): void {
-    chosen = key;
+  function toggle(key: string): void {
+    chosen = chosen.includes(key) ? chosen.filter((other) => other !== key) : [...chosen, key];
     feedback = '';
-    onchange(key);
+    onchange(chosen);
   }
 
   function check(): void {
-    if (chosen !== null && isSolved(data, chosen)) onsolved();
-    else feedback = 'Nothing here. Ask for another clue and try a different spot.';
+    if (isSolved(data, chosen)) onsolved();
+    else feedback = 'Not quite – at least one of these is empty. Go through the clues together once more.';
   }
 </script>
 
@@ -60,11 +67,11 @@
           <button
             type="button"
             class="plain cell spot"
-            class:chosen={chosen === cell.key}
+            class:chosen={chosen.includes(cell.key)}
             aria-label="Hiding place, row {y + 1}, column {x + 1}"
-            aria-pressed={chosen === cell.key}
+            aria-pressed={chosen.includes(cell.key)}
             data-spot={cell.key}
-            onclick={() => choose(cell.key)}
+            onclick={() => toggle(cell.key)}
           >
             ?
           </button>
@@ -73,9 +80,10 @@
     {/each}
   </div>
 
+  <p class="note" data-testid="map-count">{count}</p>
   <p class="problem" role="status" data-testid="puzzle-feedback">{feedback}</p>
   <div class="row">
-    <button type="button" data-testid="puzzle-check" disabled={chosen === null} onclick={check}>Look here</button>
+    <button type="button" data-testid="puzzle-check" disabled={chosen.length !== wanted} onclick={check}>Look there</button>
   </div>
 {:else}
   <p class="note">What the symbols on the floor plan stand for:</p>

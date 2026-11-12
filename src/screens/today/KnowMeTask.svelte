@@ -66,7 +66,18 @@
   {:else}
     <label data-testid="knowme-{which}">
       {legend}
-      <input type="text" maxlength={maxLength} autocomplete="off" value={entered[which] ?? ''} oninput={(event) => (entered[which] = event.currentTarget.value)} onchange={keep} />
+      <!-- Gesichert wird bei jedem Zeichen, nicht erst beim Verlassen des Felds: Wechselt man mitten im Tippen in den
+           Messenger, beendet iOS die App, ohne dass das Feld je verlassen wurde. -->
+      <input
+        type="text"
+        maxlength={maxLength}
+        autocomplete="off"
+        value={entered[which] ?? ''}
+        oninput={(event) => {
+          entered[which] = event.currentTarget.value;
+          keep();
+        }}
+      />
     </label>
   {/if}
 {/snippet}

@@ -1,14 +1,16 @@
 // Karte und Legende. Rolle 1 sieht den Grundriss: Wände, Zeichen ohne Namen und mögliche Verstecke.
-// Rolle 2 hat die Legende (welches Zeichen was ist) und die Hinweise auf das Versteck.
+// Rolle 2 hat die Legende (welches Zeichen was ist) und die Hinweise auf die Verstecke, in denen etwas liegt.
+// Gesucht sind mehrere Verstecke auf einmal, und geprüft wird nur die ganze Auswahl – ein einzelnes Versteck
+// anzutippen verrät nichts, sonst ließe sich das Rätsel allein durch Probieren lösen.
 //
 // Der Grundriss ist ein Raster aus Zeichen, eine Zeile je Reihe:
 //   '#' Wand · '.' Boden · 'a'–'z' ein Zeichen aus `landmarks` · '1'–'9' ein mögliches Versteck
-import { duplicates, type Glyph } from './tiles.ts';
+import { duplicates, type Glyph, MIN_ATTEMPTS } from './tiles.ts';
 
 export interface Landmark {
   /** Buchstabe im Grundriss. */
   key: string;
-  /** Wie das Zeichen im Grundriss aussieht. */
+  /** Wie das Zeichen im Grundriss aussieht. Es darf nicht verraten, wofür es steht. */
   glyph: Glyph;
   /** Was das Zeichen bedeutet, z. B. "the stove" – steht nur in der Legende. */
   name: string;
@@ -17,14 +19,14 @@ export interface Landmark {
 export interface MapLegendData {
   plan: string[];
   landmarks: Landmark[];
-  /** Hinweise auf das Versteck, wie Rolle 2 sie vorliest. */
+  /** Hinweise auf die Verstecke, wie Rolle 2 sie vorliest. */
   clues: string[];
-  /** Ziffer des Verstecks. */
-  treasure: string;
+  /** Ziffern der Verstecke, in denen etwas liegt. */
+  treasures: string[];
 }
 
-/** Die Ziffer des angetippten Verstecks. */
-export type MapLegendAttempt = string;
+/** Die Ziffern der markierten Verstecke. */
+export type MapLegendAttempt = string[];
 
 export type PlanCell =
   | { kind: 'wall' | 'floor' }
@@ -44,6 +46,13 @@ export function planCells(data: MapLegendData): PlanCell[][] {
   return data.plan.map((line) => [...line].map((char) => planCell(char) ?? { kind: 'floor' }));
 }
 
+/** Auf wie viele Arten sich `pick` aus `from` Verstecken auswählen lassen. */
+function selections(from: number, pick: number): number {
+  let count = 1;
+  for (let i = 1; i <= pick; i++) count = (count * (from - pick + i)) / i;
+  return count;
+}
+
 export function validate(data: MapLegendData): string[] {
   const problems: string[] = [];
   const width = data.plan[0]?.length ?? 0;
@@ -61,18 +70,29 @@ export function validate(data: MapLegendData): string[] {
   for (const char of onPlan) if (!keys.includes(char)) problems.push(`plan: Zeichen "${char}" fehlt in landmarks`);
   // Zwei gleich aussehende Zeichen ließen sich am Telefon nicht auseinanderhalten.
   for (const dup of duplicates(data.landmarks, (l) => l.glyph)) problems.push(`landmarks: "${dup}" sieht zweimal gleich aus`);
+  // Heißt das Zeichen wie das, wofür es steht, braucht Rolle 1 die Legende nicht.
+  for (const landmark of data.landmarks) {
+    if (landmark.name.toLowerCase().includes(landmark.glyph)) problems.push(`landmarks: das Zeichen "${landmark.glyph}" verrät, wofür es steht ("${landmark.name}")`);
+  }
 
   const spots = chars.filter((c) => /^[1-9]$/.test(c));
   for (const dup of duplicates(spots, (c) => c)) problems.push(`plan: Versteck "${dup}" steht mehrfach im Grundriss`);
-  if (spots.length < 4) problems.push('plan: mindestens vier mögliche Verstecke, sonst genügt Raten');
-  if (!spots.includes(data.treasure)) problems.push(`treasure: Versteck "${data.treasure}" fehlt im Grundriss`);
+  for (const dup of duplicates(data.treasures, (t) => t)) problems.push(`treasures: Versteck "${dup}" doppelt`);
+  for (const treasure of new Set(data.treasures)) {
+    if (!spots.includes(treasure)) problems.push(`treasures: Versteck "${treasure}" fehlt im Grundriss`);
+  }
+  const possible = selections(new Set(spots).size, new Set(data.treasures).size);
+  if (possible < MIN_ATTEMPTS) {
+    problems.push(`plan: ${data.treasures.length} aus ${spots.length} Verstecken lassen nur ${possible} Auswahlen zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
+  }
   return problems;
 }
 
 export function solution(data: MapLegendData): MapLegendAttempt {
-  return data.treasure;
+  return [...data.treasures].sort();
 }
 
+/** Gelöst ist es nur mit genau den richtigen Verstecken – eines zu viel oder zu wenig gilt nicht. */
 export function isSolved(data: MapLegendData, attempt: MapLegendAttempt): boolean {
-  return attempt === data.treasure;
+  return [...new Set(attempt)].sort().join() === solution(data).join();
 }

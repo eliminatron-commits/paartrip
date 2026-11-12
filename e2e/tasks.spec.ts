@@ -153,6 +153,37 @@ test('frei getippte Antwort: Bis beide abgegeben haben, steht sie in keiner Antw
   await expect(progress(b.page)).toHaveText(new RegExp(`^${done(textQuestion.id) + 1} of `));
 });
 
+test('eine halb getippte Antwort ist gesichert, bevor das Feld verlassen wird – sie übersteht, dass iOS die App beendet', async ({ browser }) => {
+  const { a, b } = await pair(browser);
+  await openTask([a, b], textQuestion.id);
+  const own = () => a.page.getByTestId('knowme-own').locator('input');
+  await own().pressSequentially('Half a thou');
+  // Das Feld hat noch den Fokus – verlassen wurde es nie.
+  await expect(own()).toBeFocused();
+
+  // Was das Gerät in seiner lokalen Datenbank gesichert hat (src/lib/store.ts).
+  const saved = () =>
+    a.page.evaluate(
+      () =>
+        new Promise<unknown>((resolve) => {
+          const open = indexedDB.open('paartrip');
+          open.onsuccess = () => {
+            const request = open.result.transaction('kv').objectStore('kv').get('settings');
+            request.onsuccess = () => {
+              open.result.close();
+              resolve((request.result as { draft?: { value?: { own?: unknown } } } | undefined)?.draft?.value?.own ?? null);
+            };
+          };
+        }),
+    );
+  await expect.poll(saved).toBe('Half a thou');
+
+  // iOS beendet die App beim Wechsel in den Messenger; beim nächsten Öffnen steht das Getippte wieder da.
+  await a.page.reload();
+  await openTab(a.page, 'Today');
+  await expect(own()).toHaveValue('Half a thou');
+});
+
 test('Aufgabe im echten Leben für einen: Erledigt ist sie erst, wenn der andere den Erhalt bestätigt', async ({ browser }) => {
   if (forOne.doer === 'both') throw new Error('Aufgabe für einen erwartet');
   const { a, b } = await pair(browser);

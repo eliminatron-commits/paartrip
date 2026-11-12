@@ -23,6 +23,12 @@ export const GLYPHS = [
 ] as const;
 export type Glyph = (typeof GLYPHS)[number];
 
+/**
+ * So viele verschiedene Eingaben muss ein Rätsel mindestens zulassen. Fehlversuche sind unbegrenzt und ohne
+ * Folgen – bei weniger Möglichkeiten wäre Durchprobieren bequemer, als den Partner zu fragen.
+ */
+export const MIN_ATTEMPTS = 50;
+
 export function duplicates<T>(values: T[], key: (value: T) => string): string[] {
   const keys = values.map(key);
   return [...new Set(keys.filter((k, i) => keys.indexOf(k) !== i))];

@@ -281,6 +281,26 @@ test('Aufgaben im Querformat: kein waagerechtes Rollen, Ränder frei', async ({ 
   }
 });
 
+test('Rätsel auf dem schmalsten iPhone (375 px breit): Tap-Ziele groß genug, kein waagerechtes Rollen', async ({ browser }) => {
+  test.setTimeout(120_000);
+  shot = 200;
+  const { a, b } = await pair(browser, { safeArea: SAFE_AREA });
+  // iPhone SE und iPhone mini; schmaler ist kein iPhone, auf dem die App läuft.
+  for (const { page } of [a, b]) await page.setViewportSize({ width: 375, height: 812 });
+  for (const task of chapter.tasks.filter((t) => t.type === 'puzzle')) {
+    await openTask([a, b], task.id);
+    for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
+    for (const [phone, role] of [[a, 'a'], [b, 'b']] as const) {
+      await expect(phone.page.getByTestId('puzzle')).toBeVisible();
+      const overflow = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${task.id} ${role}`).toBeLessThanOrEqual(0);
+      const inner = await phone.page.locator('main').evaluate((main) => main.scrollWidth - main.clientWidth);
+      expect(inner, `${task.id} ${role} im Inhaltsbereich`).toBeLessThanOrEqual(0);
+      await check(phone.page, `narrow-task-${task.kind}-${role}`);
+    }
+  }
+});
+
 test('im Querformat bricht nichts: kein waagerechtes Rollen, Ränder frei, alles bleibt erreichbar', async ({ browser }) => {
   // Im Querformat liegen Dynamic Island und Rundungen links und rechts.
   const { a } = await pair(browser, { safeArea: SAFE_AREA_LANDSCAPE });

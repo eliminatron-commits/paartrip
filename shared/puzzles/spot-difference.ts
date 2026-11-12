@@ -1,7 +1,7 @@
 // Zwei Bilder vergleichen. Beide sehen dasselbe Regal, aber je eine eigene Fassung: An einigen Feldern liegt
 // bei Rolle 2 etwas anderes (oder nichts). Was abweicht, zeigt sich nur im Gespräch. Beide markieren die
 // Felder; abgeschlossen ist das Rätsel, sobald einer genau die richtigen markiert hat.
-import { duplicates, type Glyph } from './tiles.ts';
+import { duplicates, type Glyph, MIN_ATTEMPTS } from './tiles.ts';
 import type { PuzzleRole } from './kinds.ts';
 
 export interface SpotDifferenceData {
@@ -35,6 +35,8 @@ export function validate(data: SpotDifferenceData): string[] {
     else if (before === change.glyph) problems.push(`changes.${index}: Feld ${change.cell} sieht in beiden Fassungen gleich aus`);
   });
   if (data.changes.length < 2) problems.push('changes: mindestens zwei Unterschiede');
+  // Markieren lässt sich jede Auswahl der Felder.
+  if (2 ** cells < MIN_ATTEMPTS) problems.push(`scene: ${cells} Felder lassen nur ${2 ** cells} Markierungen zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
   // Weicht mehr als die Hälfte ab, ist "alles markieren" fast schon die Lösung.
   if (data.changes.length * 2 > cells) problems.push('changes: höchstens die Hälfte der Felder darf abweichen');
   return problems;

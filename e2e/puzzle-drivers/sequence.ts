@@ -23,6 +23,14 @@ export const driver: PuzzleDriver<'sequence'> = {
     } else {
       for (const hint of data.hints) await expect(page.getByTestId('sequence-hints').getByText(hint)).toBeVisible();
       await expect(page.getByTestId('sequence-step')).toHaveCount(0);
+      // Die Schritte stehen auch nicht versteckt auf der Karte. Die Hinweise selbst dürfen Schritte beim Namen
+      // nennen – deshalb zählt alles außer ihnen.
+      const rest = await page.getByTestId('task').evaluate((card) => {
+        const copy = card.cloneNode(true) as HTMLElement;
+        copy.querySelector('[data-testid="sequence-hints"]')?.remove();
+        return copy.innerHTML;
+      });
+      for (const step of data.steps) expect(rest).not.toContain(step);
     }
   },
 

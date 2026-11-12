@@ -1,7 +1,7 @@
 // Reihenfolge. Rolle 1 hat die Schritte, durcheinander, und bringt sie in die richtige Abfolge.
 // Rolle 2 hat die Hinweise dazu. In der Datei stehen die Schritte in der richtigen Reihenfolge –
 // durcheinandergebracht werden sie erst hier, und zwar jedes Mal gleich.
-import { duplicates } from './tiles.ts';
+import { duplicates, MIN_ATTEMPTS } from './tiles.ts';
 
 export interface SequenceData {
   /** Die Schritte in der richtigen Reihenfolge. */
@@ -33,8 +33,20 @@ export function startOrder(data: SequenceData): SequenceAttempt {
   return order;
 }
 
+/** Wie viele Reihenfolgen es für so viele Schritte gibt. */
+function orders(steps: number): number {
+  let count = 1;
+  for (let i = 2; i <= steps; i++) count *= i;
+  return count;
+}
+
 export function validate(data: SequenceData): string[] {
-  return duplicates(data.steps, (s) => s.trim().toLowerCase()).map((dup) => `steps: "${dup}" doppelt – die Reihenfolge wäre nicht eindeutig`);
+  const problems = duplicates(data.steps, (s) => s.trim().toLowerCase()).map((dup) => `steps: "${dup}" doppelt – die Reihenfolge wäre nicht eindeutig`);
+  const possible = orders(data.steps.length);
+  if (possible < MIN_ATTEMPTS) {
+    problems.push(`steps: ${data.steps.length} Schritte lassen nur ${possible} Reihenfolgen zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
+  }
+  return problems;
 }
 
 export function solution(data: SequenceData): SequenceAttempt {
