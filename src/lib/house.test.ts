@@ -74,14 +74,19 @@ describe('der nächste Schritt im Haus', () => {
     expect(openMoves(view, [act({ type: 'build.choose', turn: 2, pieceId: turn.offer[0]! })])).toMatchObject([{ kind: 'choose', sent: false }]);
   });
 
-  it('sind mehrere Züge offen, kommt zuerst, was ich tun kann', () => {
-    // Zwei Aufgaben: Zug 1 wählt der eine, Zug 2 der andere – jeder hat also etwas zu wählen und etwas abzuwarten.
-    const state = complete(paired(), 2);
-    for (const you of ['a', 'b'] as const) {
-      const moves = openMoves(viewOf(state, you), []);
-      expect(moves.map((m) => m.kind).sort()).toEqual(['choose', 'wait-choose']);
-      expect(nextMove(moves)).toMatchObject({ kind: 'choose' });
-    }
+  it('sind mehrere Aufgaben erledigt, ist nur der älteste Bauzug dran – der nächste folgt mit getauschten Rollen', () => {
+    let state = complete(paired(), 2);
+    const first = state.buildTurns[0]!;
+    const chooser = first.chooser;
+    const placer = otherSlot(chooser);
+    expect(openMoves(viewOf(state, chooser), []).map((m) => m.kind)).toEqual(['choose']);
+    expect(openMoves(viewOf(state, placer), []).map((m) => m.kind)).toEqual(['wait-choose']);
+
+    state = play(state, chooser, { type: 'build.choose', turn: 1, pieceId: first.offer[0]! });
+    const spot = freeSpotsFor(chapter.pieces.find((p) => p.id === first.offer[0])!, state.placements, chapter)[0]!;
+    state = play(state, placer, { type: 'build.place', turn: 1, spotId: spot.id });
+    expect(nextMove(openMoves(viewOf(state, placer), []))).toMatchObject({ kind: 'choose', turn: { n: 2 } });
+    expect(nextMove(openMoves(viewOf(state, chooser), []))).toMatchObject({ kind: 'wait-choose', turn: { n: 2 } });
   });
 
   it('ein Dekostück aus einem Geschenk wartet auf seinen Platz, bis es steht', () => {

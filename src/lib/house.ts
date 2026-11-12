@@ -4,7 +4,7 @@
 import type { Action } from '../../shared/actions.ts';
 import type { Chapter, Content, Piece, StoryScene, Task } from '../../shared/content-schema.ts';
 import { type BuildTurn, type CouponView, type HouseView, type KnowMeAnswer, otherSlot, type ReachedMilestone, type Slot } from '../../shared/model.ts';
-import { milestoneForDeposit, unplacedDeco } from '../../shared/rules.ts';
+import { activeTurn, milestoneForDeposit, unplacedDeco } from '../../shared/rules.ts';
 
 export function chapterFor(view: Pick<HouseView, 'chapter'>, content: Content): Chapter | null {
   return content.chapters.find((c) => c.number === view.chapter) ?? null;
@@ -24,11 +24,14 @@ export type Move =
   | { kind: 'wait-choose'; turn: BuildTurn }
   | { kind: 'wait-place'; turn: BuildTurn; pieceId: string };
 
-/** Alles, was im Haus offen ist: Bauzüge in ihrer Reihenfolge, danach Dekostücke aus Geschenken. */
+/**
+ * Alles, was im Haus offen ist: der Bauzug, der gerade dran ist (Bauzüge laufen einer nach dem anderen),
+ * danach Dekostücke aus Geschenken.
+ */
 export function openMoves(view: HouseView, queued: Action[]): Move[] {
   const moves: Move[] = [];
-  for (const turn of view.buildTurns) {
-    if (turn.placedAt !== null) continue;
+  const turn = activeTurn(view);
+  if (turn) {
     const mine = turn.chooser === view.you;
     if (turn.chosen === null) {
       if (mine) moves.push({ kind: 'choose', turn, sent: queued.some((a) => a.type === 'build.choose' && a.turn === turn.n) });

@@ -3,7 +3,7 @@ import generated from '../generated/content-rules.json';
 import type { Action, ActionBody } from './actions.ts';
 import type { RulesContent } from './content-schema.ts';
 import { type HouseState, otherSlot, type Slot } from './model.ts';
-import { applyAction, createHouse, freeSpotsFor, joinHouse, milestoneForDeposit, type RuleContext, spotsOf, unplacedDeco } from './rules.ts';
+import { applyAction, createHouse, freeSpotsFor, joinHouse, milestoneForDeposit, moveSpotsFor, type RuleContext, spotsOf, unplacedDeco } from './rules.ts';
 
 const content = generated as unknown as RulesContent;
 const ctx: RuleContext = { content, now: '2026-11-11T10:00:00.000Z' };
@@ -160,19 +160,28 @@ describe('Erledigte Aufgabe', () => {
     expect(state.buildTurns.map((t) => t.n)).toEqual([1, 2]);
     const first = chapter.build.firstChooser;
     expect(state.buildTurns.map((t) => t.chooser)).toEqual([first, otherSlot(first)]);
-    for (const turn of state.buildTurns) {
-      expect(turn).toMatchObject({ chosen: null, placedAt: null });
-      expect(turn.offer).toHaveLength(chapter.build.offerSize);
-      expect(new Set(turn.offer).size).toBe(turn.offer.length);
-      // Nur normale Stücke: Die Dekostücke der Meilensteine kommen nie ins Angebot.
-      expect(turn.offer.every((id) => piece(id) !== undefined && piece(id).milestone === undefined)).toBe(true);
-    }
+    for (const turn of state.buildTurns) expect(turn).toMatchObject({ chosen: null, placedAt: null });
+    const offer = state.buildTurns[0]!.offer;
+    expect(offer).toHaveLength(chapter.build.offerSize);
+    expect(new Set(offer).size).toBe(offer.length);
+    // Nur normale Stücke: Die Dekostücke der Meilensteine kommen nie ins Angebot.
+    expect(offer.every((id) => piece(id) !== undefined && piece(id).milestone === undefined)).toBe(true);
   });
 
-  it('solange ein Zug offen ist, wird keines seiner Stücke noch einmal angeboten', () => {
-    const state = complete(paired(), 2);
-    const [one, two] = state.buildTurns;
-    expect(two!.offer.filter((id) => one!.offer.includes(id))).toEqual([]);
+  it('Bauzüge laufen einer nach dem anderen: Der wartende bekommt sein Angebot erst, wenn er dran ist', () => {
+    let state = complete(paired(), 2);
+    // Zug 2 wartet noch – ohne Angebot, und spielen lässt er sich nicht.
+    expect(turnOf(state, 2).offer).toEqual([]);
+    const waiting = turnOf(state, 2).chooser;
+    const anyPiece = turnOf(state, 1).offer[0]!;
+    expect(applyAction(state, waiting, act({ type: 'build.choose', turn: 2, pieceId: anyPiece }), testCtx).result).toMatchObject({ reason: 'stale' });
+
+    state = finishTurn(state, 1);
+    const placed = state.placements[0]!.pieceId;
+    const offer = turnOf(state, 2).offer;
+    expect(offer).toHaveLength(chapter.build.offerSize);
+    // Aus dem, was jetzt noch zu haben ist.
+    expect(offer).not.toContain(placed);
   });
 
   it('platzierte Stücke werden nie wieder angeboten', () => {
@@ -314,6 +323,107 @@ describe('Bauzug', () => {
     expect(state.placements).toEqual([{ pieceId, spotId: from }]);
     // Der eigene Platz als Ziel ändert nichts.
     expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId, spotId: from }), testCtx).result).toMatchObject({ reason: 'stale' });
+  });
+
+  describe('damit kein Bauzug hängen bleibt', () => {
+    // Ein kleines Haus mit bekannten Größen: zwei Bodenplätze, ein Wandplatz; zwei Stücke nur für den Boden,
+    // eines für Boden oder Wand.
+    const tiny: RulesContent = {
+      chapters: [
+        {
+          number: 1,
+          title: 'Tiny',
+          titleVi: 'Tiny',
+          taskOrder: ['task'],
+          milestones: [9],
+          build: { offerSize: 2, firstChooser: 'a' },
+          tasks: [{ id: 'task', type: 'reallife', title: 'Task', text: 'Do it.', doer: 'both' }],
+          coupons: [],
+          rooms: [
+            {
+              id: 'room',
+              name: 'Room',
+              spots: [
+                { id: 'room-floor-1', kind: 'floor', x: 0, y: 0, size: 1 },
+                { id: 'room-floor-2', kind: 'floor', x: 0, y: 0, size: 1 },
+                { id: 'room-wall-1', kind: 'wall', x: 0, y: 0, size: 1 },
+              ],
+            },
+          ],
+          pieces: [
+            { id: 'chair', name: 'Chair', fits: ['floor'] },
+            { id: 'lamp', name: 'Lamp', fits: ['floor'] },
+            { id: 'banner', name: 'Banner', fits: ['floor', 'wall'] },
+          ],
+        },
+      ],
+    };
+    const tinyCtx: RuleContext = { content: tiny, now: ctx.now, testActions: true };
+    const tinyChapter = tiny.chapters[0]!;
+    const house = (): HouseState => joinHouse(createHouse('tiny-house', 'Ada', tinyCtx), 'Bao', tinyCtx)!;
+    const banner = tinyChapter.pieces.find((p) => p.id === 'banner')!;
+    const move = (state: HouseState, spotId: string) => applyAction(state, 'a', act({ type: 'piece.move', pieceId: 'banner', spotId }), tinyCtx);
+
+    it('Umstellen, das dem gewählten Stück den letzten Platz nähme, wird abgelehnt', () => {
+      // Der Stuhl ist gewählt und braucht einen Bodenplatz; frei ist nur noch room-floor-2.
+      const state: HouseState = {
+        ...house(),
+        placements: [
+          { pieceId: 'banner', spotId: 'room-wall-1' },
+          { pieceId: 'lamp', spotId: 'room-floor-1' },
+        ],
+        buildTurns: [{ n: 1, chooser: 'a', offer: ['chair'], chosen: 'chair', placedAt: null }],
+      };
+      expect(moveSpotsFor(banner, state, tinyChapter)).toEqual([]);
+      const applied = move(state, 'room-floor-2');
+      expect(applied.result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
+      expect(applied.state).toBe(state);
+      // Der Zug lässt sich danach abschließen.
+      expect(applyAction(state, 'b', act({ type: 'build.place', turn: 1, spotId: 'room-floor-2' }), tinyCtx).result).toMatchObject({ outcome: 'applied' });
+    });
+
+    it('auch vor der Wahl bleibt für mindestens ein angebotenes Stück ein Platz', () => {
+      const state: HouseState = {
+        ...house(),
+        placements: [
+          { pieceId: 'banner', spotId: 'room-wall-1' },
+          { pieceId: 'filler', spotId: 'room-floor-1' },
+        ],
+        buildTurns: [{ n: 1, chooser: 'a', offer: ['chair', 'lamp'], chosen: null, placedAt: null }],
+      };
+      expect(move(state, 'room-floor-2').result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
+    });
+
+    it('bleibt dem Bauzug ein anderer Platz, ist das Umstellen erlaubt', () => {
+      const state: HouseState = {
+        ...house(),
+        placements: [{ pieceId: 'banner', spotId: 'room-wall-1' }],
+        buildTurns: [{ n: 1, chooser: 'a', offer: ['chair'], chosen: 'chair', placedAt: null }],
+      };
+      expect(moveSpotsFor(banner, state, tinyChapter).map((s) => s.id)).toEqual(['room-floor-1', 'room-floor-2']);
+      expect(move(state, 'room-floor-2').state.placements).toEqual([{ pieceId: 'banner', spotId: 'room-floor-2' }]);
+    });
+
+    it('passt für einen wartenden Zug nichts mehr ins Haus, wenn er dran wäre, entfällt er', () => {
+      // Nur ein Platz ist frei; zwei Aufgaben bringen zwei Züge.
+      let state: HouseState = {
+        ...house(),
+        placements: [
+          { pieceId: 'filler-1', spotId: 'room-floor-1' },
+          { pieceId: 'filler-2', spotId: 'room-wall-1' },
+        ],
+      };
+      for (let i = 0; i < 2; i++) state = applyAction(state, 'a', act({ type: 'test.completeTask' }), tinyCtx).state;
+      expect(state.buildTurns.map((t) => t.n)).toEqual([1, 2]);
+      const first = state.buildTurns[0]!;
+      expect(first.offer).toHaveLength(2);
+
+      state = applyAction(state, first.chooser, act({ type: 'build.choose', turn: 1, pieceId: first.offer[0]! }), tinyCtx).state;
+      state = applyAction(state, otherSlot(first.chooser), act({ type: 'build.place', turn: 1, spotId: 'room-floor-2' }), tinyCtx).state;
+      // Das Haus ist voll: Zug 2 hängt nicht für immer offen, er entfällt. Die Aufgaben zählen trotzdem.
+      expect(state.buildTurns).toEqual([{ ...first, chosen: first.offer[0], placedAt: 'room-floor-2' }]);
+      expect(state.done).toHaveLength(2);
+    });
   });
 
   it('was nicht im Haus steht, lässt sich nicht umstellen', () => {

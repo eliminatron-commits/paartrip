@@ -50,7 +50,7 @@ worker/             Cloudflare Worker "paartrip-api" + D1
   test/               Tests gegen den echten Worker, local-api.ts startet ihn
   wrangler.jsonc      Konfiguration ohne Secrets
 scripts/            Build-Helfer (Inhalte bündeln, Icons und iPhone-Startbilder erzeugen; splash-sizes.ts: die eine Liste der Gerätegrößen)
-e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Worker mit Hilfsroute /__test/forget-house; phones.ts: gemeinsame Handgriffe der Zwei-Geräte-Tests)
+e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Worker mit den Hilfsrouten /__test/forget-house und /__test/fill-house; phones.ts: gemeinsame Handgriffe der Zwei-Geräte-Tests)
 generated/          erzeugt, nicht im Repo (content.json, content-rules.json)
 public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 public/splash/      erzeugt, nicht im Repo (Startbilder je iPhone-Größe)
@@ -128,7 +128,8 @@ screenshots/        erzeugt, nicht im Repo (e2e/screens.spec.ts legt dort jeden 
 - **Dekostück im Meilenstein-Geschenk:** Es bekommt keinen eigenen Bauzug. Wer zuerst kommt, stellt es mit `piece.move` auf einen passenden freien Platz; danach lässt es sich wie jedes Stück umstellen.
 - **Geheime Gutscheine nach dem letzten Meilenstein:** Hinterlegen ist dann geschlossen (es gibt keinen nächsten Meilenstein im Kapitel); die Gifts-Seite sagt das.
 - **Push im Bauzug:** Hat einer gewählt, bekommt der andere die Mitteilung "partner_done" – er ist mit Platzieren an der Reihe. Allgemein gilt: Wer eine Aktion selbst ausgelöst hat, bekommt dazu keine Mitteilung (`applyRule` in `shared/rules.ts`).
-- **Mehr Plätze als Bauzüge:** Kapitel 1 hat 34 Plätze für 30 Bauzüge und bis zu 3 Dekostücke. Ist für kein Stück mehr ein Platz frei, entfällt der Bauzug; die Aufgabe zählt trotzdem.
+- **Bauzüge laufen einer nach dem anderen:** Dran ist immer der älteste offene Zug (`activeTurn`); ein wartender bekommt sein Angebot erst, wenn er dran ist – aus dem, was dann noch zu haben ist und ins Haus passt (`withActiveOffer`). Umstellen und das Aufstellen eines Dekostücks dürfen dem offenen Zug nie den letzten Platz nehmen (`moveSpotsFor`). So bleibt kein Bauzug hängen, auch wenn der Katalog mehr Stücke einer Platzart hat als das Haus Plätze. Passt für einen Zug gar nichts mehr, entfällt er; die Aufgabe zählt trotzdem.
+- **Mehr Plätze als Bauzüge:** Kapitel 1 hat 34 Plätze für 30 Bauzüge und bis zu 3 Dekostücke (wall 8, surface 9, floor 6, ground 8, fence 3). Ein Dekostück hat keinen Vorrang vor dem Bauzug: Sind alle Plätze seiner Art besetzt, wartet es, bis einer frei wird.
 - **Startbilder nicht im Precache:** iOS holt sie beim Ablegen auf dem Home-Bildschirm; im Precache wären sie nur Ballast.
 - **Ton im Test:** Der Test-Browser hat kein Audio (der Konstruktor von `AudioContext` wirft dort). `e2e/settings.spec.ts` setzt deshalb einen Zähler mit derselben Schnittstelle ein und prüft den Weg von der Geste bis zum Ton; wie es klingt, lässt sich nur auf dem Gerät beurteilen.
 - **TypeScript 6 statt 7:** svelte-check unterstützt TypeScript 7 noch nicht.

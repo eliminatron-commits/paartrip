@@ -12,6 +12,7 @@ import {
   openTab,
   pair,
   phone,
+  recordResponses,
   returnToApp,
   startHouse,
   syncStatus,
@@ -61,10 +62,7 @@ test('eine Aktion von A erscheint bei B nach dem Abgleich â€“ der Text bleibt fÃ
   const secret = 'Breakfast in bed 4711';
 
   // Alles mitlesen, was der Server an GerÃ¤t B schickt.
-  const sentToB: string[] = [];
-  b.page.on('response', async (response) => {
-    if (response.url().includes(':8788/')) sentToB.push(await response.text().catch(() => ''));
-  });
+  const sentToB = recordResponses(b.page);
 
   await wrapGift(a.page, secret);
   await expect(giftsFromMe(a.page)).toHaveText([new RegExp(`^\\s*${secret}`)]);
@@ -79,9 +77,11 @@ test('eine Aktion von A erscheint bei B nach dem Abgleich â€“ der Text bleibt fÃ
 
   // Der Text ist weder zu sehen noch je bei B angekommen.
   await expect(b.page.getByText(secret)).toHaveCount(0);
-  expect(sentToB.length).toBeGreaterThan(0);
-  expect(sentToB.join('\n')).not.toContain(secret);
-  expect(sentToB.join('\n')).toContain('"veiled"');
+  await expect(syncStatus(b.page)).toHaveText('Up to date.');
+  const received = await sentToB.texts();
+  expect(received.length).toBeGreaterThan(0);
+  expect(received.join('\n')).not.toContain(secret);
+  expect(received.join('\n')).toContain('"veiled"');
 });
 
 test('eine offline erzeugte Aktion wird nachgereicht', async ({ browser }) => {

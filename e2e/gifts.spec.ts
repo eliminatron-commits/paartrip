@@ -1,9 +1,9 @@
 // Gutscheine mit zwei Geräten: Ein geheimer Gutschein bleibt bis zum Meilenstein verhüllt – auch in dem,
 // was der Server schickt – und durchläuft danach das Einlösen.
 import { readFile } from 'node:fs/promises';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import type { Content } from '../shared/content-schema.ts';
-import { closePhones, finishTestTask, giftsForMe, giftsFromMe, openTab, pair, returnToApp, wrapGift } from './phones.ts';
+import { closePhones, finishTestTask, giftsForMe, giftsFromMe, openTab, pair, recordResponses, returnToApp, syncStatus, wrapGift } from './phones.ts';
 
 test.afterEach(closePhones);
 
@@ -12,15 +12,6 @@ const chapter = content.chapters[0]!;
 const fixedAt = new Set(chapter.coupons.map((c) => c.milestone));
 /** Hier wartet der erste geheime Gutschein. */
 const milestone = chapter.milestones.find((m) => !fixedAt.has(m))!;
-
-/** Alles mitlesen, was der Server an dieses Gerät schickt. */
-function recordResponses(page: Page): string[] {
-  const received: string[] = [];
-  page.on('response', async (response) => {
-    if (response.url().includes(':8788/')) received.push(await response.text().catch(() => ''));
-  });
-  return received;
-}
 
 test('ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text', async ({ browser }) => {
   const { a, b } = await pair(browser);
@@ -46,8 +37,10 @@ test('ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text'
   await openTab(a.page, 'Gifts');
   await expect(giftsForMe(a.page)).toHaveAttribute('data-state', 'veiled');
   await expect(a.page.getByText(secret)).toHaveCount(0);
-  expect(sentToA.length).toBeGreaterThan(0);
-  expect(sentToA.join('\n')).not.toContain(secret);
+  await expect(syncStatus(a.page)).toHaveText('Up to date.');
+  const before = await sentToA.texts();
+  expect(before.length).toBeGreaterThan(0);
+  expect(before.join('\n')).not.toContain(secret);
 
   // Der Meilenstein: A bekommt die Szene, das Geschenk ist noch zu.
   await finishTestTask(b.page);
@@ -60,7 +53,7 @@ test('ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text'
   await expect(a.page.getByTestId('gift-inside')).toContainText(secret);
   // Ein Gutschein liegt im Geschenk – also kein Dekostück.
   await expect(a.page.getByTestId('gift-inside')).not.toContainText('A special piece');
-  expect(sentToA.join('\n')).toContain(secret);
+  expect((await sentToA.texts()).join('\n')).toContain(secret);
 
   await scene.getByRole('button', { name: 'See your gifts' }).click();
   await expect(scene).toBeHidden();
@@ -72,6 +65,8 @@ test('Einlösen durchläuft verhüllt, freigeschaltet und eingelöst – der Sch
   const { a, b } = await pair(browser);
   const secret = 'Pancakes on Sunday';
   await wrapGift(b.page, secret);
+  // Erst wenn der Server den Gutschein hat, kann A ihn beim Abgleich sehen.
+  await expect(giftsFromMe(b.page)).toHaveAttribute('data-state', 'veiled');
   await openTab(a.page, 'Gifts');
   await returnToApp(a.page);
 

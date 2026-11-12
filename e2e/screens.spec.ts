@@ -8,6 +8,7 @@ import {
   closePhones,
   closeSettings,
   finishTestTask,
+  LOCAL_API,
   moveCard,
   openSettings,
   openTab,
@@ -15,6 +16,8 @@ import {
   phone,
   returnToApp,
   SAFE_AREA,
+  SAFE_AREA_LANDSCAPE,
+  type SafeArea,
   startHouse,
   syncStatus,
   wrapGift,
@@ -31,25 +34,30 @@ const TAP = 44;
 const CONTROLS = 'button, a[href], input, textarea, select, [role="radio"], [role="switch"]';
 
 /** Was liegt in den Rändern? Abgetastet wird, was an jedem Punkt tatsächlich oben liegt. */
-async function inSafeAreas(page: Page): Promise<string[]> {
+async function inSafeAreas(page: Page, area: SafeArea): Promise<string[]> {
   return page.evaluate(
-    ({ top, bottom, controls }) => {
+    ({ area, controls }) => {
       const found = new Set<string>();
-      const probe = (y: number, zone: string) => {
-        for (let x = 3; x < window.innerWidth; x += 8) {
-          const element = document.elementFromPoint(x, y);
-          if (!element) continue;
-          const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '');
-          if (element.closest(controls) || hasText) {
-            found.add(`${zone}: <${element.tagName.toLowerCase()} class="${element.getAttribute('class') ?? ''}"> ${(element.textContent ?? '').trim().slice(0, 40)}`);
-          }
+      const probe = (x: number, y: number, zone: string) => {
+        const element = document.elementFromPoint(x, y);
+        if (!element) return;
+        const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '');
+        if (element.closest(controls) || hasText) {
+          found.add(`${zone}: <${element.tagName.toLowerCase()} class="${element.getAttribute('class') ?? ''}"> ${(element.textContent ?? '').trim().slice(0, 40)}`);
         }
       };
-      for (let y = 1; y < top; y += 4) probe(y, 'oben');
-      for (let y = window.innerHeight - bottom + 1; y < window.innerHeight; y += 4) probe(y, 'unten');
+      const { innerWidth: width, innerHeight: height } = window;
+      for (let x = 3; x < width; x += 8) {
+        for (let y = 1; y < area.top; y += 4) probe(x, y, 'oben');
+        for (let y = height - area.bottom + 1; y < height; y += 4) probe(x, y, 'unten');
+      }
+      for (let y = 3; y < height; y += 8) {
+        for (let x = 1; x < area.left; x += 4) probe(x, y, 'links');
+        for (let x = width - area.right + 1; x < width; x += 4) probe(x, y, 'rechts');
+      }
       return [...found];
     },
-    { ...SAFE_AREA, controls: CONTROLS },
+    { area, controls: CONTROLS },
   );
 }
 
@@ -75,11 +83,11 @@ async function smallTargets(page: Page): Promise<string[]> {
 
 let shot = 0;
 /** Screenshot plus die beiden Prüfungen für den Bildschirm, wie er gerade ist. */
-async function check(page: Page, name: string): Promise<void> {
+async function check(page: Page, name: string, area: SafeArea = SAFE_AREA): Promise<void> {
   shot += 1;
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: `screenshots/${String(shot).padStart(2, '0')}-${name}.png` });
-  expect(await inSafeAreas(page), `${name}: in den Rändern`).toEqual([]);
+  expect(await inSafeAreas(page, area), `${name}: in den Rändern`).toEqual([]);
   expect(await smallTargets(page), `${name}: zu kleine Tap-Ziele`).toEqual([]);
 }
 
@@ -87,12 +95,12 @@ async function check(page: Page, name: string): Promise<void> {
 const scrollToEnd = (page: Page) => page.locator('main').evaluate((main) => main.scrollTo(0, main.scrollHeight));
 
 test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({ browser }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await mkdir('screenshots', { recursive: true });
   shot = 0;
 
   // ---- Vor dem Koppeln
-  const solo = await phone(browser, { safeArea: true });
+  const solo = await phone(browser, { safeArea: SAFE_AREA });
   await check(solo.page, 'welcome');
   await solo.page.getByRole('button', { name: 'I have a code' }).click();
   await check(solo.page, 'welcome-join');
@@ -104,7 +112,7 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
   await check(solo.page, 'home-waiting-for-partner');
 
   // ---- Zu zweit
-  const { a, b } = await pair(browser, { safeArea: true });
+  const { a, b } = await pair(browser, { safeArea: SAFE_AREA });
   const [first, second] = chapter.build.firstChooser === 'a' ? [a, b] : [b, a];
   await check(a.page, 'home-empty-house');
   await scrollToEnd(a.page);
@@ -142,6 +150,7 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
 
   // Erinnerungsstück und Meilenstein: so viele Aufgaben, bis das erste freie Geschenk aufgeht.
   await wrapGift(b.page, 'Breakfast in bed, with the good coffee');
+  await expect(b.page.locator('[data-testid="gift"][data-kind="secret"]')).toHaveCount(1);
   await check(b.page, 'gifts-wrapped-by-me');
   for (let done = 1; done < freeMilestone; done++) await finishTestTask(a.page);
   await check(a.page, 'milestone-scene');
@@ -183,18 +192,45 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
   await check(a.page, 'home-offline');
 });
 
-test('im Querformat bricht nichts: kein waagerechtes Rollen, alles bleibt erreichbar', async ({ browser }) => {
-  const { a } = await pair(browser);
+test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die Ränder frei', async ({ browser, request }) => {
+  const { a, b, code } = await pair(browser, { safeArea: SAFE_AREA });
+  // Wer im ersten Bauzug nicht wählt, hat im Haus nur das Dekostück vor sich.
+  const { page } = chapter.build.firstChooser === 'a' ? b : a;
+  for (let done = 0; done < freeMilestone; done++) await finishTestTask(a.page);
+
+  await returnToApp(page);
+  await expect(page.getByTestId('milestone')).toBeVisible();
+  await page.getByRole('button', { name: 'Open the gift' }).click();
+  await expect(page.getByTestId('gift-inside')).toContainText('A special piece for your home');
+  await check(page, 'milestone-gift-deco');
+  await page.getByRole('button', { name: 'Later' }).click();
+
+  await openTab(page, 'Home');
+  await expect(moveCard(page)).toHaveAttribute('data-kind', 'deco');
+  await check(page, 'home-deco-card');
+
+  // Jeder Platz ist besetzt (Hilfsroute des lokalen Testservers): Für das Dekostück ist nichts mehr frei.
+  expect((await request.post(`${LOCAL_API}/__test/fill-house?code=${code.replace('-', '')}`)).status()).toBe(204);
+  await returnToApp(page);
+  await page.getByRole('button', { name: 'Find a spot' }).click();
+  await expect(page.getByTestId('placing-bar')).toContainText('No free spot fits');
+  await expect(page.locator('button.target')).toHaveCount(0);
+  await check(page, 'home-no-free-spot');
+});
+
+test('im Querformat bricht nichts: kein waagerechtes Rollen, Ränder frei, alles bleibt erreichbar', async ({ browser }) => {
+  // Im Querformat liegen Dynamic Island und Rundungen links und rechts.
+  const { a } = await pair(browser, { safeArea: SAFE_AREA_LANDSCAPE });
   await a.page.setViewportSize({ width: 956, height: 440 });
   for (const tab of ['Home', 'Today', 'Gifts'] as const) {
     await openTab(a.page, tab);
     const overflow = await a.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, tab).toBeLessThanOrEqual(0);
     await expect(a.page.getByRole('navigation', { name: 'Main' })).toBeInViewport();
+    await check(a.page, `landscape-${tab.toLowerCase()}`, SAFE_AREA_LANDSCAPE);
   }
-  await a.page.screenshot({ path: 'screenshots/landscape-gifts.png' });
-  await openTab(a.page, 'Home');
-  await a.page.screenshot({ path: 'screenshots/landscape-home.png' });
+  await openSettings(a.page);
+  await check(a.page, 'landscape-settings', SAFE_AREA_LANDSCAPE);
 });
 
 test('mit "Bewegung reduzieren" pulsieren die leuchtenden Plätze nicht', async ({ browser }) => {
