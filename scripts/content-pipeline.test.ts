@@ -47,7 +47,8 @@ const variant = {
   variant: 2,
   title: 'The cellar stairs',
   lead: 'a',
-  data: { maze: ['..#G', '.##.', '....', 'S.#.'] },
+  // Eine Treppe von links unten nach rechts oben.
+  data: { maze: ['###.G', '##..#', '#..##', '..###', 'S####'] },
 };
 
 describe('neue Rätselvariante als Inhaltsdatei', () => {

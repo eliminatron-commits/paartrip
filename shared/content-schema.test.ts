@@ -60,6 +60,7 @@ describe('Aufgaben-Schema', () => {
         { pick: 'place', n: 1 },
         { pick: 'left-of', of: 'star' },
         { pick: 'from-end', n: 1 },
+        { pick: 'place', n: 2 },
       ],
     },
   };

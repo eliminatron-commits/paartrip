@@ -1,7 +1,7 @@
 // Geteilter Code. Rolle 1 hat das Schloss und für jede Stelle des Codes eine Regel, die auf eine Reihe von
 // Symbolen verweist ("das Symbol links vom Mond"). Die Reihe sieht nur Rolle 2. Der Code steht nirgends in
 // der Datei – er ergibt sich aus Reihe und Regeln, kann ihnen also nie widersprechen.
-import { duplicates, type Glyph, GLYPHS } from './tiles.ts';
+import { duplicates, type Glyph, GLYPHS, MIN_ATTEMPTS } from './tiles.ts';
 
 export type CodeRule =
   /** Das n-te Symbol von links (ab 1). */
@@ -59,7 +59,19 @@ export function validate(data: SplitCodeData): string[] {
   // Das Schloss zeigt die Symbole in der Reihenfolge des Zeichenvorrats. Stünde die Reihe genauso da,
   // könnte Rolle 1 sie erraten, ohne zu fragen.
   if (palette(data).join() === data.row.join()) problems.push('row: steht in der Reihenfolge des Zeichenvorrats – ohne Partner lösbar');
+  const possible = codes(data);
+  if (possible < MIN_ATTEMPTS) problems.push(`code: die Regeln lassen nur ${possible} Codes zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
   return problems;
+}
+
+/**
+ * Wie viele Codes Rolle 1 durchprobieren müsste: An jeder Stelle kommt jedes Symbol des Schlosses in Frage –
+ * außer denen, die die Regel selbst nennt ("links vom Mond" ist nie der Mond).
+ */
+function codes(data: SplitCodeData): number {
+  const symbols = palette(data).length;
+  const named = (rule: CodeRule) => (rule.pick === 'between' ? new Set([rule.a, rule.b]).size : rule.pick === 'left-of' || rule.pick === 'right-of' ? 1 : 0);
+  return data.code.reduce((count, rule) => count * Math.max(symbols - named(rule), 0), 1);
 }
 
 export function solution(data: SplitCodeData): SplitCodeAttempt {

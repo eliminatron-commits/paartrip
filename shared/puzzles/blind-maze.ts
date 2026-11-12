@@ -4,6 +4,8 @@
 //
 // Das Labyrinth ist ein Raster aus Zeichen, eine Zeile je Reihe: '#' Wand · '.' Weg · 'S' Start · 'G' Ziel
 
+import { MIN_ATTEMPTS } from './tiles.ts';
+
 export interface BlindMazeData {
   maze: string[];
 }
@@ -112,7 +114,40 @@ export function validate(data: BlindMazeData): string[] {
   if (walk(data, [...across, ...along]).clean || walk(data, [...along, ...across]).clean) {
     problems.push('maze: der gerade Weg zum Ziel ist frei – ohne Partner lösbar');
   }
+  const possible = blindRoutes(data, route.length, MIN_ATTEMPTS);
+  if (possible < MIN_ATTEMPTS) {
+    problems.push(`maze: bis zur Länge des richtigen Wegs (${route.length} Schritte) gibt es nur ${possible} Wege zum Ziel – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
+  }
   return problems;
+}
+
+/**
+ * Wie viele Wege Rolle 2 durchprobieren müsste, vom kürzesten an: Wege vom Start zum Ziel, die kein Feld zweimal
+ * betreten und höchstens `limit` Schritte lang sind. Wände zählen dabei nicht – Rolle 2 sieht sie nicht.
+ * Gezählt wird nur bis `enough`; mehr braucht die Prüfung nicht zu wissen.
+ */
+function blindRoutes(data: BlindMazeData, limit: number, enough: number): number {
+  const goal = goalCell(data);
+  const key = (cell: Cell) => `${cell.row},${cell.col}`;
+  const walked = new Set<string>();
+  let count = 0;
+  const visit = (cell: Cell, left: number): void => {
+    if (count >= enough) return;
+    if (cell.row === goal.row && cell.col === goal.col) {
+      count += 1;
+      return;
+    }
+    // Von hier aus ist das Ziel mit den übrigen Schritten nicht mehr zu erreichen.
+    if (Math.abs(goal.row - cell.row) + Math.abs(goal.col - cell.col) > left) return;
+    walked.add(key(cell));
+    for (const move of MOVES) {
+      const next = stepFrom(data, cell, move);
+      if (next && !walked.has(key(next))) visit(next, left - 1);
+    }
+    walked.delete(key(cell));
+  };
+  visit(startCell(data), limit);
+  return count;
 }
 
 export function solution(data: BlindMazeData): BlindMazeAttempt {

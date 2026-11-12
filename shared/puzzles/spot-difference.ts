@@ -35,11 +35,25 @@ export function validate(data: SpotDifferenceData): string[] {
     else if (before === change.glyph) problems.push(`changes.${index}: Feld ${change.cell} sieht in beiden Fassungen gleich aus`);
   });
   if (data.changes.length < 2) problems.push('changes: mindestens zwei Unterschiede');
-  // Markieren lässt sich jede Auswahl der Felder.
-  if (2 ** cells < MIN_ATTEMPTS) problems.push(`scene: ${cells} Felder lassen nur ${2 ** cells} Markierungen zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
+  const possible = markings(cells);
+  if (possible < MIN_ATTEMPTS) problems.push(`scene: ${cells} Felder lassen nur ${possible} Markierungen zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
   // Weicht mehr als die Hälfte ab, ist "alles markieren" fast schon die Lösung.
   if (data.changes.length * 2 > cells) problems.push('changes: höchstens die Hälfte der Felder darf abweichen');
   return problems;
+}
+
+/**
+ * Wie viele Markierungen in Frage kommen, wenn man die Regeln dieser Art kennt: mindestens zwei Unterschiede,
+ * höchstens die Hälfte der Felder.
+ */
+function markings(cells: number): number {
+  let total = 0;
+  let selections = cells; // Auswahlen von genau einem Feld
+  for (let marked = 2; marked * 2 <= cells; marked++) {
+    selections = (selections * (cells - marked + 1)) / marked;
+    total += selections;
+  }
+  return Math.round(total);
 }
 
 export function solution(data: SpotDifferenceData): SpotDifferenceAttempt {

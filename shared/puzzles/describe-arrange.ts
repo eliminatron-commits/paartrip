@@ -1,6 +1,6 @@
 // Beschreiben und Anordnen. Rolle 1 sieht das Zielbild: Teile in einem Raster. Rolle 2 hat das leere Raster
 // und einen Vorrat an Teilen (mehr, als gebraucht werden) und legt nach, was Rolle 1 beschreibt.
-import { duplicates, type Glyph } from './tiles.ts';
+import { duplicates, type Glyph, MIN_ATTEMPTS } from './tiles.ts';
 
 export interface DescribeArrangeData {
   cols: number;
@@ -22,7 +22,18 @@ export function validate(data: DescribeArrangeData): string[] {
   for (const dup of duplicates(used, String)) problems.push(`target: Teil ${dup} liegt auf zwei Feldern`);
   for (const dup of duplicates(data.tiles, (glyph) => glyph)) problems.push(`tiles: "${dup}" doppelt – am Telefon nicht zu unterscheiden`);
   if (used.length < 3) problems.push('target: mindestens drei Teile');
+  const possible = pictures(data.tiles.length, data.cols * data.rows, new Set(used).size);
+  if (possible < MIN_ATTEMPTS) {
+    problems.push(`target: ${used.length} von ${data.tiles.length} Teilen auf ${data.cols * data.rows} Feldern lassen nur ${possible} Bilder zu – mindestens ${MIN_ATTEMPTS}, sonst genügt Probieren`);
+  }
   return problems;
+}
+
+/** Wie viele Bilder sich legen lassen, wenn man weiß, wie viele Teile gebraucht werden: Auswahl der Teile mal ihre Plätze. */
+function pictures(tiles: number, cells: number, used: number): number {
+  let count = 1;
+  for (let i = 0; i < used; i++) count *= ((tiles - i) / (i + 1)) * (cells - i);
+  return Math.max(Math.round(count), 0);
 }
 
 export function solution(data: DescribeArrangeData): DescribeArrangeAttempt {

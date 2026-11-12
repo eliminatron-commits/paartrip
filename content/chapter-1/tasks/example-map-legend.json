@@ -8,11 +8,12 @@
   "data": {
     "plan": [
       "######",
-      "#a12b#",
-      "#3..4#",
-      "#.##.#",
+      "#a1.2#",
+      "#3..b#",
+      "#.#.4#",
       "#5..6#",
-      "#c78d#",
+      "#c7..#",
+      "#.8.d#",
       "######"
     ],
     "landmarks": [
@@ -38,10 +39,10 @@
       }
     ],
     "clues": [
-      "One is right next to the stove, on the wall the stove shares with the window.",
-      "One is next to the front door, but not on the wall the door shares with the big plant.",
-      "One is next to the big plant, on the side that faces the stove."
+      "Two of them are right next to the stove.",
+      "The third one is directly below the window on the plan.",
+      "Nothing is hidden beside the big plant."
     ],
-    "treasures": ["1", "5", "6"]
+    "treasures": ["1", "3", "4"]
   }
 }

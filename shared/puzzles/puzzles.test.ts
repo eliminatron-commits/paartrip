@@ -59,13 +59,24 @@ describe('Geteilter Code', () => {
       { pick: 'left-of', of: 'heart' },
       { pick: 'between', a: 'wave', b: 'sun' },
     ];
-    for (const rule of rules) expect(splitCode.validate({ ...data, code: [rule] }), JSON.stringify(rule)).toHaveLength(1);
+    for (const rule of rules) expect(splitCode.validate({ ...data, code: [...data.code, rule] }), JSON.stringify(rule)).toHaveLength(1);
   });
 
   it('eine Reihe, die sich ohne Partner erraten ließe, fällt bei der Prüfung auf', () => {
     const guessable = splitCode.validate({ row: ['sun', 'moon', 'star', 'leaf'], code: [{ pick: 'place', n: 1 }] });
     expect(guessable.join()).toContain('ohne Partner lösbar');
     expect(splitCode.validate({ ...data, row: ['wave', 'moon', 'wave', 'sun', 'star'] }).join()).toContain('doppelt');
+  });
+
+  it('Regeln, die so wenige Codes zulassen, dass Durchprobieren genügt, fallen auf', () => {
+    // Vier Symbole; "zwischen" schließt zwei davon aus, "links von" und "rechts von" je eines: 2 · 3 · 3 Codes.
+    const few: splitCode.SplitCodeData = {
+      row: ['wave', 'moon', 'leaf', 'sun'],
+      code: [{ pick: 'between', a: 'wave', b: 'leaf' }, { pick: 'left-of', of: 'leaf' }, { pick: 'right-of', of: 'leaf' }],
+    };
+    expect(splitCode.validate(few).join()).toContain('nur 18 Codes');
+    // Eine vierte Stelle macht daraus 72.
+    expect(splitCode.validate({ ...few, code: [...few.code, { pick: 'place', n: 1 }] })).toEqual([]);
   });
 });
 
@@ -146,15 +157,21 @@ describe('Beschreiben und Anordnen', () => {
     expect(describeArrange.validate({ ...data, target: [0, 7, 2, 1] }).join()).toContain('gibt es nicht');
     expect(describeArrange.validate({ ...data, tiles: [...tiles, tiles[0]!] }).join()).toContain('doppelt');
   });
+
+  it('ein Regal, bei dem Durchprobieren genügt, fällt auf', () => {
+    // Drei Teile, alle gebraucht, vier Felder: 4 · 3 · 2 Bilder. Mit einem vierten Teil als Ablenkung sind es 96.
+    expect(describeArrange.validate({ ...data, tiles: tiles.slice(0, 3) }).join()).toContain('nur 24 Bilder');
+    expect(describeArrange.validate(data)).toEqual([]);
+  });
 });
 
 describe('Zwei Bilder vergleichen', () => {
   const sun: Glyph = 'sun';
   const moon: Glyph = 'moon';
   const data: spotDifference.SpotDifferenceData = {
-    cols: 3,
+    cols: 4,
     rows: 2,
-    scene: [sun, moon, null, sun, moon, null],
+    scene: [sun, moon, null, sun, moon, null, sun, moon],
     changes: [
       { cell: 1, glyph: 'star' },
       { cell: 2, glyph: sun },
@@ -165,7 +182,7 @@ describe('Zwei Bilder vergleichen', () => {
   it('jede Rolle sieht ihre eigene Fassung', () => {
     expect(spotDifference.validate(data)).toEqual([]);
     expect(spotDifference.versionFor(data, 'lead')).toEqual(data.scene);
-    expect(spotDifference.versionFor(data, 'partner')).toEqual([sun, 'star', sun, null, moon, null]);
+    expect(spotDifference.versionFor(data, 'partner')).toEqual([sun, 'star', sun, null, moon, null, sun, moon]);
   });
 
   it('gelöst ist es mit genau den abweichenden Feldern, in beliebiger Reihenfolge', () => {
@@ -173,20 +190,24 @@ describe('Zwei Bilder vergleichen', () => {
     expect(spotDifference.isSolved(data, [1, 2])).toBe(false);
     expect(spotDifference.isSolved(data, [1, 2, 3, 4])).toBe(false);
     // Alles zu markieren ist keine Lösung.
-    expect(spotDifference.isSolved(data, [0, 1, 2, 3, 4, 5])).toBe(false);
+    expect(spotDifference.isSolved(data, [0, 1, 2, 3, 4, 5, 6, 7])).toBe(false);
   });
 
   it('ein Unterschied, der keiner ist, und zu viele Unterschiede fallen auf', () => {
     expect(spotDifference.validate({ ...data, changes: [...data.changes.slice(0, 2), { cell: 0, glyph: sun }] }).join()).toContain('sieht in beiden Fassungen gleich aus');
-    expect(spotDifference.validate({ ...data, changes: [...data.changes, { cell: 4, glyph: null }] }).join()).toContain('höchstens die Hälfte');
+    // Vier von acht Feldern sind gerade noch die Hälfte, fünf sind zu viele.
+    const four = [...data.changes, { cell: 4, glyph: null }];
+    expect(spotDifference.validate({ ...data, changes: four })).toEqual([]);
+    expect(spotDifference.validate({ ...data, changes: [...four, { cell: 5, glyph: 'star' as Glyph }] }).join()).toContain('höchstens die Hälfte');
     expect(spotDifference.validate({ ...data, changes: data.changes.slice(0, 1) }).join()).toContain('mindestens zwei');
     expect(spotDifference.validate({ ...data, changes: [...data.changes.slice(0, 2), { cell: 9, glyph: null }] }).join()).toContain('gibt es nicht');
   });
 
   it('ein Regal mit so wenigen Feldern, dass Durchprobieren genügt, fällt auf', () => {
-    const small: spotDifference.SpotDifferenceData = { cols: 2, rows: 2, scene: [sun, moon, null, sun], changes: [{ cell: 0, glyph: moon }, { cell: 2, glyph: sun }] };
-    expect(spotDifference.validate(small).join()).toContain('nur 16 Markierungen');
-    expect(spotDifference.validate({ ...small, cols: 3, scene: [...small.scene, moon, null] })).toEqual([]);
+    // Sechs Felder mit zwei oder drei Unterschieden: 15 + 20 Markierungen. Bei acht Feldern sind es 154.
+    const small: spotDifference.SpotDifferenceData = { cols: 3, rows: 2, scene: data.scene.slice(0, 6), changes: data.changes };
+    expect(spotDifference.validate(small).join()).toContain('nur 35 Markierungen');
+    expect(spotDifference.validate({ ...small, cols: 2, scene: data.scene.slice(0, 4), changes: data.changes.slice(0, 2) }).join()).toContain('nur 6 Markierungen');
   });
 });
 
@@ -222,17 +243,18 @@ describe('Reihenfolge', () => {
 });
 
 describe('Wegweiser', () => {
-  const data: blindMaze.BlindMazeData = { maze: ['S.#.', '#.#.', '#...', '###G'] };
+  // Eine Treppe von links oben nach rechts unten.
+  const data: blindMaze.BlindMazeData = { maze: ['S.###', '#..##', '##..#', '###..', '####G'] };
 
   it('der kürzeste Weg führt ans Ziel, ohne eine Wand zu berühren', () => {
     expect(blindMaze.validate(data)).toEqual([]);
     const route = blindMaze.solution(data);
-    expect(route).toEqual(['right', 'down', 'down', 'right', 'right', 'down']);
+    expect(route).toEqual(['right', 'down', 'right', 'down', 'right', 'down', 'right', 'down']);
     expect(blindMaze.isSolved(data, route)).toBe(true);
   });
 
   it('wer durch eine Wand geht, kommt an – aber gelöst ist es nicht', () => {
-    const through: blindMaze.Move[] = ['right', 'right', 'right', 'down', 'down', 'down'];
+    const through: blindMaze.Move[] = ['right', 'right', 'right', 'right', 'down', 'down', 'down', 'down'];
     expect(blindMaze.walk(data, through)).toMatchObject({ atGoal: true, clean: false });
     expect(blindMaze.isSolved(data, through)).toBe(false);
     // Unterwegs anzuhalten ist auch keine Lösung.
@@ -249,5 +271,13 @@ describe('Wegweiser', () => {
     expect(blindMaze.validate({ maze: ['S...', '.##.', '.##.', '...G'] }).join()).toContain('ohne Partner lösbar');
     expect(blindMaze.validate({ maze: ['S.#.', '#.#.', '#...', '###.'] }).join()).toContain('genau ein "G"');
     expect(blindMaze.validate({ maze: ['S.#.', '#.#', '#...', '###G'] }).join()).toContain('nicht gleich lang');
+  });
+
+  it('ein Labyrinth, bei dem Durchprobieren genügt, fällt auf', () => {
+    // Das Ziel liegt zwei Felder neben dem Start hinter einer Wand: Bis zur Länge des richtigen Wegs (sechs
+    // Schritte) gibt es ohne Blick auf die Wände nur elf Wege dorthin.
+    expect(blindMaze.validate({ maze: ['S#G.', '.#..', '....', '....'] }).join()).toContain('nur 11 Wege');
+    // Auf vier mal vier Feldern von Ecke zu Ecke sind es zwanzig kürzeste Wege – auch das ist zu wenig.
+    expect(blindMaze.validate({ maze: ['S.#.', '#.#.', '#...', '###G'] }).join()).toContain('nur 20 Wege');
   });
 });
