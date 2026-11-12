@@ -190,6 +190,14 @@ export async function passMilestone(page: Page): Promise<void> {
   await scene.getByRole('button', { name: /^(Later|Continue)$/ }).click();
 }
 
+/** Wie `openTab`, geht aber vorher an einer Meilenstein-Szene vorbei, falls eine über der App liegt. */
+export async function openTabPastMilestone(page: Page, name: TabName): Promise<void> {
+  await expect(async () => {
+    await passMilestone(page);
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name }).click({ timeout: 1000 });
+  }).toPass();
+}
+
 /** Spielt auf dem Server so weit, bis diese Aufgabe die laufende ist, und zeigt sie auf beiden Geräten. */
 export async function openTask(phones: Phone[], taskId: string): Promise<void> {
   await testRoute(phones[0]!, 'open-task', `&task=${taskId}`);

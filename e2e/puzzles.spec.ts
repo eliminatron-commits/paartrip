@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 import type { Content } from '../shared/content-schema.ts';
 import type { PuzzleData } from '../shared/puzzles/index.ts';
 import { canSolve, type PuzzleKind, SOLVER } from '../shared/puzzles/kinds.ts';
-import { closePhones, moveCard, openTab, openTask, pair, returnToApp, taskCard } from './phones.ts';
+import { closePhones, moveCard, openTab, openTabPastMilestone, openTask, pair, returnToApp, taskCard } from './phones.ts';
 import type { PuzzleDriver } from './puzzle-drivers/driver.ts';
 import { DRIVERS } from './puzzle-drivers/index.ts';
 
@@ -68,7 +68,8 @@ for (const task of puzzles) {
       await expect(page.getByTestId('today-progress')).toHaveText(new RegExp(`^${done + 1} of `));
       await expect(taskCard(page)).toHaveCount(0);
     }
-    await openTab(other.page, 'Home');
+    // Ist mit dieser Aufgabe ein Meilenstein erreicht, zeigt sich erst dessen Szene.
+    await openTabPastMilestone(other.page, 'Home');
     await expect(moveCard(other.page)).toBeVisible();
   });
 }
