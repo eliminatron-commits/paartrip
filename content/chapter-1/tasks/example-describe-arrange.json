@@ -1,0 +1,28 @@
+{
+  "id": "example-describe-arrange",
+  "type": "puzzle",
+  "kind": "describe-arrange",
+  "variant": 1,
+  "title": "The shelf, just so",
+  "lead": "a",
+  "data": {
+    "cols": 3,
+    "rows": 2,
+    "tiles": [
+      "sun",
+      "moon",
+      "leaf",
+      "heart",
+      "star",
+      "boat"
+    ],
+    "target": [
+      0,
+      null,
+      4,
+      3,
+      2,
+      null
+    ]
+  }
+}

@@ -1,8 +1,10 @@
 // Tests gegen den lokal gestarteten Worker (echtes workerd, echte D1): Koppeln, Abgleich, Geheimhaltung, CORS.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import generated from '../../generated/content-rules.json';
 import type { ApiError, EnterHouseResponse } from '../../shared/api.ts';
+import type { RulesContent } from '../../shared/content-schema.ts';
 import type { HouseState } from '../../shared/model.ts';
-import { action, call, ORIGIN, pair, sync } from './client.ts';
+import { action, call, noon, ORIGIN, pair, playTasks, sync } from './client.ts';
 import { type LocalApi, startLocalApi } from './local-api.ts';
 
 let api: LocalApi;
@@ -19,10 +21,9 @@ async function readState(houseId: string): Promise<HouseState> {
   return JSON.parse(row?.state ?? 'null') as HouseState;
 }
 
-/** Stellt einen Stand her, den es über die Schnittstelle (noch) nicht gibt. */
-async function writeState(state: HouseState): Promise<void> {
-  await (await api.db()).prepare('UPDATE houses SET state = ?, rev = ? WHERE id = ?').bind(JSON.stringify(state), crypto.randomUUID(), state.id).run();
-}
+const chapter = (generated as unknown as RulesContent).chapters[0]!;
+/** Erster Spieltag der gestellten Uhr. */
+const START = '2027-01-11';
 
 describe('Koppeln', () => {
   it('A legt ein Haus an und bekommt Token, Rolle a und einen Kopplungscode', async () => {
@@ -232,35 +233,33 @@ describe('Verborgenes bleibt auf dem Server', () => {
   });
 
   it('Kennst-du-mich: die Antwort des anderen steht erst nach beidseitiger Abgabe in der Antwort', async () => {
-    const { a, b } = await pair(api);
+    // Bis zur ersten Frage mit frei getippter Antwort spielen, eine Aufgabe pro Tag.
+    const index = chapter.tasks.findIndex((t) => t.type === 'knowme' && t.answer.kind === 'text');
+    expect(index, 'Inhalte ohne Frage mit freier Antwort').toBeGreaterThanOrEqual(0);
+    const question = chapter.tasks[index]!;
+    const players = await pair(api, undefined, noon(START));
+    const { a, b } = players;
+    const now = noon(await playTasks(api, players, index, START));
     const own = 'Antwort-von-A-5521';
     const guess = 'Tipp-von-A-9087';
-    const state = await readState(a.view.houseId);
 
-    // Nur A hat abgegeben.
-    state.task = {
-      taskId: 'example-knowme',
-      availableOn: a.view.today,
-      completedAt: null,
-      progress: { type: 'knowme', submissions: { a: { own: { kind: 'text', text: own }, guess: { kind: 'text', text: guess } } }, hearts: [] },
-    };
-    await writeState(state);
-
-    const forB = await sync(api, b.token);
-    expect(forB.text).not.toContain(own);
-    expect(forB.text).not.toContain(guess);
-    expect(forB.json.view.task?.progress).toEqual({ type: 'knowme', mine: null, theirsSubmitted: true, theirs: null, hearts: [] });
-    // A selbst sieht die eigene Abgabe.
-    const forA = await sync(api, a.token);
+    // Nur A hat abgegeben – und sieht die eigene Abgabe.
+    const submit = (ownText: string, guessText: string) =>
+      action({ type: 'knowme.submit', taskId: question.id, own: { kind: 'text', text: ownText }, guess: { kind: 'text', text: guessText } });
+    const forA = await sync(api, a.token, [submit(own, guess)], now);
+    expect(forA.json.results).toMatchObject([{ outcome: 'applied' }]);
     expect(forA.json.view.task?.progress).toMatchObject({ mine: { own: { text: own } }, theirsSubmitted: false, theirs: null });
 
-    // Jetzt hat auch B abgegeben: aufgedeckt.
-    if (state.task.progress.type !== 'knowme') throw new Error('unerwarteter Aufgabentyp');
-    state.task.progress.submissions.b = { own: { kind: 'text', text: 'B own' }, guess: { kind: 'text', text: 'B guess' } };
-    await writeState(state);
-    const revealed = await sync(api, b.token);
+    const forB = await sync(api, b.token, [], now);
+    expect(forB.text).not.toContain(own);
+    expect(forB.text).not.toContain(guess);
+    expect(forB.json.view.task?.progress).toEqual({ type: 'knowme', mine: null, theirsSubmitted: true, theirs: null, hearts: [], judged: [] });
+
+    // Jetzt gibt auch B ab: aufgedeckt, für beide.
+    const revealed = await sync(api, b.token, [submit('Antwort-von-B', 'Tipp-von-B')], now);
     expect(revealed.text).toContain(own);
     expect(revealed.json.view.task?.progress).toMatchObject({ theirsSubmitted: true, theirs: { own: { text: own }, guess: { text: guess } } });
+    expect((await sync(api, a.token, [], now)).json.view.task?.progress).toMatchObject({ theirs: { own: { text: 'Antwort-von-B' } } });
   });
 });
 

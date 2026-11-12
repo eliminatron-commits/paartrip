@@ -2,8 +2,19 @@ import { describe, expect, it, vi } from 'vitest';
 import generated from '../generated/content-rules.json';
 import type { Action, ActionBody } from './actions.ts';
 import type { RulesContent } from './content-schema.ts';
-import { type HouseState, otherSlot, type Slot } from './model.ts';
-import { applyAction, createHouse, freeSpotsFor, joinHouse, milestoneForDeposit, moveSpotsFor, type RuleContext, spotsOf, unplacedDeco } from './rules.ts';
+import { type DoneTask, type HouseState, otherSlot, type Slot } from './model.ts';
+import {
+  applyAction,
+  completeTask,
+  createHouse,
+  freeSpotsFor,
+  joinHouse,
+  milestoneForDeposit,
+  moveSpotsFor,
+  type RuleContext,
+  spotsOf,
+  unplacedDeco,
+} from './rules.ts';
 
 const content = generated as unknown as RulesContent;
 const ctx: RuleContext = { content, now: '2026-11-11T10:00:00.000Z' };
@@ -121,8 +132,7 @@ describe('Meilenstein für geheime Gutscheine', () => {
 });
 
 // ---------------------------------------------------------------- Bauzug, Meilenstein, Einlösen
-
-const testCtx: RuleContext = { ...ctx, testActions: true };
+// Hier geht es um das, was auf eine erledigte Aufgabe folgt. Wie eine Aufgabe erledigt wird, prüft tasks.test.ts.
 
 function act(body: ActionBody): Action {
   n += 1;
@@ -131,14 +141,21 @@ function act(body: ActionBody): Action {
 
 /** Wendet eine Aktion an und verlangt, dass sie gilt. */
 function play(state: HouseState, slot: Slot, body: ActionBody): HouseState {
-  const applied = applyAction(state, slot, act(body), testCtx);
+  const applied = applyAction(state, slot, act(body), ctx);
   expect(applied.result, JSON.stringify(body)).toMatchObject({ outcome: 'applied' });
   return applied.state;
 }
 
-/** Erledigt `count` Aufgaben über die Test-Aktion. */
+/** Eine erledigte Aufgabe, wie die Regeln der Aufgabentypen sie an `completeTask` übergeben. */
+const finished = (state: HouseState): DoneTask => ({
+  taskId: `task-${state.done.length + 1}`,
+  completedAt: ctx.now,
+  progress: { type: 'puzzle', solvedBy: 'a' },
+});
+
+/** Erledigt `count` Aufgaben über `completeTask` – denselben Weg, den jede echte Aufgabe am Ende nimmt. */
 function complete(state: HouseState, count = 1): HouseState {
-  for (let i = 0; i < count; i++) state = play(state, 'a', { type: 'test.completeTask' });
+  for (let i = 0; i < count; i++) state = completeTask(state, finished(state), ctx).state;
   return state;
 }
 
@@ -174,7 +191,7 @@ describe('Erledigte Aufgabe', () => {
     expect(turnOf(state, 2).offer).toEqual([]);
     const waiting = turnOf(state, 2).chooser;
     const anyPiece = turnOf(state, 1).offer[0]!;
-    expect(applyAction(state, waiting, act({ type: 'build.choose', turn: 2, pieceId: anyPiece }), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, waiting, act({ type: 'build.choose', turn: 2, pieceId: anyPiece }), ctx).result).toMatchObject({ reason: 'stale' });
 
     state = finishTurn(state, 1);
     const placed = state.placements[0]!.pieceId;
@@ -204,16 +221,11 @@ describe('Erledigte Aufgabe', () => {
     expect(offers.size).toBeGreaterThan(1);
   });
 
-  it('Test-Aufgaben nimmt der Server nur an, wenn sie eingeschaltet sind', () => {
+  it('die Test-Aktion aus der Bauphase lehnt der Server immer ab – eine ältere App hängt daran nicht fest', () => {
     const state = paired();
     const applied = applyAction(state, 'a', act({ type: 'test.completeTask' }), ctx);
     expect(applied.result).toMatchObject({ outcome: 'rejected', reason: 'forbidden' });
     expect(applied.state).toBe(state);
-  });
-
-  it('mehr Aufgaben, als das Kapitel Meilensteine hergibt, entstehen auch im Test nicht', () => {
-    const full = withDone(paired(), chapter.milestones.at(-1)!);
-    expect(applyAction(full, 'a', act({ type: 'test.completeTask' }), testCtx).result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
   });
 
   it('ist kein Platz mehr frei, entfällt der Bauzug – die Aufgabe zählt trotzdem', () => {
@@ -231,7 +243,7 @@ describe('Bauzug', () => {
     const placer = otherSlot(chooser);
     const chosen = offer[1]!;
 
-    const choosing = applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: chosen }), testCtx);
+    const choosing = applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: chosen }), ctx);
     expect(choosing.result).toMatchObject({ outcome: 'applied' });
     // Der andere erfährt, dass er an der Reihe ist.
     expect(choosing.effects).toEqual([{ to: placer, kind: 'partner_done' }]);
@@ -249,10 +261,10 @@ describe('Bauzug', () => {
     let state = complete(paired());
     const { chooser, offer } = turnOf(state, 1);
     const placer = otherSlot(chooser);
-    expect(applyAction(state, placer, act({ type: 'build.choose', turn: 1, pieceId: offer[0]! }), testCtx).result).toMatchObject({ reason: 'forbidden' });
+    expect(applyAction(state, placer, act({ type: 'build.choose', turn: 1, pieceId: offer[0]! }), ctx).result).toMatchObject({ reason: 'forbidden' });
     state = play(state, chooser, { type: 'build.choose', turn: 1, pieceId: offer[0]! });
     const spot = freeSpotsFor(piece(offer[0]!), state.placements, chapter)[0]!;
-    expect(applyAction(state, chooser, act({ type: 'build.place', turn: 1, spotId: spot.id }), testCtx).result).toMatchObject({ reason: 'forbidden' });
+    expect(applyAction(state, chooser, act({ type: 'build.place', turn: 1, spotId: spot.id }), ctx).result).toMatchObject({ reason: 'forbidden' });
   });
 
   it('gewählt wird nur aus dem Angebot und nur einmal; platziert wird erst nach dem Wählen', () => {
@@ -262,12 +274,12 @@ describe('Bauzug', () => {
     const outside = chapter.pieces.find((p) => !offer.includes(p.id))!;
     const anySpot = spotsOf(chapter)[0]!;
 
-    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: outside.id }), testCtx).result).toMatchObject({ reason: 'invalid' });
-    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 99, pieceId: offer[0]! }), testCtx).result).toMatchObject({ reason: 'invalid' });
-    expect(applyAction(state, placer, act({ type: 'build.place', turn: 1, spotId: anySpot.id }), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: outside.id }), ctx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 99, pieceId: offer[0]! }), ctx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, placer, act({ type: 'build.place', turn: 1, spotId: anySpot.id }), ctx).result).toMatchObject({ reason: 'stale' });
 
     state = play(state, chooser, { type: 'build.choose', turn: 1, pieceId: offer[0]! });
-    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: offer[1]! }), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, chooser, act({ type: 'build.choose', turn: 1, pieceId: offer[1]! }), ctx).result).toMatchObject({ reason: 'stale' });
     expect(turnOf(state, 1).chosen).toBe(offer[0]);
   });
 
@@ -279,7 +291,7 @@ describe('Bauzug', () => {
     state = play(state, chooser, { type: 'build.choose', turn: 2, pieceId: offer[0]! });
     const chosen = piece(offer[0]!);
     const wrongKind = spotsOf(chapter).find((s) => !chosen.fits.includes(s.kind))!;
-    const place = (spotId: string) => applyAction(state, placer, act({ type: 'build.place', turn: 2, spotId }), testCtx);
+    const place = (spotId: string) => applyAction(state, placer, act({ type: 'build.place', turn: 2, spotId }), ctx);
 
     expect(place(wrongKind.id).result).toMatchObject({ reason: 'invalid' });
     expect(place('no-such-spot').result).toMatchObject({ reason: 'invalid' });
@@ -299,7 +311,7 @@ describe('Bauzug', () => {
     const rival = chapter.pieces.find((p) => p.id !== pieceId && p.milestone === undefined && p.fits.includes(kind))!;
     // Ein offener Zug, in dem genau dieses Stück gewählt ist.
     const open: HouseState = { ...state, buildTurns: [...state.buildTurns, { n: 2, chooser: first.chooser, offer: [rival.id], chosen: rival.id, placedAt: null }] };
-    const applied = applyAction(open, otherSlot(first.chooser), act({ type: 'build.place', turn: 2, spotId }), testCtx);
+    const applied = applyAction(open, otherSlot(first.chooser), act({ type: 'build.place', turn: 2, spotId }), ctx);
     expect(applied.result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
     expect(applied.state.placements).toEqual([{ pieceId, spotId }]);
   });
@@ -308,7 +320,7 @@ describe('Bauzug', () => {
     const state = finishTurn(complete(paired()), 1);
     const free = spotsOf(chapter).find((s) => s.id !== state.placements[0]!.spotId)!;
     const placer = otherSlot(turnOf(state, 1).chooser);
-    expect(applyAction(state, placer, act({ type: 'build.place', turn: 1, spotId: free.id }), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, placer, act({ type: 'build.place', turn: 1, spotId: free.id }), ctx).result).toMatchObject({ reason: 'stale' });
   });
 
   it('umstellen dürfen beide; der alte Platz wird frei', () => {
@@ -322,7 +334,7 @@ describe('Bauzug', () => {
     state = play(state, 'b', { type: 'piece.move', pieceId, spotId: from });
     expect(state.placements).toEqual([{ pieceId, spotId: from }]);
     // Der eigene Platz als Ziel ändert nichts.
-    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId, spotId: from }), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId, spotId: from }), ctx).result).toMatchObject({ reason: 'stale' });
   });
 
   describe('damit kein Bauzug hängen bleibt', () => {
@@ -358,7 +370,7 @@ describe('Bauzug', () => {
         },
       ],
     };
-    const tinyCtx: RuleContext = { content: tiny, now: ctx.now, testActions: true };
+    const tinyCtx: RuleContext = { content: tiny, now: ctx.now };
     const tinyChapter = tiny.chapters[0]!;
     const house = (): HouseState => joinHouse(createHouse('tiny-house', 'Ada', tinyCtx), 'Bao', tinyCtx)!;
     const banner = tinyChapter.pieces.find((p) => p.id === 'banner')!;
@@ -413,7 +425,7 @@ describe('Bauzug', () => {
           { pieceId: 'filler-2', spotId: 'room-wall-1' },
         ],
       };
-      for (let i = 0; i < 2; i++) state = applyAction(state, 'a', act({ type: 'test.completeTask' }), tinyCtx).state;
+      for (let i = 0; i < 2; i++) state = completeTask(state, finished(state), tinyCtx).state;
       expect(state.buildTurns.map((t) => t.n)).toEqual([1, 2]);
       const first = state.buildTurns[0]!;
       expect(first.offer).toHaveLength(2);
@@ -430,8 +442,8 @@ describe('Bauzug', () => {
     const state = complete(paired());
     const offered = turnOf(state, 1).offer[0]!;
     const spot = freeSpotsFor(piece(offered), state.placements, chapter)[0]!;
-    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: offered, spotId: spot.id }), testCtx).result).toMatchObject({ reason: 'invalid' });
-    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: 'no-such-piece', spotId: spot.id }), testCtx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: offered, spotId: spot.id }), ctx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: 'no-such-piece', spotId: spot.id }), ctx).result).toMatchObject({ reason: 'invalid' });
   });
 });
 
@@ -450,17 +462,14 @@ describe('Meilenstein', () => {
     expect(state.milestones).toEqual([]);
     expect(state.coupons.every((c) => c.state === 'veiled')).toBe(true);
 
-    const reached = applyAction(state, 'b', act({ type: 'test.completeTask' }), testCtx);
+    const reached = completeTask(state, finished(state), ctx);
     expect(reached.state.milestones).toEqual([{ at: free, reachedAt: ctx.now, decoPiece: null, seenBy: [] }]);
     expect(reached.state.coupons.find((c) => c.id === secret.id)).toMatchObject({ state: 'unlocked' });
     // Nur was an diesem Meilenstein liegt, geht auf.
     expect(reached.state.coupons.filter((c) => c.milestone !== free).every((c) => c.state === 'veiled')).toBe(true);
-    // Die Beschenkte bekommt die Mitteilung …
+    // Die Beschenkte bekommt die Mitteilung. Dass sie ausbleibt, wenn sie den Meilenstein selbst auslöst,
+    // prüft tasks.test.ts mit echten Aufgaben.
     expect(reached.effects).toEqual([{ to: 'a', kind: 'coupon_unlocked' }]);
-    // … es sei denn, sie hat den Meilenstein selbst ausgelöst: Dann sieht sie das Geschenk schon in der App.
-    const byHerself = applyAction(state, 'a', act({ type: 'test.completeTask' }), testCtx);
-    expect(byHerself.state.coupons.find((c) => c.id === secret.id)).toMatchObject({ state: 'unlocked' });
-    expect(byHerself.effects).toEqual([]);
   });
 
   it('ein fester Gutschein wird an seinem Meilenstein freigeschaltet', () => {
@@ -472,7 +481,8 @@ describe('Meilenstein', () => {
   it('liegt kein Gutschein dort, enthält das Geschenk das Dekostück dieses Meilensteins', () => {
     // Fehlt das Dekostück in den Inhalten, schlägt der Test fehl, statt still durchzulaufen.
     expect(deco, `Dekostück für Meilenstein ${free} fehlt in den Inhalten`).toBeDefined();
-    const reached = applyAction(complete(paired(), free - 1), 'a', act({ type: 'test.completeTask' }), testCtx);
+    const before = complete(paired(), free - 1);
+    const reached = completeTask(before, finished(before), ctx);
     expect(reached.state.milestones).toEqual([{ at: free, reachedAt: ctx.now, decoPiece: deco!.id, seenBy: [] }]);
     expect(reached.effects).toEqual([]);
   });
@@ -492,7 +502,7 @@ describe('Meilenstein', () => {
   it('ein Dekostück, dessen Meilenstein noch nicht erreicht ist, kommt nicht ins Haus', () => {
     const state = complete(paired(), free - 1);
     const spot = freeSpotsFor(deco!, state.placements, chapter)[0]!;
-    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: deco!.id, spotId: spot.id }), testCtx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: deco!.id, spotId: spot.id }), ctx).result).toMatchObject({ reason: 'invalid' });
   });
 
   it('jeder merkt für sich, dass er Szene und Geschenk gesehen hat', () => {
@@ -503,7 +513,7 @@ describe('Meilenstein', () => {
     expect(play(state, 'b', { type: 'milestone.seen', milestone: free }).milestones[0]!.seenBy).toEqual(['b']);
     state = play(state, 'a', { type: 'milestone.seen', milestone: free });
     expect(state.milestones[0]!.seenBy).toEqual(['b', 'a']);
-    expect(applyAction(state, 'a', act({ type: 'milestone.seen', milestone: free + 1 }), testCtx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, 'a', act({ type: 'milestone.seen', milestone: free + 1 }), ctx).result).toMatchObject({ reason: 'invalid' });
   });
 });
 
@@ -518,29 +528,29 @@ describe('Einlösen', () => {
     const coupon = () => state.coupons.find((c) => c.id === fixed.id)!;
 
     // Verhüllt: Es gibt noch nichts einzulösen.
-    expect(applyAction(state, fixed.to, act(request), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, fixed.to, act(request), ctx).result).toMatchObject({ reason: 'stale' });
 
     state = unlocked();
     expect(coupon()).toMatchObject({ state: 'unlocked', redeemRequestedAt: null, redeemedAt: null });
     // Bestätigen kann der Schenkende erst nach der Anfrage.
-    expect(applyAction(state, fixed.from, act(confirm), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, fixed.from, act(confirm), ctx).result).toMatchObject({ reason: 'stale' });
 
-    const requested = applyAction(state, fixed.to, act(request), testCtx);
+    const requested = applyAction(state, fixed.to, act(request), ctx);
     expect(requested.effects).toEqual([{ to: fixed.from, kind: 'redeem_requested' }]);
     state = requested.state;
     expect(coupon()).toMatchObject({ state: 'unlocked', redeemRequestedAt: ctx.now, redeemedAt: null });
-    expect(applyAction(state, fixed.to, act(request), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, fixed.to, act(request), ctx).result).toMatchObject({ reason: 'stale' });
 
     state = play(state, fixed.from, confirm);
     expect(coupon()).toMatchObject({ state: 'redeemed', redeemedAt: ctx.now });
-    expect(applyAction(state, fixed.from, act(confirm), testCtx).result).toMatchObject({ reason: 'stale' });
+    expect(applyAction(state, fixed.from, act(confirm), ctx).result).toMatchObject({ reason: 'stale' });
   });
 
   it('anfragen darf nur der Beschenkte, bestätigen nur der Schenkende', () => {
     let state = unlocked();
-    expect(applyAction(state, fixed.from, act({ type: 'coupon.requestRedeem', couponId: fixed.id }), testCtx).result).toMatchObject({ reason: 'forbidden' });
+    expect(applyAction(state, fixed.from, act({ type: 'coupon.requestRedeem', couponId: fixed.id }), ctx).result).toMatchObject({ reason: 'forbidden' });
     state = play(state, fixed.to, { type: 'coupon.requestRedeem', couponId: fixed.id });
-    expect(applyAction(state, fixed.to, act({ type: 'coupon.confirmRedeem', couponId: fixed.id }), testCtx).result).toMatchObject({ reason: 'forbidden' });
-    expect(applyAction(state, fixed.to, act({ type: 'coupon.confirmRedeem', couponId: 'no-such-coupon' }), testCtx).result).toMatchObject({ reason: 'invalid' });
+    expect(applyAction(state, fixed.to, act({ type: 'coupon.confirmRedeem', couponId: fixed.id }), ctx).result).toMatchObject({ reason: 'forbidden' });
+    expect(applyAction(state, fixed.to, act({ type: 'coupon.confirmRedeem', couponId: 'no-such-coupon' }), ctx).result).toMatchObject({ reason: 'invalid' });
   });
 });

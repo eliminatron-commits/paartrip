@@ -55,9 +55,12 @@ describe('Aufgaben-Schema', () => {
     title: 'Lock',
     lead: 'a',
     data: {
-      symbols: ['sun', 'moon', 'star', 'leaf'],
-      hints: { lead: ['x'], partner: ['y'] },
-      solution: ['sun', 'leaf', 'moon'],
+      row: ['leaf', 'sun', 'star', 'moon'],
+      code: [
+        { pick: 'place', n: 1 },
+        { pick: 'left-of', of: 'star' },
+        { pick: 'from-end', n: 1 },
+      ],
     },
   };
 
@@ -70,9 +73,25 @@ describe('Aufgaben-Schema', () => {
     expect(taskSchema.safeParse({ id: 'r', type: 'reallife', title: 'T', text: 'Call.', doer: 'a' }).success).toBe(true);
   });
 
-  it('lehnt eine Lösung mit unbekanntem Symbol ab', () => {
-    const broken = { ...puzzle, data: { ...puzzle.data, solution: ['sun', 'leaf', 'comet'] } };
+  it('lehnt ein unbekanntes Symbol ab', () => {
+    const broken = { ...puzzle, data: { ...puzzle.data, row: ['leaf', 'sun', 'star', 'comet'] } };
     expect(taskSchema.safeParse(broken).success).toBe(false);
+  });
+
+  it('lehnt Rätseldaten ab, die sich widersprechen, und nennt den Grund', () => {
+    // Links vom ersten Symbol der Reihe steht nichts: Die Regel zeigt ins Leere.
+    const broken = { ...puzzle, data: { ...puzzle.data, code: [...puzzle.data.code, { pick: 'left-of', of: 'leaf' }] } };
+    const result = taskSchema.safeParse(broken);
+    expect(result.success).toBe(false);
+    expect(JSON.stringify(result.error?.issues)).toContain('zeigt in dieser Reihe auf kein Symbol');
+  });
+
+  it('lehnt ein Rätsel ab, das sich ohne Partner lösen ließe', () => {
+    // Die Reihe steht so da, wie das Schloss die Symbole ohnehin zeigt.
+    const guessable = { ...puzzle, data: { ...puzzle.data, row: ['sun', 'moon', 'star', 'leaf'] } };
+    const result = taskSchema.safeParse(guessable);
+    expect(result.success).toBe(false);
+    expect(JSON.stringify(result.error?.issues)).toContain('ohne Partner lösbar');
   });
 
   it('lehnt unbekannte Felder und Typen ab', () => {
@@ -81,7 +100,7 @@ describe('Aufgaben-Schema', () => {
     expect(taskSchema.safeParse({ id: 'Not An Id', type: 'reallife', title: 'T', text: 'x', doer: 'a' }).success).toBe(false);
   });
 
-  it('lehnt eine Rätselart ohne hinterlegtes Datenschema ab', () => {
+  it('lehnt Daten ab, die nicht zur Rätselart passen', () => {
     expect(taskSchema.safeParse({ ...puzzle, kind: 'blind-maze' }).success).toBe(false);
   });
 });

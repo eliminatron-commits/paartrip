@@ -3,7 +3,18 @@
   "title": "Moving In",
   "titleVi": "Dọn về nhà mới",
   "rooms": ["living-room", "kitchen", "garden"],
-  "taskOrder": ["example-split-code", "example-knowme", "example-reallife"],
+  "taskOrder": [
+    "example-split-code",
+    "example-knowme",
+    "example-reallife",
+    "example-map-legend",
+    "example-knowme-text",
+    "example-describe-arrange",
+    "example-reallife-song",
+    "example-spot-difference",
+    "example-sequence",
+    "example-blind-maze"
+  ],
   "milestones": [5, 10, 15, 20, 25, 30],
   "build": { "offerSize": 3, "firstChooser": "a" }
 }

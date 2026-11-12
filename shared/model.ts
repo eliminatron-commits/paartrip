@@ -40,6 +40,11 @@ export type TaskProgress =
       submissions: Partial<Record<Slot, KnowMeSubmission>>;
       /** Wer richtig getippt hat (Herz-Abzeichen); steht erst nach dem Aufdecken fest. */
       hearts: Slot[];
+      /**
+       * Nur bei frei getippten Antworten: wer schon entschieden hat, ob der Tipp des anderen auf die eigene
+       * Antwort zählt. Bei Auswahlfragen vergleicht der Server selbst, die Liste bleibt leer.
+       */
+      judged: Slot[];
     }
   | {
       type: 'reallife';
@@ -50,7 +55,7 @@ export type TaskProgress =
 /** Die eine aktuelle Aufgabe. Bleibt nach dem Erledigen stehen, bis die nächste erscheint. */
 export interface ActiveTask {
   taskId: string;
-  /** Tag, an dem die Aufgabe erschienen ist. */
+  /** Tag, an dem die Aufgabe erschienen ist. Die nächste erscheint frühestens am Tag danach. */
   availableOn: DayKey;
   progress: TaskProgress;
   completedAt: IsoTime | null;
@@ -139,6 +144,7 @@ export type TaskProgressView =
       theirsSubmitted: boolean;
       theirs: KnowMeSubmission | null;
       hearts: Slot[];
+      judged: Slot[];
     };
 
 export interface ActiveTaskView extends Omit<ActiveTask, 'progress'> {
@@ -166,6 +172,4 @@ export interface HouseView {
   placements: Placement[];
   milestones: ReachedMilestone[];
   coupons: CouponView[];
-  /** Der Server nimmt Test-Aufgaben an (Bauphase). Fehlt in Sichten älterer Stände. */
-  testActions?: boolean;
 }

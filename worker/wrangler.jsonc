@@ -28,10 +28,11 @@
     "VAPID_SUBJECT": "https://eliminatron-commits.github.io/paartrip/",
     // Push-Dienste von Apple, Google, Mozilla und Microsoft.
     "PUSH_HOSTS": "push.apple.com,fcm.googleapis.com,push.services.mozilla.com,notify.windows.com",
-    "PUSH_TEST_DELAY_MS": "5000",
-    // Test-Aufgaben (Aktion test.completeTask) nimmt der Worker nur mit "TEST_ACTIONS": "1" an.
-    // Seit 2026-11-12 auf Wunsch des Nutzers auch im Betrieb an, damit sich Bauzug und Meilenstein
-    // auf den echten iPhones ausprobieren lassen. Entfällt mit dem Aufgabenablauf in Phase 4.
-    "TEST_ACTIONS": "1"
-  }
+    "PUSH_TEST_DELAY_MS": "5000"
+    // TEST_CLOCK steht hier bewusst nicht: Nur lokal und in den Tests (worker/test/local-api.ts) lässt sich
+    // die Serverzeit stellen.
+  },
+  // Morgen-Mitteilung "neue Aufgabe": einmal täglich um 06:00 UTC, also 07:00 Uhr (Winter) bzw. 08:00 Uhr
+  // (Sommer) in Berlin. Die Aufgabe selbst erscheint schon um Mitternacht, sobald jemand die App öffnet.
+  "triggers": { "crons": ["0 6 * * *"] }
 }

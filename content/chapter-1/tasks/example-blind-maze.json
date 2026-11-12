@@ -1,0 +1,18 @@
+{
+  "id": "example-blind-maze",
+  "type": "puzzle",
+  "kind": "blind-maze",
+  "variant": 1,
+  "title": "Through the dark hallway",
+  "lead": "b",
+  "data": {
+    "maze": [
+      "S.#...",
+      "#.#.#.",
+      "#...#.",
+      "###.#.",
+      "....#.",
+      ".####G"
+    ]
+  }
+}

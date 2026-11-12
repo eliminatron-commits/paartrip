@@ -117,7 +117,8 @@ export interface Memory {
   hearts: Slot[];
 }
 
-function answerText(task: Extract<Task, { type: 'knowme' }>, answer: KnowMeAnswer): string {
+/** Eine Antwort als Text: der getippte Text oder die gewählte Option der Frage. */
+export function answerText(task: Extract<Task, { type: 'knowme' }>, answer: KnowMeAnswer): string {
   if (answer.kind === 'text') return answer.text;
   return task.answer.kind === 'choice' ? (task.answer.options[answer.option] ?? '') : '';
 }

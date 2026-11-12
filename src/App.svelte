@@ -9,6 +9,7 @@
   import { content } from './lib/content.ts';
   import { awaitsMyConfirm, chapterFor, myTurn, nextMove, openMoves, unseenMilestone } from './lib/house.ts';
   import { session } from './lib/session.svelte.ts';
+  import { todayWaits } from './lib/tasks.ts';
   import { ui } from './lib/ui.svelte.ts';
   import GiftsScreen from './screens/gifts/GiftsScreen.svelte';
   import HomeScreen from './screens/home/HomeScreen.svelte';
@@ -23,7 +24,7 @@
   const milestone = $derived(view ? unseenMilestone(view, session.queued) : null);
   const waiting = $derived({
     home: myTurn(moves),
-    today: false,
+    today: view && chapter ? todayWaits(view, chapter, session.queued) : false,
     gifts: view ? view.coupons.some((c) => awaitsMyConfirm(c, view.you)) : false,
   });
 

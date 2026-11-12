@@ -1,0 +1,37 @@
+{
+  "id": "example-spot-difference",
+  "type": "puzzle",
+  "kind": "spot-difference",
+  "variant": 1,
+  "title": "Two shelves, almost the same",
+  "lead": "b",
+  "data": {
+    "cols": 3,
+    "rows": 3,
+    "scene": [
+      "sun",
+      "moon",
+      "leaf",
+      "fish",
+      null,
+      "heart",
+      "bell",
+      "drop",
+      "flower"
+    ],
+    "changes": [
+      {
+        "cell": 1,
+        "glyph": "star"
+      },
+      {
+        "cell": 4,
+        "glyph": "key"
+      },
+      {
+        "cell": 8,
+        "glyph": "tree"
+      }
+    ]
+  }
+}

@@ -6,19 +6,11 @@
   "title": "The pantry lock",
   "lead": "a",
   "data": {
-    "symbols": ["sun", "moon", "star", "leaf", "wave"],
-    "hints": {
-      "lead": [
-        "The lock takes three symbols.",
-        "First: the symbol in the middle of your partner's row.",
-        "Second: the symbol just left of the moon.",
-        "Third: the last symbol in the row."
-      ],
-      "partner": [
-        "Your row reads: wave, moon, leaf, sun, star.",
-        "Your partner has the lock but can't see this row."
-      ]
-    },
-    "solution": ["leaf", "wave", "star"]
+    "row": ["wave", "moon", "leaf", "sun", "star"],
+    "code": [
+      { "pick": "place", "n": 3 },
+      { "pick": "left-of", "of": "moon" },
+      { "pick": "from-end", "n": 1 }
+    ]
   }
 }

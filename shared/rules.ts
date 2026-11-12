@@ -5,6 +5,7 @@ import type { Action, ActionResult, RejectReason } from './actions.ts';
 import type { PushKind } from './api.ts';
 import type { RulesChapter, RulesContent } from './content-schema.ts';
 import {
+  type ActiveTask,
   type BuildTurn,
   type Coupon,
   type DoneTask,
@@ -16,13 +17,13 @@ import {
   type Slot,
   type TaskProgress,
 } from './model.ts';
+import { canSolve, type PuzzleRole } from './puzzles/kinds.ts';
+import { dayKey } from './time.ts';
 
 export interface RuleContext {
   content: RulesContent;
   /** Serverzeit. */
   now: IsoTime;
-  /** Test-Aktionen annehmen (lokal und in der Bauphase); sonst lehnt der Server sie ab. */
-  testActions?: boolean;
 }
 
 /** Push-Auslöser: wer worüber eine Mitteilung bekommt. Der Worker verschickt sie nach dem Speichern. */
@@ -39,6 +40,7 @@ export interface Applied {
 
 type RulesPiece = RulesChapter['pieces'][number];
 type RulesSpot = RulesChapter['rooms'][number]['spots'][number];
+type RulesTask = RulesChapter['tasks'][number];
 
 export function chapterOf(state: Pick<HouseState, 'chapter'>, content: RulesContent): RulesChapter {
   const chapter = content.chapters.find((c) => c.number === state.chapter);
@@ -55,7 +57,7 @@ export function createHouse(id: string, name: string, ctx: RuleContext): HouseSt
     chapter: chapter.number,
     createdAt: ctx.now,
     players: { a: { name, joinedAt: ctx.now }, b: null },
-    // Die erste Aufgabe erscheint mit dem Aufgabenablauf (Phase 4).
+    // Die erste Aufgabe erscheint, sobald der zweite Spieler eingezogen ist.
     task: null,
     done: [],
     buildTurns: [],
@@ -79,7 +81,72 @@ export function createHouse(id: string, name: string, ctx: RuleContext): HouseSt
 /** Zweiter Spieler tritt bei. Liefert null, wenn das Haus schon zwei Spieler hat. */
 export function joinHouse(state: HouseState, name: string, ctx: RuleContext): HouseState | null {
   if (state.players.b) return null;
-  return { ...state, players: { a: state.players.a, b: { name, joinedAt: ctx.now } } };
+  return advance({ ...state, players: { a: state.players.a, b: { name, joinedAt: ctx.now } } }, ctx);
+}
+
+// ---------------------------------------------------------------- Tagesablauf
+
+function freshProgress(task: RulesTask): TaskProgress {
+  switch (task.type) {
+    case 'puzzle':
+      return { type: 'puzzle', solvedBy: null };
+    case 'knowme':
+      return { type: 'knowme', submissions: {}, hearts: [], judged: [] };
+    case 'reallife':
+      return { type: 'reallife', confirmedBy: [] };
+  }
+}
+
+/** Die Aufgabe, die als nächste erscheint: die erste der festen Reihenfolge, die noch nicht erledigt ist. null = Kapitel durchgespielt. */
+export function upcomingTask(state: Pick<HouseState, 'done'>, chapter: RulesChapter): RulesTask | null {
+  return chapter.tasks[state.done.length] ?? null;
+}
+
+/**
+ * Lässt die nächste Aufgabe erscheinen, wenn es so weit ist: Beide sind eingezogen, die laufende Aufgabe ist
+ * von beiden erledigt, und seit ihrem Erscheinen hat ein neuer Kalendertag begonnen – höchstens eine neue
+ * Aufgabe pro Tag. Wer pausiert, verliert nichts: Eine liegen gebliebene Aufgabe wartet, und ist sie erledigt,
+ * rückt die nächste gleich nach. Der Worker ruft das bei jedem Abgleich und einmal am Morgen auf.
+ */
+export function advance(state: HouseState, ctx: RuleContext): HouseState {
+  if (!state.players.b) return state;
+  const today = dayKey(ctx.now);
+  if (state.task && (state.task.completedAt === null || today <= state.task.availableOn)) return state;
+  const next = upcomingTask(state, chapterOf(state, ctx.content));
+  if (!next) return state;
+  return { ...state, task: { taskId: next.id, availableOn: today, progress: freshProgress(next), completedAt: null } };
+}
+
+/** Rolle eines Spielers in einem Rätsel. */
+export function puzzleRole(task: { lead: Slot }, slot: Slot): PuzzleRole {
+  return task.lead === slot ? 'lead' : 'partner';
+}
+
+/** Wer bei einer Aufgabe im echten Leben den Erhalt bestätigt: der jeweils andere – richtet sie sich an beide, dann beide. */
+export function receiversOf(task: { doer: Slot | 'both' }): Slot[] {
+  return task.doer === 'both' ? ['a', 'b'] : [otherSlot(task.doer)];
+}
+
+/** Hat dieser Spieler seinen Teil in der App getan? Ein Rätsel lösen beide im Gespräch – das gilt für beide erst mit der Lösung. */
+export function hasActed(progress: TaskProgress, slot: Slot): boolean {
+  switch (progress.type) {
+    case 'puzzle':
+      return progress.solvedBy !== null;
+    case 'knowme':
+      return progress.submissions[slot] !== undefined;
+    case 'reallife':
+      return progress.confirmedBy.includes(slot);
+  }
+}
+
+/**
+ * Mitteilung "neue Aufgabe" am Morgen: an jeden, der an der heute erschienenen Aufgabe seinen Teil noch nicht
+ * getan hat. Weil nur die Aufgabe von heute zählt, bekommt niemand dieselbe Mitteilung zweimal – und nie eine Mahnung.
+ */
+export function announceTask(state: HouseState, ctx: RuleContext): PushEffect[] {
+  const task = state.task;
+  if (!state.players.b || !task || task.completedAt !== null || task.availableOn !== dayKey(ctx.now)) return [];
+  return (['a', 'b'] as const).filter((slot) => !hasActed(task.progress, slot)).map((to): PushEffect => ({ to, kind: 'new_task' }));
 }
 
 /**
@@ -198,7 +265,7 @@ function withActiveOffer(state: Pick<HouseState, 'id' | 'placements' | 'buildTur
 /**
  * Eine Aufgabe ist für beide erledigt: Sie wandert nach `done`, bringt einen Bauzug und öffnet, wenn ihre
  * Nummer ein Meilenstein ist, dessen Geschenk – die dort wartenden Gutscheine oder, liegt keiner dort,
- * das Dekostück dieses Meilensteins. Der Aufgabenablauf (Phase 4) ruft das aus seinen Regeln auf.
+ * das Dekostück dieses Meilensteins. Die Regeln der drei Aufgabentypen rufen das über `finishTask` auf.
  */
 export function completeTask(state: HouseState, done: DoneTask, ctx: RuleContext): { state: HouseState; effects: PushEffect[] } {
   const chapter = chapterOf(state, ctx.content);
@@ -233,35 +300,35 @@ export function completeTask(state: HouseState, done: DoneTask, ctx: RuleContext
 }
 
 /**
- * Nur für die Bauphase (Aktion test.completeTask): die nächste Aufgabe der Reihenfolge so, als hätten beide
- * sie erledigt. Bei Kennst-du-mich mit Antworten, damit Erinnerungsstücke entstehen. Entfällt mit Phase 4.
+ * Die laufende Aufgabe ist mit diesem Fortschritt für beide erledigt. Sie bleibt als erledigt stehen, bis die
+ * nächste erscheint – lag sie schon seit einem früheren Tag bereit, ist das sofort.
  */
-function testDone(state: HouseState, chapter: RulesChapter, now: IsoTime): DoneTask {
-  const n = state.done.length;
-  const task = chapter.tasks[n % chapter.tasks.length];
-  if (!task) throw new Error('Kapitel ohne Aufgaben');
-  let progress: TaskProgress;
-  switch (task.type) {
-    case 'puzzle':
-      progress = { type: 'puzzle', solvedBy: task.lead };
-      break;
-    case 'reallife':
-      progress = { type: 'reallife', confirmedBy: task.doer === 'both' ? ['a', 'b'] : [otherSlot(task.doer)] };
-      break;
-    case 'knowme': {
-      const spec = task.answer;
-      const answer = (i: number): KnowMeAnswer =>
-        spec.kind === 'choice' ? { kind: 'choice', option: i % spec.options.length } : { kind: 'text', text: `Test answer ${i + 1}` };
-      // a tippt richtig und bekommt ein Herz, b tippt daneben.
-      progress = {
-        type: 'knowme',
-        submissions: { a: { own: answer(n), guess: answer(n + 1) }, b: { own: answer(n + 1), guess: answer(n + 1) } },
-        hearts: ['a'],
-      };
-      break;
-    }
-  }
-  return { taskId: task.id, completedAt: now, progress };
+function finishTask(state: HouseState, task: ActiveTask, progress: TaskProgress, ctx: RuleContext): { state: HouseState; effects: PushEffect[] } {
+  const closed: HouseState = { ...state, task: { ...task, progress, completedAt: ctx.now } };
+  const completed = completeTask(closed, { taskId: task.taskId, completedAt: ctx.now, progress }, ctx);
+  return { state: advance(completed.state, ctx), effects: completed.effects };
+}
+
+type OpenTask<T extends RulesTask['type']> = {
+  task: ActiveTask;
+  spec: Extract<RulesTask, { type: T }>;
+  progress: Extract<TaskProgress, { type: T }>;
+};
+
+/** Die laufende, noch offene Aufgabe – oder der Grund, warum eine Aktion nicht (mehr) zu ihr passt. */
+function openTask<T extends RulesTask['type']>(state: HouseState, chapter: RulesChapter, taskId: string, type: T): OpenTask<T> | RejectReason {
+  const spec = chapter.tasks.find((t) => t.id === taskId);
+  if (!spec || spec.type !== type) return 'invalid';
+  const task = state.task;
+  // Noch nicht erschienen, schon erledigt oder längst die nächste dran.
+  if (!task || task.taskId !== taskId || task.completedAt !== null) return 'stale';
+  if (task.progress.type !== type) return 'invalid';
+  return { task, spec: spec as Extract<RulesTask, { type: T }>, progress: task.progress as Extract<TaskProgress, { type: T }> };
+}
+
+function fitsQuestion(spec: Extract<RulesTask, { type: 'knowme' }>['answer'], answer: KnowMeAnswer): boolean {
+  if (spec.kind === 'choice') return answer.kind === 'choice' && answer.option < spec.options.length;
+  return answer.kind === 'text' && answer.text.length <= spec.maxLength;
 }
 
 // ---------------------------------------------------------------- Aktionen
@@ -383,20 +450,73 @@ function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleConte
       return apply({ ...state, coupons });
     }
 
-    // ---- Bauphase
-    case 'test.completeTask': {
-      if (!ctx.testActions) return reject('forbidden');
-      // Mehr als das Kapitel hergibt, soll auch im Test nicht entstehen.
-      if (state.done.length >= (chapter.milestones.at(-1) ?? 0)) return reject('stale');
-      const completed = completeTask(state, testDone(state, chapter, ctx.now), ctx);
-      return apply(completed.state, completed.effects);
+    // ---- Aufgaben. Jeder Schritt des einen geht als "partner_done" an den anderen.
+
+    // Geprüft hat die Lösung das Gerät des Handelnden; der Server prüft, dass es der Handelnde war.
+    case 'puzzle.solve': {
+      const open = openTask(state, chapter, action.taskId, 'puzzle');
+      if (typeof open === 'string') return reject(open);
+      if (!canSolve(open.spec.kind, puzzleRole(open.spec, slot))) return reject('forbidden');
+      const finished = finishTask(state, open.task, { type: 'puzzle', solvedBy: slot }, ctx);
+      return apply(finished.state, [{ to: otherSlot(slot), kind: 'partner_done' }, ...finished.effects]);
     }
 
-    // Die Regeln für Aufgaben folgen mit dem Aufgabenablauf in Phase 4.
-    // Bis dahin lehnt der Server diese Aktionen ab, statt sie ungeprüft anzunehmen.
-    case 'puzzle.solve':
-    case 'knowme.submit':
-    case 'reallife.confirm':
-      return reject('invalid');
+    case 'knowme.submit': {
+      const open = openTask(state, chapter, action.taskId, 'knowme');
+      if (typeof open === 'string') return reject(open);
+      if (open.progress.submissions[slot]) return reject('stale');
+      if (!fitsQuestion(open.spec.answer, action.own) || !fitsQuestion(open.spec.answer, action.guess)) return reject('invalid');
+      const submissions = { ...open.progress.submissions, [slot]: { own: action.own, guess: action.guess } };
+      const effects: PushEffect[] = [{ to: otherSlot(slot), kind: 'partner_done' }];
+      const { a, b } = submissions;
+      if (!a || !b) return apply({ ...state, task: { ...open.task, progress: { ...open.progress, submissions } } }, effects);
+      // Beide haben abgegeben: Die Aufgabe ist erledigt und wird aufgedeckt. Bei Auswahlfragen steht der Treffer
+      // damit fest; bei frei getippten Antworten entscheidet der Befragte später selbst (knowme.judge).
+      const hit = (guess: KnowMeAnswer, own: KnowMeAnswer) => guess.kind === 'choice' && own.kind === 'choice' && guess.option === own.option;
+      const hearts: Slot[] = [...(hit(a.guess, b.own) ? (['a'] as const) : []), ...(hit(b.guess, a.own) ? (['b'] as const) : [])];
+      const finished = finishTask(state, open.task, { type: 'knowme', submissions, hearts, judged: [] }, ctx);
+      return apply(finished.state, [...effects, ...finished.effects]);
+    }
+
+    // Frei getippte Antworten vergleicht niemand automatisch: Wer geantwortet hat, sieht nach dem Aufdecken den
+    // Tipp des anderen und sagt, ob er zählt. Die Aufgabe ist da längst erledigt – darauf wartet nichts.
+    case 'knowme.judge': {
+      const spec = chapter.tasks.find((t) => t.id === action.taskId);
+      if (!spec || spec.type !== 'knowme' || spec.answer.kind !== 'text') return reject('invalid');
+      const done = state.done.find((d) => d.taskId === action.taskId);
+      // Vor dem Aufdecken gibt es nichts zu entscheiden; danach nur einmal.
+      if (!done || done.progress.type !== 'knowme' || done.progress.judged.includes(slot)) return reject('stale');
+      const progress: TaskProgress = {
+        ...done.progress,
+        judged: [...done.progress.judged, slot],
+        hearts: action.counts ? [...done.progress.hearts, otherSlot(slot)] : done.progress.hearts,
+      };
+      return apply({
+        ...state,
+        done: state.done.map((d) => (d === done ? { ...d, progress } : d)),
+        // Steht die Aufgabe noch als erledigte aktuelle da, bleibt ihr Fortschritt derselbe.
+        task: state.task?.taskId === action.taskId ? { ...state.task, progress } : state.task,
+      });
+    }
+
+    // Erledigt wird außerhalb der App; es zählt, dass der Empfänger den Erhalt bestätigt.
+    case 'reallife.confirm': {
+      const open = openTask(state, chapter, action.taskId, 'reallife');
+      if (typeof open === 'string') return reject(open);
+      const receivers = receiversOf(open.spec);
+      if (!receivers.includes(slot)) return reject('forbidden');
+      if (open.progress.confirmedBy.includes(slot)) return reject('stale');
+      const progress: TaskProgress = { type: 'reallife', confirmedBy: [...open.progress.confirmedBy, slot] };
+      const effects: PushEffect[] = [{ to: otherSlot(slot), kind: 'partner_done' }];
+      if (!receivers.every((receiver) => progress.confirmedBy.includes(receiver))) {
+        return apply({ ...state, task: { ...open.task, progress } }, effects);
+      }
+      const finished = finishTask(state, open.task, progress, ctx);
+      return apply(finished.state, [...effects, ...finished.effects]);
+    }
+
+    // Aus der Bauphase; siehe actions.ts.
+    case 'test.completeTask':
+      return reject('forbidden');
   }
 }

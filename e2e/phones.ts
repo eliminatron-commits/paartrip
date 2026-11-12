@@ -5,6 +5,8 @@ import { type Browser, type BrowserContext, expect, type Locator, type Page } fr
 export interface Phone {
   context: BrowserContext;
   page: Page;
+  /** Kopplungscode des Hauses (ohne Bindestrich), sobald das Gerät gekoppelt ist – für die Hilfsrouten des Testservers. */
+  code?: string;
 }
 
 /** Der lokal gestartete Worker (Port wie in playwright.config.ts und e2e/build-versions.ts). */
@@ -25,6 +27,16 @@ export const SAFE_AREA_LANDSCAPE: SafeArea = { top: 0, right: 59, bottom: 21, le
 export interface PhoneOptions {
   /** Stellt die Ränder eines echten iPhones nach. */
   safeArea?: SafeArea;
+  /** Gestellte Serverzeit von Anfang an (siehe `setClock`). */
+  now?: string;
+}
+
+/**
+ * Stellt die Uhr des Servers für diese Geräte: Jede ihrer Anfragen trägt den Kopf X-Test-Now, den der lokale
+ * Worker als Serverzeit nimmt. Andere Tests, die gleichzeitig laufen, merken davon nichts.
+ */
+export async function setClock(phones: Phone[], now: string): Promise<void> {
+  for (const { context } of phones) await context.setExtraHTTPHeaders({ 'X-Test-Now': now });
 }
 
 const open: BrowserContext[] = [];
@@ -33,6 +45,7 @@ const open: BrowserContext[] = [];
 export async function phone(browser: Browser, options: PhoneOptions = {}): Promise<Phone> {
   const context = await browser.newContext();
   open.push(context);
+  if (options.now) await context.setExtraHTTPHeaders({ 'X-Test-Now': options.now });
   if (options.safeArea) {
     // Desktop-Browser kennen env(safe-area-inset-*) nur als 0; die App liest die Ränder deshalb aus diesen Variablen.
     await context.addInitScript((area) => {
@@ -92,6 +105,7 @@ export async function pair(browser: Browser, options: PhoneOptions = {}): Promis
   await expect(b.page.getByTestId('house-names')).toHaveText('Bao & Ada');
   await returnToApp(a.page);
   await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
+  a.code = b.code = code.replace('-', '');
   return { a, b, code };
 }
 
@@ -141,14 +155,41 @@ export const giftsForMe = (page: Page): Locator => page.locator('[data-testid="g
 
 // ---------------------------------------------------------------- Haus
 
-/** Erledigt eine Test-Aufgabe (nur möglich, weil der lokale Worker Test-Aktionen annimmt) und wartet auf den Abgleich. */
-export async function finishTestTask(page: Page): Promise<void> {
-  await openTab(page, 'Today');
-  const progress = page.getByTestId('today-progress');
+/** Ruft eine Hilfsroute des Testservers für das Haus dieses Geräts auf (e2e/api-server.ts). */
+async function testRoute(phone: Phone, name: string, query = ''): Promise<void> {
+  if (!phone.code) throw new Error('Gerät ist nicht gekoppelt');
+  const reply = await phone.page.request.post(`${LOCAL_API}/__test/${name}?code=${phone.code}${query}`);
+  expect(reply.status(), `Hilfsroute ${name}`).toBe(204);
+}
+
+/**
+ * Erledigt die nächste Aufgabe auf dem Server so, wie zwei Spieler es täten (ohne einen Tag zu warten),
+ * und wartet, bis dieses Gerät den neuen Stand hat. Für Tests, denen es um das geht, was danach kommt.
+ */
+export async function finishTask(phone: Phone): Promise<void> {
+  await openTab(phone.page, 'Today');
+  const progress = phone.page.getByTestId('today-progress');
   const before = Number((await progress.innerText()).split(' ')[0]);
-  await page.getByTestId('test-task').click();
+  await testRoute(phone, 'finish-task');
+  await returnToApp(phone.page);
   await expect(progress).toHaveText(new RegExp(`^${before + 1} of `));
 }
+
+/** Lässt die nächste Aufgabe erscheinen, als wäre ein Tag vergangen. Die Geräte gleichen danach selbst ab (`returnToApp`). */
+export const nextTask = (phone: Phone): Promise<void> => testRoute(phone, 'next-task');
+
+/** Spielt auf dem Server so weit, bis diese Aufgabe die laufende ist, und zeigt sie auf beiden Geräten. */
+export async function openTask(phones: Phone[], taskId: string): Promise<void> {
+  await testRoute(phones[0]!, 'open-task', `&task=${taskId}`);
+  for (const { page } of phones) {
+    await returnToApp(page);
+    await openTab(page, 'Today');
+    await expect(page.getByTestId('task')).toBeVisible();
+  }
+}
+
+/** Die Karte der laufenden, offenen Aufgabe (Today). */
+export const taskCard = (page: Page): Locator => page.getByTestId('task');
 
 /** Die Karte mit dem nächsten Schritt im Haus (Home). */
 export const moveCard = (page: Page): Locator => page.getByTestId('move');

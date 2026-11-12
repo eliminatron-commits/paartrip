@@ -1,24 +1,26 @@
 <script lang="ts">
-  // Today: Hier erscheint mit dem Aufgabenablauf (Phase 4) die Tagesaufgabe. Bis dahin zeigt der Bildschirm
-  // den Stand – und, solange der Server Test-Aufgaben annimmt, einen Knopf zum Ausprobieren.
+  // Today: die eine aktuelle Aufgabe. Offen zeigt sie den Baustein ihrer Art; erledigt bleibt sie stehen, bis
+  // die nächste erscheint – frühestens am folgenden Tag. Darunter: der Stand, der Weg zum Bauzug und die
+  // aufgedeckten Antworten der letzten Frage.
   import type { Chapter } from '../../../shared/content-schema.ts';
   import { type HouseView, otherSlot } from '../../../shared/model.ts';
-  import { playSound } from '../../lib/audio.ts';
   import { type Move } from '../../lib/house.ts';
-  import { dispatch, session } from '../../lib/session.svelte.ts';
+  import { session } from '../../lib/session.svelte.ts';
+  import { reveals, today } from '../../lib/tasks.ts';
   import { go } from '../../lib/ui.svelte.ts';
+  import KnowMeTask from './KnowMeTask.svelte';
+  import PuzzleTask from './PuzzleTask.svelte';
+  import RealLifeTask from './RealLifeTask.svelte';
+  import Reveal from './Reveal.svelte';
 
   let { view, chapter, move }: { view: HouseView; chapter: Chapter; move: Move | null } = $props();
 
   const partner = $derived(view.players[otherSlot(view.you)]);
-  const total = $derived(chapter.milestones.at(-1) ?? 0);
+  const name = $derived(partner?.name ?? 'Your partner');
+  const now = $derived(today(view, chapter));
+  const unveiled = $derived(reveals(view, chapter, session.queued));
+  const total = $derived(chapter.tasks.length);
   const done = $derived(view.done.length);
-  const testSent = $derived(session.queued.some((a) => a.type === 'test.completeTask'));
-
-  async function finishTestTask(): Promise<void> {
-    playSound('solve');
-    await dispatch({ type: 'test.completeTask' });
-  }
 </script>
 
 <div class="page">
@@ -29,11 +31,38 @@
       <p>Once your partner has moved in, a small task for the two of you waits here.</p>
     </section>
   {:else}
-    <section class="panel" aria-labelledby="task-title">
-      <h2 id="task-title">Daily tasks are on their way</h2>
-      <p>Soon a small task for the two of you waits here: a puzzle to solve together, a question about each other, or a little something in real life.</p>
-      <p class="note" data-testid="today-progress">{done} of {total} tasks done.</p>
-    </section>
+    {#if now && !now.done}
+      <!-- Mit der Aufgabe wechselt der ganze Baustein, samt allem, was darin angefangen wurde. -->
+      {#key now.task.taskId}
+        {#if now.spec.type === 'puzzle'}
+          <PuzzleTask spec={now.spec} you={view.you} partner={name} />
+        {:else if now.spec.type === 'knowme'}
+          <KnowMeTask task={now.task} spec={now.spec} partner={name} />
+        {:else}
+          <RealLifeTask task={now.task} spec={now.spec} you={view.you} partner={name} />
+        {/if}
+      {/key}
+    {:else if now}
+      <section class="panel" aria-labelledby="done-title" data-testid="task-done">
+        {#if view.nextTaskOn}
+          <h2 id="done-title">Done for today</h2>
+          <p>You finished this one together. A new task arrives tomorrow.</p>
+        {:else}
+          <h2 id="done-title">That was the last one</h2>
+          <p>You finished every task of this chapter together.</p>
+        {/if}
+      </section>
+    {:else if view.task}
+      <section class="panel">
+        <p>This task is newer than this version of the app. Please update it in the settings.</p>
+      </section>
+    {:else}
+      <section class="panel">
+        <p>A small task for the two of you is on its way.</p>
+      </section>
+    {/if}
+
+    <p class="note" data-testid="today-progress">{done} of {total} tasks done.</p>
 
     {#if move}
       <section class="panel" aria-labelledby="build-title">
@@ -45,25 +74,8 @@
       </section>
     {/if}
 
-    {#if view.testActions}
-      <section class="panel test" aria-labelledby="test-title">
-        <p class="eyebrow">Test mode</p>
-        <h2 id="test-title">Try it out</h2>
-        <p>Until the real tasks arrive, a test task counts as done by both of you. It brings a build turn, and gifts open at the milestones.</p>
-        <div class="row">
-          <button type="button" data-testid="test-task" disabled={testSent || done >= total} onclick={finishTestTask}>Finish a test task</button>
-        </div>
-        {#if done >= total}
-          <p class="note">All {total} tasks of this chapter are done.</p>
-        {/if}
-      </section>
-    {/if}
+    {#each unveiled as reveal (reveal.taskId)}
+      <Reveal {reveal} partner={name} />
+    {/each}
   {/if}
 </div>
-
-<style>
-  .test {
-    background: transparent;
-    box-shadow: inset 0 0 0 2px var(--sage-deep);
-  }
-</style>

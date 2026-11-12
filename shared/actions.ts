@@ -6,6 +6,8 @@ export type ActionBody =
   // Aufgaben
   | { type: 'puzzle.solve'; taskId: string }
   | { type: 'knowme.submit'; taskId: string; own: KnowMeAnswer; guess: KnowMeAnswer }
+  // Nur bei frei getippten Antworten, nach dem Aufdecken: Zählt der Tipp des anderen auf meine Antwort?
+  | { type: 'knowme.judge'; taskId: string; counts: boolean }
   | { type: 'reallife.confirm'; taskId: string }
   // Bauen
   | { type: 'build.choose'; turn: number; pieceId: string }
@@ -18,9 +20,9 @@ export type ActionBody =
   | { type: 'coupon.deposit'; text: string }
   | { type: 'coupon.requestRedeem'; couponId: string }
   | { type: 'coupon.confirmRedeem'; couponId: string }
-  // Nur für die Bauphase: erledigt die nächste Aufgabe ohne Spiel, damit Bauzug, Meilenstein und Gutscheine
-  // schon ohne Aufgabenablauf laufen. Der Server nimmt sie nur an, wenn Test-Aktionen eingeschaltet sind
-  // (Worker-Variable TEST_ACTIONS). Entfällt mit dem Aufgabenablauf in Phase 4.
+  // Aus der Bauphase vor dem Aufgabenablauf; der Server lehnt sie immer ab. Sie bleibt bekannt, damit eine
+  // noch nicht aktualisierte App, die sie in der Warteschlange hat, eine Ablehnung bekommt statt eines
+  // Fehlers – sonst hinge deren Abgleich fest.
   | { type: 'test.completeTask' };
 
 export type Action = ActionBody & {

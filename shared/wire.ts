@@ -27,6 +27,7 @@ const meta = {
 export const actionSchema: z.ZodMiniType<Action> = z.discriminatedUnion('type', [
   z.strictObject({ ...meta, type: z.literal('puzzle.solve'), taskId: ref }),
   z.strictObject({ ...meta, type: z.literal('knowme.submit'), taskId: ref, own: knowMeAnswer, guess: knowMeAnswer }),
+  z.strictObject({ ...meta, type: z.literal('knowme.judge'), taskId: ref, counts: z.boolean() }),
   z.strictObject({ ...meta, type: z.literal('reallife.confirm'), taskId: ref }),
   z.strictObject({ ...meta, type: z.literal('build.choose'), turn: count, pieceId: ref }),
   z.strictObject({ ...meta, type: z.literal('build.place'), turn: count, spotId: ref }),

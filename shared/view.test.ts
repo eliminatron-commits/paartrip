@@ -22,10 +22,10 @@ const submission = (tag: string): KnowMeSubmission => ({
   guess: { kind: 'text', text: `guess-${tag}` },
 });
 
-function withKnowMe(submissions: Partial<Record<Slot, KnowMeSubmission>>, hearts: Slot[] = []): HouseState {
+function withKnowMe(submissions: Partial<Record<Slot, KnowMeSubmission>>, hearts: Slot[] = [], judged: Slot[] = []): HouseState {
   return {
     ...paired(),
-    task: { taskId: 'q1', availableOn: '2026-11-11', completedAt: null, progress: { type: 'knowme', submissions, hearts } },
+    task: { taskId: 'q1', availableOn: '2026-11-11', completedAt: null, progress: { type: 'knowme', submissions, hearts, judged } },
   };
 }
 
@@ -42,11 +42,11 @@ describe('Kennst-du-mich', () => {
   it('vor beidseitiger Abgabe geht die Antwort des anderen nicht an das Gerät', () => {
     const state = withKnowMe({ a: submission('A') });
     const forB = deriveView(state, 'b', ctx);
-    expect(forB.task?.progress).toEqual({ type: 'knowme', mine: null, theirsSubmitted: true, theirs: null, hearts: [] });
+    expect(forB.task?.progress).toEqual({ type: 'knowme', mine: null, theirsSubmitted: true, theirs: null, hearts: [], judged: [] });
     expect(wire(state, 'b')).not.toContain('own-A');
     expect(wire(state, 'b')).not.toContain('guess-A');
     // Wer abgegeben hat, sieht die eigene Abgabe.
-    expect(deriveView(state, 'a', ctx).task?.progress).toEqual({ type: 'knowme', mine: submission('A'), theirsSubmitted: false, theirs: null, hearts: [] });
+    expect(deriveView(state, 'a', ctx).task?.progress).toEqual({ type: 'knowme', mine: submission('A'), theirsSubmitted: false, theirs: null, hearts: [], judged: [] });
   });
 
   it('gilt in beide Richtungen', () => {
@@ -57,16 +57,30 @@ describe('Kennst-du-mich', () => {
   });
 
   it('nach beidseitiger Abgabe sehen beide beide Antworten und die Herzen', () => {
-    const state = withKnowMe({ a: submission('A'), b: submission('B') }, ['b']);
-    expect(deriveView(state, 'a', ctx).task?.progress).toEqual({ type: 'knowme', mine: submission('A'), theirsSubmitted: true, theirs: submission('B'), hearts: ['b'] });
-    expect(deriveView(state, 'b', ctx).task?.progress).toEqual({ type: 'knowme', mine: submission('B'), theirsSubmitted: true, theirs: submission('A'), hearts: ['b'] });
+    const state = withKnowMe({ a: submission('A'), b: submission('B') }, ['b'], ['a']);
+    expect(deriveView(state, 'a', ctx).task?.progress).toEqual({
+      type: 'knowme',
+      mine: submission('A'),
+      theirsSubmitted: true,
+      theirs: submission('B'),
+      hearts: ['b'],
+      judged: ['a'],
+    });
+    expect(deriveView(state, 'b', ctx).task?.progress).toEqual({
+      type: 'knowme',
+      mine: submission('B'),
+      theirsSubmitted: true,
+      theirs: submission('A'),
+      hearts: ['b'],
+      judged: ['a'],
+    });
   });
 
-  it('Herzen stehen erst mit dem Aufdecken in der Sicht', () => {
+  it('Herzen und Entscheidungen stehen erst mit dem Aufdecken in der Sicht', () => {
     // Ein Herz verriete, ob der Tipp stimmt – also auch etwas über die Antwort des anderen.
-    const state = withKnowMe({ a: submission('A') }, ['a']);
-    expect(deriveView(state, 'a', ctx).task?.progress).toMatchObject({ hearts: [] });
-    expect(deriveView(state, 'b', ctx).task?.progress).toMatchObject({ hearts: [] });
+    const state = withKnowMe({ a: submission('A') }, ['a'], ['b']);
+    expect(deriveView(state, 'a', ctx).task?.progress).toMatchObject({ hearts: [], judged: [] });
+    expect(deriveView(state, 'b', ctx).task?.progress).toMatchObject({ hearts: [], judged: [] });
   });
 });
 
@@ -107,20 +121,15 @@ describe('Aufbau der Sicht', () => {
     const state = { ...paired(), internalNote: 'nur-fuer-den-server' } as HouseState;
     expect(wire(state, 'a')).not.toContain('nur-fuer-den-server');
     expect(Object.keys(deriveView(state, 'a', ctx)).sort()).toEqual(
-      ['buildTurns', 'chapter', 'coupons', 'done', 'houseId', 'milestones', 'nextTaskOn', 'pairingCode', 'placements', 'players', 'task', 'testActions', 'today', 'you'].sort(),
+      ['buildTurns', 'chapter', 'coupons', 'done', 'houseId', 'milestones', 'nextTaskOn', 'pairingCode', 'placements', 'players', 'task', 'today', 'you'].sort(),
     );
-  });
-
-  it('ob der Server Test-Aufgaben annimmt, steht in der Sicht – ohne Angabe nicht', () => {
-    expect(deriveView(paired(), 'a', ctx).testActions).toBe(false);
-    expect(deriveView(paired(), 'a', { ...ctx, testActions: true }).testActions).toBe(true);
   });
 
   it('gilt auch in der Tiefe: Zusatzfelder in Aufgaben, Abgaben, Bauzügen, Meilensteinen und Gutscheinen bleiben zurück', () => {
     const extra = { internalNote: 'nur-fuer-den-server' };
     const base = paired();
     const marked = (tag: string) => ({ own: { ...submission(tag).own, ...extra }, guess: { ...submission(tag).guess, ...extra }, ...extra });
-    const knowme = (hearts: Slot[]) => ({ type: 'knowme', submissions: { a: marked('A'), b: marked('B') }, hearts, ...extra });
+    const knowme = (hearts: Slot[]) => ({ type: 'knowme', submissions: { a: marked('A'), b: marked('B') }, hearts, judged: ['b'], ...extra });
     const state = {
       ...base,
       players: { a: { ...base.players.a, ...extra }, b: { ...base.players.b!, ...extra } },
@@ -140,11 +149,11 @@ describe('Aufbau der Sicht', () => {
     // Was beide sehen dürfen, kommt dabei vollständig an.
     const forB = deriveView(state, 'b', ctx);
     expect(forB.done).toEqual([
-      { taskId: 'q1', completedAt: rules.now, progress: { type: 'knowme', submissions: { a: submission('A'), b: submission('B') }, hearts: ['a'] } },
+      { taskId: 'q1', completedAt: rules.now, progress: { type: 'knowme', submissions: { a: submission('A'), b: submission('B') }, hearts: ['a'], judged: ['b'] } },
       { taskId: 'p1', completedAt: rules.now, progress: { type: 'puzzle', solvedBy: 'a' } },
       { taskId: 'r1', completedAt: rules.now, progress: { type: 'reallife', confirmedBy: ['b'] } },
     ]);
-    expect(forB.task?.progress).toEqual({ type: 'knowme', mine: submission('B'), theirsSubmitted: true, theirs: submission('A'), hearts: [] });
+    expect(forB.task?.progress).toEqual({ type: 'knowme', mine: submission('B'), theirsSubmitted: true, theirs: submission('A'), hearts: [], judged: ['b'] });
   });
 
   it('der heutige Tag kommt aus der Serverzeit in Europe/Berlin', () => {

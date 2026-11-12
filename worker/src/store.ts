@@ -68,6 +68,12 @@ export async function findHouseByCode(db: D1Database, code: string): Promise<Hou
   return row ? toHouse(row) : null;
 }
 
+/** Alle Häuser – für die Morgen-Mitteilung. Es sind höchstens MAX_HOUSES. */
+export async function allHouseIds(db: D1Database): Promise<string[]> {
+  const { results } = await db.prepare('SELECT id FROM houses').all<{ id: string }>();
+  return results.map((row) => row.id);
+}
+
 export async function countHouses(db: D1Database): Promise<number> {
   return (await db.prepare('SELECT COUNT(*) AS n FROM houses').first<{ n: number }>())?.n ?? 0;
 }

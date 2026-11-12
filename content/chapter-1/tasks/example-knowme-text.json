@@ -1,0 +1,6 @@
+{
+  "id": "example-knowme-text",
+  "type": "knowme",
+  "question": "Which dish could you happily eat every single day?",
+  "answer": { "kind": "text", "maxLength": 40 }
+}

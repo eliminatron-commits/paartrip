@@ -21,8 +21,9 @@ import {
   viTermsFileSchema,
 } from '../shared/content-schema.ts';
 
-const ROOT = 'content';
-const OUT_DIR = 'generated';
+// Ohne Angaben: content/ → generated/. Tests übergeben eigene Ordner: node scripts/build-content.ts <Inhalte> <Ziel>
+const ROOT = process.argv[2] ?? 'content';
+const OUT_DIR = process.argv[3] ?? 'generated';
 const problems: string[] = [];
 
 async function readJson<T>(schema: z.ZodType<T>, path: string): Promise<T | null> {

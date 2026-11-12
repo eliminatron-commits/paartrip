@@ -3,6 +3,7 @@
 // ohne Vorwarnung. Die Sicht kommt immer vom Server; das Gerät schreibt sie nie selbst um.
 import type { Action } from '../../shared/actions.ts';
 import type { HouseView, Slot } from '../../shared/model.ts';
+import type { PuzzleKind } from '../../shared/puzzles/kinds.ts';
 
 /** Was dieses Gerät als Mitspieler ausweist. Das Token ist geheim. */
 export interface DeviceRecord {
@@ -11,14 +12,28 @@ export interface DeviceRecord {
   slot: Slot;
 }
 
+/** Angefangenes zu einer Aufgabe: gelegte Teile, getippte Antworten. Die Form kennt nur, wer es abgelegt hat. */
+export interface Draft {
+  taskId: string;
+  value: unknown;
+}
+
+/** Was dieses Gerät sich merkt, ohne dass der Server es kennt. */
 export interface Settings {
   /** Der Nutzer hat Mitteilungen auf diesem Gerät eingeschaltet. */
   push: boolean;
   /** Klänge beim Platzieren, Lösen und Enthüllen. */
   sound: boolean;
+  /** Rätselarten, deren Erklärung auf diesem Gerät schon gezeigt wurde. */
+  introSeen: PuzzleKind[];
+  /**
+   * Zwischenstand der laufenden Aufgabe. Gelöst wird im Gespräch, also oft mit einem Wechsel in den Messenger –
+   * und iOS beendet die App dabei ohne Vorwarnung. Was schon gelegt oder getippt ist, soll das überstehen.
+   */
+  draft: Draft | null;
 }
 
-export const DEFAULT_SETTINGS: Settings = { push: false, sound: true };
+export const DEFAULT_SETTINGS: Settings = { push: false, sound: true, introSeen: [], draft: null };
 
 export interface Stored {
   device: DeviceRecord | null;

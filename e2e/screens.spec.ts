@@ -7,7 +7,7 @@ import type { Content } from '../shared/content-schema.ts';
 import {
   closePhones,
   closeSettings,
-  finishTestTask,
+  finishTask,
   LOCAL_API,
   moveCard,
   openSettings,
@@ -123,7 +123,7 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
   await check(a.page, 'gifts-start');
 
   // Bauzug: wählen, warten, platzieren.
-  await finishTestTask(a.page);
+  await finishTask(a);
   await check(a.page, 'today-after-task');
   await openTab(first.page, 'Home');
   await returnToApp(first.page);
@@ -152,7 +152,7 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
   await wrapGift(b.page, 'Breakfast in bed, with the good coffee');
   await expect(b.page.locator('[data-testid="gift"][data-kind="secret"]')).toHaveCount(1);
   await check(b.page, 'gifts-wrapped-by-me');
-  for (let done = 1; done < freeMilestone; done++) await finishTestTask(a.page);
+  for (let done = 1; done < freeMilestone; done++) await finishTask(a);
   await check(a.page, 'milestone-scene');
   await a.page.getByRole('button', { name: 'Open the gift' }).click();
   await check(a.page, 'milestone-gift-open');
@@ -196,7 +196,7 @@ test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die R
   const { a, b, code } = await pair(browser, { safeArea: SAFE_AREA });
   // Wer im ersten Bauzug nicht wählt, hat im Haus nur das Dekostück vor sich.
   const { page } = chapter.build.firstChooser === 'a' ? b : a;
-  for (let done = 0; done < freeMilestone; done++) await finishTestTask(a.page);
+  for (let done = 0; done < freeMilestone; done++) await finishTask(a);
 
   await returnToApp(page);
   await expect(page.getByTestId('milestone')).toBeVisible();
@@ -237,7 +237,7 @@ test('mit "Bewegung reduzieren" pulsieren die leuchtenden Plätze nicht', async 
   const { a, b } = await pair(browser);
   const placer = chapter.build.firstChooser === 'a' ? b : a;
   const chooser = placer === a ? b : a;
-  await finishTestTask(a.page);
+  await finishTask(a);
   await openTab(chooser.page, 'Home');
   await returnToApp(chooser.page);
   await chooser.page.getByRole('radio').first().click();

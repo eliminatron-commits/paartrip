@@ -18,8 +18,8 @@ import {
   type TaskProgress,
   type TaskProgressView,
 } from './model.ts';
-import { chapterOf } from './rules.ts';
-import { dayKey } from './time.ts';
+import { chapterOf, upcomingTask } from './rules.ts';
+import { dayKey, nextDay } from './time.ts';
 
 export interface ViewContext {
   content: RulesContent;
@@ -27,8 +27,6 @@ export interface ViewContext {
   now: IsoTime;
   /** Kopplungscode des Hauses; in die Sicht kommt er nur für a und nur, solange b fehlt. */
   pairingCode: string;
-  /** Der Server nimmt Test-Aufgaben an (Bauphase). */
-  testActions?: boolean;
 }
 
 function answerView(answer: KnowMeAnswer): KnowMeAnswer {
@@ -52,7 +50,7 @@ function doneProgressView(progress: TaskProgress): TaskProgress {
         const submission = submissionView(progress.submissions[slot]);
         if (submission) submissions[slot] = submission;
       }
-      return { type: 'knowme', submissions, hearts: [...progress.hearts] };
+      return { type: 'knowme', submissions, hearts: [...progress.hearts], judged: [...progress.judged] };
     }
   }
 }
@@ -74,6 +72,7 @@ function progressView(progress: TaskProgress, you: Slot): TaskProgressView {
         theirsSubmitted: theirs !== null,
         theirs: revealed ? theirs : null,
         hearts: revealed ? [...progress.hearts] : [],
+        judged: revealed ? [...progress.judged] : [],
       };
     }
   }
@@ -119,13 +118,12 @@ export function deriveView(state: HouseState, you: Slot, ctx: ViewContext): Hous
     today: dayKey(ctx.now),
     chapter: state.chapter,
     task: state.task ? taskView(state.task, you) : null,
-    // Die Tagesregel kommt mit dem Aufgabenablauf (Phase 4).
-    nextTaskOn: null,
+    // Erledigt und noch am Tag ihres Erscheinens: Die nächste Aufgabe kommt am Tag danach – wenn es noch eine gibt.
+    nextTaskOn: state.task?.completedAt && upcomingTask(state, chapter) ? nextDay(state.task.availableOn) : null,
     done: state.done.map((d) => ({ taskId: d.taskId, completedAt: d.completedAt, progress: doneProgressView(d.progress) })),
     buildTurns: state.buildTurns.map((t) => ({ n: t.n, chooser: t.chooser, offer: [...t.offer], chosen: t.chosen, placedAt: t.placedAt })),
     placements: state.placements.map((p) => ({ pieceId: p.pieceId, spotId: p.spotId })),
     milestones: state.milestones.map((m) => ({ at: m.at, reachedAt: m.reachedAt, decoPiece: m.decoPiece, seenBy: [...m.seenBy] })),
     coupons: state.coupons.map((c) => couponView(c, you, fixedTexts)),
-    testActions: ctx.testActions === true,
   };
 }

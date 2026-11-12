@@ -1,0 +1,47 @@
+{
+  "id": "example-map-legend",
+  "type": "puzzle",
+  "kind": "map-legend",
+  "variant": 1,
+  "title": "Where is the spare key?",
+  "lead": "b",
+  "data": {
+    "plan": [
+      "########",
+      "#a.1..b#",
+      "#..##..#",
+      "#2.##.3#",
+      "#..5...#",
+      "#c.4.6d#",
+      "########"
+    ],
+    "landmarks": [
+      {
+        "key": "a",
+        "glyph": "sun",
+        "name": "the stove"
+      },
+      {
+        "key": "b",
+        "glyph": "cloud",
+        "name": "the window"
+      },
+      {
+        "key": "c",
+        "glyph": "leaf",
+        "name": "the big plant"
+      },
+      {
+        "key": "d",
+        "glyph": "key",
+        "name": "the front door"
+      }
+    ],
+    "clues": [
+      "Whoever hid it wanted to grab it on the way out.",
+      "It lies right beside the front door.",
+      "The big plant is at the other end of that wall."
+    ],
+    "treasure": "6"
+  }
+}

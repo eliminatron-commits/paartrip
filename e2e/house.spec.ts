@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import type { Content } from '../shared/content-schema.ts';
-import { closePhones, finishTestTask, moveCard, openTab, pair, type Phone, pieceInHouse, returnToApp, syncStatus } from './phones.ts';
+import { closePhones, finishTask, moveCard, openTab, pair, type Phone, pieceInHouse, returnToApp, syncStatus } from './phones.ts';
 
 test.afterEach(closePhones);
 
@@ -63,12 +63,12 @@ test('Bauzug: einer wählt, der andere platziert – beim nächsten Zug sind die
   await expect(moveCard(a.page)).toHaveCount(0);
   await expect(a.page.getByText('Dọn về nhà mới')).toBeVisible();
 
-  await finishTestTask(a.page);
+  await finishTask(a);
   const one = await playTurn(first, second);
   await expect(moveCard(a.page)).toHaveCount(0);
   await expect(moveCard(b.page)).toHaveCount(0);
 
-  await finishTestTask(b.page);
+  await finishTask(b);
   const two = await playTurn(second, first);
   expect(two.pieceId).not.toBe(one.pieceId);
   expect(two.spotId).not.toBe(one.spotId);
@@ -82,7 +82,7 @@ test('Bauzug: einer wählt, der andere platziert – beim nächsten Zug sind die
 test('ein platziertes Stück können beide umstellen', async ({ browser }) => {
   const { a, b } = await pair(browser);
   const [first, second] = chapter.build.firstChooser === 'a' ? [a, b] : [b, a];
-  await finishTestTask(a.page);
+  await finishTask(a);
   const { pieceId, spotId } = await playTurn(first, second);
 
   // Wer gewählt hat, stellt um: Stück antippen, "Move", neuer Platz.
@@ -116,7 +116,7 @@ test('eine beantwortete Kennst-du-mich-Frage hängt als Erinnerungsstück im Hau
 
   await openTab(a.page, 'Home');
   await expect(a.page.getByTestId('memory')).toHaveCount(0);
-  for (let i = 0; i <= index; i++) await finishTestTask(a.page);
+  for (let i = 0; i <= index; i++) await finishTask(a);
 
   for (const { page } of [a, b]) {
     await openTab(page, 'Home');
@@ -134,7 +134,7 @@ test('eine beantwortete Kennst-du-mich-Frage hängt als Erinnerungsstück im Hau
 
 test('Meilenstein ohne Gutschein: Szene, Geschenk mit Dekostück, einer stellt es auf', async ({ browser }) => {
   const { a, b } = await pair(browser);
-  for (let i = 0; i < freeMilestone; i++) await finishTestTask(a.page);
+  for (let i = 0; i < freeMilestone; i++) await finishTask(a);
 
   // A sieht die Szene; das Geschenk ist noch zu.
   const sceneA = a.page.getByTestId('milestone');
@@ -175,7 +175,7 @@ test('Meilenstein ohne Gutschein: Szene, Geschenk mit Dekostück, einer stellt e
 test('die App startet ohne Netz mit dem letzten Stand', async ({ browser }) => {
   const { a, b } = await pair(browser);
   const [first, second] = chapter.build.firstChooser === 'a' ? [a, b] : [b, a];
-  await finishTestTask(a.page);
+  await finishTask(a);
   const { pieceId, spotId } = await playTurn(first, second);
 
   // Der Service Worker muss die Seite steuern, damit sie ohne Netz neu lädt.

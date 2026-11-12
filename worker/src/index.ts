@@ -5,13 +5,14 @@ import type { ActionResult } from '../../shared/actions.ts';
 import type { ApiError, ApiErrorCode, EnterHouseResponse, OkResponse, PushKeyResponse, SyncResponse } from '../../shared/api.ts';
 import type { RulesContent } from '../../shared/content-schema.ts';
 import type { HouseState } from '../../shared/model.ts';
-import { applyAction, createHouse, joinHouse, type PushEffect, type RuleContext } from '../../shared/rules.ts';
+import { advance, announceTask, applyAction, createHouse, joinHouse, type PushEffect, type RuleContext } from '../../shared/rules.ts';
 import { deriveView, type ViewContext } from '../../shared/view.ts';
 import { CODE_LENGTH, normalizeCode } from '../../shared/limits.ts';
 import { createHouseSchema, joinHouseSchema, pushSubscribeSchema, syncSchema } from '../../shared/wire.ts';
 import { deliver, pushKeys, sendTest } from './push.ts';
 import {
   addSecondDevice,
+  allHouseIds,
   countHouses,
   deleteSubscription,
   type Device,
@@ -43,8 +44,11 @@ export interface Env {
   PUSH_HOSTS: string;
   /** Wartezeit vor der Probe-Mitteilung, damit man die App vorher schließen kann. */
   PUSH_TEST_DELAY_MS: string;
-  /** "1": Test-Aktionen annehmen (Bauphase und lokale Tests). Fehlt die Variable, lehnt der Server sie ab. */
-  TEST_ACTIONS?: string;
+  /**
+   * "1": Die Serverzeit lässt sich je Anfrage über den Kopf X-Test-Now stellen – nur lokal und in den Tests,
+   * damit sich der Tageswechsel prüfen lässt. Im Betrieb fehlt die Variable, der Kopf wird dann überlesen.
+   */
+  TEST_CLOCK?: string;
 }
 
 // Beim Bauen geprüft (scripts/build-content.ts); hier genügt die Typzuweisung.
@@ -96,7 +100,14 @@ async function requireDevice(request: Request, env: Env): Promise<Device> {
 
 /** Die Sicht entsteht aus denselben Inhalten und derselben Serverzeit wie die Regeln. */
 function viewContext(rules: RuleContext, pairingCode: string): ViewContext {
-  return { content: rules.content, now: rules.now, pairingCode, testActions: rules.testActions };
+  return { content: rules.content, now: rules.now, pairingCode };
+}
+
+/** Serverzeit. Nur mit TEST_CLOCK (lokal, Tests) gilt stattdessen die Zeit aus dem Kopf X-Test-Now. */
+function serverNow(request: Request, env: Env): string {
+  const set = env.TEST_CLOCK === '1' ? request.headers.get('X-Test-Now') : null;
+  const time = set ? new Date(set) : new Date();
+  return (Number.isNaN(time.getTime()) ? new Date() : time).toISOString();
 }
 
 // ---------------------------------------------------------------- Koppeln
@@ -151,7 +162,8 @@ async function handleSync(request: Request, env: Env, ctx: ExecutionContext, rul
       actions.map((a) => a.id),
     );
 
-    let state: HouseState = house.state;
+    // Hat seit dem letzten Abgleich ein neuer Tag begonnen, erscheint jetzt die nächste Aufgabe.
+    let state: HouseState = advance(house.state, rules);
     const results: ActionResult[] = [];
     const seen: SeenAction[] = [];
     const effects: PushEffect[] = [];
@@ -169,7 +181,8 @@ async function handleSync(request: Request, env: Env, ctx: ExecutionContext, rul
       effects.push(...applied.effects);
     }
 
-    const saved = seen.length === 0 || (await saveHouse(env.DB, house, state, device.slot, seen, rules.now));
+    const unchanged = seen.length === 0 && state === house.state;
+    const saved = unchanged || (await saveHouse(env.DB, house, state, device.slot, seen, rules.now));
     if (saved) {
       if (effects.length > 0) ctx.waitUntil(deliver(env, state, effects));
       // Die Sicht ist das Einzige, was das Gerät vom Stand erfährt.
@@ -204,11 +217,38 @@ async function handlePushTest(request: Request, env: Env, ctx: ExecutionContext)
   return { ok: true };
 }
 
+// ---------------------------------------------------------------- Morgen-Mitteilung
+
+/**
+ * Läuft einmal am Morgen (Cron-Trigger in wrangler.jsonc): Wo über Nacht eine neue Aufgabe fällig wurde,
+ * erscheint sie jetzt, und wer seinen Teil noch nicht getan hat, bekommt "neue Aufgabe". Das Spiel selbst
+ * hängt nicht daran – beim Abgleich erscheint die Aufgabe genauso; hier geht es nur um die Mitteilung.
+ */
+async function announceNewTasks(env: Env, now: string): Promise<void> {
+  const rules: RuleContext = { content, now };
+  for (const id of await allHouseIds(env.DB)) {
+    try {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const house = await loadHouse(env.DB, id);
+        if (!house) break;
+        const state = advance(house.state, rules);
+        // Hat gerade ein Gerät geschrieben: neu laden und noch einmal ansehen.
+        if (state !== house.state && !(await saveHouse(env.DB, house, state, 'a', [], now))) continue;
+        await deliver(env, state, announceTask(state, rules));
+        break;
+      }
+    } catch (error) {
+      // Ein Haus mit einem Fehler darf die anderen nicht um ihre Mitteilung bringen.
+      console.error(`Morgen-Mitteilung für Haus ${id} gescheitert`, error);
+    }
+  }
+}
+
 // ---------------------------------------------------------------- Einstieg
 
 async function route(request: Request, env: Env, ctx: ExecutionContext): Promise<{ status: number; body: unknown }> {
   const { pathname } = new URL(request.url);
-  const rules: RuleContext = { content, now: new Date().toISOString(), testActions: env.TEST_ACTIONS === '1' };
+  const rules: RuleContext = { content, now: serverNow(request, env) };
   const key = `${request.method} ${pathname}`;
   switch (key) {
     case 'POST /houses':
@@ -267,5 +307,9 @@ export default {
       console.error(error);
       return json({ error: 'server_error', message: 'Something went wrong on the server.' } satisfies ApiError, 500, cors);
     }
+  },
+
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(announceNewTasks(env, new Date(controller.scheduledTime).toISOString()));
   },
 } satisfies ExportedHandler<Env>;

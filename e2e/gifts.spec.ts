@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import type { Content } from '../shared/content-schema.ts';
-import { closePhones, finishTestTask, giftsForMe, giftsFromMe, openTab, pair, recordResponses, returnToApp, syncStatus, wrapGift } from './phones.ts';
+import { closePhones, finishTask, giftsForMe, giftsFromMe, openTab, pair, recordResponses, returnToApp, syncStatus, wrapGift } from './phones.ts';
 
 test.afterEach(closePhones);
 
@@ -30,7 +30,7 @@ test('ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text'
   await expect(giftsForMe(a.page)).toContainText(`Opens after ${milestone} tasks`);
 
   // Eine Aufgabe vor dem Meilenstein: weiter verhüllt, der Text war noch in keiner Antwort an A.
-  for (let i = 0; i < milestone - 1; i++) await finishTestTask(b.page);
+  for (let i = 0; i < milestone - 1; i++) await finishTask(b);
   await returnToApp(a.page);
   await openTab(a.page, 'Today');
   await expect(a.page.getByTestId('today-progress')).toHaveText(new RegExp(`^${milestone - 1} of `));
@@ -43,7 +43,7 @@ test('ein geheimer Gutschein von B erscheint bei A erst am Meilenstein mit Text'
   expect(before.join('\n')).not.toContain(secret);
 
   // Der Meilenstein: A bekommt die Szene, das Geschenk ist noch zu.
-  await finishTestTask(b.page);
+  await finishTask(b);
   await returnToApp(a.page);
   const scene = a.page.getByTestId('milestone');
   await expect(scene).toContainText(`${milestone} tasks together`);
@@ -74,7 +74,7 @@ test('Einlösen durchläuft verhüllt, freigeschaltet und eingelöst – der Sch
   await expect(giftsForMe(a.page)).toHaveAttribute('data-state', 'veiled');
   await expect(giftsForMe(a.page).getByRole('button')).toHaveCount(0);
 
-  for (let i = 0; i < milestone; i++) await finishTestTask(b.page);
+  for (let i = 0; i < milestone; i++) await finishTask(b);
   // B, der Schenkende, sieht im Geschenk den eigenen Gutschein.
   const sceneB = b.page.getByTestId('milestone');
   await sceneB.getByRole('button', { name: 'Open the gift' }).click();

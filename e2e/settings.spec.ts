@@ -1,6 +1,16 @@
 // Einstellungen: Der Ton lässt sich abschalten, die Wahl bleibt erhalten und wirkt.
+import { readFileSync } from 'node:fs';
 import { expect, type Page, test } from '@playwright/test';
-import { closePhones, closeSettings, finishTestTask, openSettings, pair, phone } from './phones.ts';
+import type { Content } from '../shared/content-schema.ts';
+import { otherSlot } from '../shared/model.ts';
+import type { PuzzleData } from '../shared/puzzles/index.ts';
+import { canSolve, type PuzzleKind } from '../shared/puzzles/kinds.ts';
+import { receiversOf } from '../shared/rules.ts';
+import { closePhones, closeSettings, openSettings, openTask, pair, phone } from './phones.ts';
+import type { PuzzleDriver } from './puzzle-drivers/driver.ts';
+import { DRIVERS } from './puzzle-drivers/index.ts';
+
+const chapter = (JSON.parse(readFileSync('generated/content.json', 'utf8')) as Content).chapters[0]!;
 
 test.afterEach(closePhones);
 
@@ -56,26 +66,40 @@ test('der Ton ist an, lässt sich abschalten und bleibt nach dem Neuladen aus', 
 });
 
 test('eingeschaltet erklingt beim Lösen ein Klang, ausgeschaltet nicht', async ({ browser }) => {
-  const { a } = await pair(browser);
-  await countTones(a.page);
-  await a.page.reload();
-  await expect(a.page.getByTestId('house-names')).toHaveText('Ada & Bao');
+  // Das erste Rätsel der Inhalte – und eine Aufgabe im echten Leben, die derselbe Spieler bestätigt.
+  const puzzle = chapter.tasks.find((task) => task.type === 'puzzle');
+  if (!puzzle || puzzle.type !== 'puzzle') throw new Error('Inhalte ohne Rätsel');
+  const solverSlot = canSolve(puzzle.kind, 'lead') ? puzzle.lead : otherSlot(puzzle.lead);
+  const errand = chapter.tasks.find((task) => task.type === 'reallife' && receiversOf(task).includes(solverSlot));
+  if (!errand) throw new Error('Inhalte ohne passende Aufgabe im echten Leben');
 
-  // Ton an (Voreinstellung): Die Test-Aufgabe klingt.
-  await finishTestTask(a.page);
-  await expect.poll(() => tones(a.page)).toBeGreaterThan(0);
+  const { a, b } = await pair(browser);
+  const solver = solverSlot === 'a' ? a : b;
+  const { page } = solver;
+  await countTones(page);
+  await page.reload();
+  await expect(page.getByTestId('house-names')).toBeVisible();
 
-  // Ton aus: Es kommt nichts mehr dazu.
-  await openSettings(a.page);
-  await a.page.getByRole('switch', { name: 'Sound' }).click();
-  await expect(a.page.getByRole('switch', { name: 'Sound' })).toHaveAttribute('aria-checked', 'false');
-  await closeSettings(a.page);
-  const before = await tones(a.page);
-  await finishTestTask(a.page);
-  expect(await tones(a.page)).toBe(before);
+  // Ton an (Voreinstellung): Das gelöste Rätsel klingt.
+  await openTask([a, b], puzzle.id);
+  await page.getByRole('button', { name: 'Got it' }).click();
+  await (DRIVERS[puzzle.kind] as PuzzleDriver<PuzzleKind>).solve(page, puzzle.data as PuzzleData[PuzzleKind]);
+  await expect(page.getByTestId('task-done')).toBeVisible();
+  await expect.poll(() => tones(page)).toBeGreaterThan(0);
+
+  // Ton aus: Auch eine Bestätigung, die sonst klingt, bleibt still.
+  await openSettings(page);
+  await page.getByRole('switch', { name: 'Sound' }).click();
+  await expect(page.getByRole('switch', { name: 'Sound' })).toHaveAttribute('aria-checked', 'false');
+  await closeSettings(page);
+  const before = await tones(page);
+  await openTask([a, b], errand.id);
+  await page.getByRole('button', { name: 'It arrived' }).click();
+  await expect(page.getByRole('button', { name: 'It arrived' })).toHaveCount(0);
+  expect(await tones(page)).toBe(before);
 
   // Wieder an: Schon das Einschalten gibt eine Kostprobe.
-  await openSettings(a.page);
-  await a.page.getByRole('switch', { name: 'Sound' }).click();
-  await expect.poll(() => tones(a.page)).toBeGreaterThan(before);
+  await openSettings(page);
+  await page.getByRole('switch', { name: 'Sound' }).click();
+  await expect.poll(() => tones(page)).toBeGreaterThan(before);
 });

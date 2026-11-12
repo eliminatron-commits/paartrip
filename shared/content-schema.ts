@@ -4,6 +4,16 @@
 //
 // Diese Datei läuft auch direkt in Node (ohne Bundler): keine relativen Importe ohne .ts-Endung.
 import { z } from 'zod';
+import * as blindMaze from './puzzles/blind-maze.ts';
+import * as describeArrange from './puzzles/describe-arrange.ts';
+import { PUZZLE_KINDS, type PuzzleKind } from './puzzles/kinds.ts';
+import * as mapLegend from './puzzles/map-legend.ts';
+import * as sequence from './puzzles/sequence.ts';
+import * as splitCode from './puzzles/split-code.ts';
+import * as spotDifference from './puzzles/spot-difference.ts';
+import { GLYPHS } from './puzzles/tiles.ts';
+
+export { PUZZLE_KINDS, type PuzzleKind };
 
 const id = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'nur a-z, 0-9 und Bindestriche');
 const text = z.string().trim().min(1);
@@ -12,41 +22,91 @@ const slot = z.enum(['a', 'b']);
 
 // ---------------------------------------------------------------- Aufgaben
 
-export const PUZZLE_KINDS = [
-  'map-legend', // Karte und Legende
-  'split-code', // Geteilter Code
-  'describe-arrange', // Beschreiben und Anordnen
-  'spot-difference', // Zwei Bilder vergleichen
-  'sequence', // Reihenfolge
-  'blind-maze', // Wegweiser
-] as const;
-export type PuzzleKind = (typeof PUZZLE_KINDS)[number];
+// Rätseldaten je Art. Die Form steht hier; ob die Daten in sich stimmen und sich nur zu zweit lösen lassen,
+// prüft die Logik der Art (shared/puzzles/) – ihre Befunde brechen den Bau genauso ab wie ein Formfehler.
+function checked<S extends z.ZodType>(schema: S, validate: (data: z.output<S>) => string[]) {
+  return schema.superRefine((data, ctx) => {
+    for (const message of validate(data)) ctx.addIssue({ code: 'custom', message });
+  });
+}
 
-// Gemeinsame Felder aller Rätsel. `lead` übernimmt Rolle 1 der Rätselart, der andere Rolle 2;
+const glyph = z.enum(GLYPHS);
+/** Raster aus Zeichen: höchstens 8 breit, damit jedes Feld auf dem iPhone mindestens 44 px misst. */
+const charGrid = z.array(z.string().min(4).max(8)).min(4).max(9);
+const gridSide = z.int().min(2).max(5);
+
+const puzzleData = {
+  'map-legend': checked(
+    z.strictObject({
+      plan: charGrid,
+      landmarks: z.array(z.strictObject({ key: z.string().regex(/^[a-z]$/), glyph, name: text })).min(3),
+      clues: z.array(text).min(2).max(5),
+      treasure: z.string().regex(/^[1-9]$/),
+    }),
+    mapLegend.validate,
+  ),
+  'split-code': checked(
+    z.strictObject({
+      row: z.array(glyph).min(4).max(8),
+      code: z
+        .array(
+          z.discriminatedUnion('pick', [
+            z.strictObject({ pick: z.literal('place'), n: z.int().min(1) }),
+            z.strictObject({ pick: z.literal('from-end'), n: z.int().min(1) }),
+            z.strictObject({ pick: z.literal('left-of'), of: glyph }),
+            z.strictObject({ pick: z.literal('right-of'), of: glyph }),
+            z.strictObject({ pick: z.literal('between'), a: glyph, b: glyph }),
+          ]),
+        )
+        .min(3)
+        .max(6),
+    }),
+    splitCode.validate,
+  ),
+  'describe-arrange': checked(
+    z.strictObject({
+      cols: gridSide,
+      rows: gridSide,
+      tiles: z.array(glyph).min(3).max(12),
+      target: z.array(z.union([z.int().min(0), z.null()])),
+    }),
+    describeArrange.validate,
+  ),
+  'spot-difference': checked(
+    z.strictObject({
+      cols: gridSide,
+      rows: gridSide,
+      scene: z.array(z.union([glyph, z.null()])),
+      changes: z.array(z.strictObject({ cell: z.int().min(0), glyph: z.union([glyph, z.null()]) })),
+    }),
+    spotDifference.validate,
+  ),
+  sequence: checked(z.strictObject({ steps: z.array(text).min(4).max(7), hints: z.array(text).min(2).max(6) }), sequence.validate),
+  'blind-maze': checked(z.strictObject({ maze: charGrid }), blindMaze.validate),
+} satisfies Record<PuzzleKind, z.ZodType>;
+
+// Gemeinsame Felder aller Rätsel. `lead` übernimmt Rolle 1 der Rätselart, der andere Rolle 2
+// (welche Rolle was sieht und wer die Lösung eingibt: shared/puzzles/kinds.ts).
 // Variante 2 tauscht die Rollen und ist schwerer.
-const puzzleBase = {
-  id,
-  type: z.literal('puzzle'),
-  variant: z.union([z.literal(1), z.literal(2)]),
-  title: text,
-  lead: slot,
-};
+const puzzleOf = <K extends PuzzleKind>(kind: K) =>
+  z.strictObject({
+    id,
+    type: z.literal('puzzle'),
+    variant: z.union([z.literal(1), z.literal(2)]),
+    title: text,
+    lead: slot,
+    kind: z.literal(kind),
+    data: puzzleData[kind],
+  });
 
-// Geteilter Code: `lead` gibt den Code ein und sieht seine Hinweise, der Partner sieht die anderen.
-const splitCodePuzzle = z.strictObject({
-  ...puzzleBase,
-  kind: z.literal('split-code'),
-  data: z
-    .strictObject({
-      symbols: z.array(text).min(4),
-      hints: z.strictObject({ lead: z.array(text).min(1), partner: z.array(text).min(1) }),
-      solution: z.array(text).min(3),
-    })
-    .refine((d) => d.solution.every((s) => d.symbols.includes(s)), 'solution enthält ein Symbol, das nicht in symbols steht'),
-});
-
-// Phase 4 ergänzt hier die Datenschemata der übrigen fünf Rätselarten.
-const puzzleTask = z.discriminatedUnion('kind', [splitCodePuzzle]);
+const puzzleTask = z.discriminatedUnion('kind', [
+  puzzleOf('map-legend'),
+  puzzleOf('split-code'),
+  puzzleOf('describe-arrange'),
+  puzzleOf('spot-difference'),
+  puzzleOf('sequence'),
+  puzzleOf('blind-maze'),
+]);
 
 const knowMeTask = z.strictObject({
   id,
@@ -70,6 +130,9 @@ const realLifeTask = z.strictObject({
 
 export const taskSchema = z.union([puzzleTask, knowMeTask, realLifeTask]);
 export type Task = z.infer<typeof taskSchema>;
+export type PuzzleTask = Extract<Task, { type: 'puzzle' }>;
+export type KnowMeTask = Extract<Task, { type: 'knowme' }>;
+export type RealLifeTask = Extract<Task, { type: 'reallife' }>;
 
 // ---------------------------------------------------------------- Haus und Katalog
 

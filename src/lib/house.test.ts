@@ -3,14 +3,16 @@ import generated from '../../generated/content.json';
 import type { Action, ActionBody } from '../../shared/actions.ts';
 import type { Content } from '../../shared/content-schema.ts';
 import { type HouseState, type HouseView, otherSlot, type Slot } from '../../shared/model.ts';
-import { applyAction, createHouse, freeSpotsFor, joinHouse, type RuleContext } from '../../shared/rules.ts';
+import { stepsToFinish } from '../../shared/autoplay.ts';
+import { advance, applyAction, completeTask, createHouse, freeSpotsFor, joinHouse, type RuleContext } from '../../shared/rules.ts';
+import { nextDay } from '../../shared/time.ts';
 import { deriveView } from '../../shared/view.ts';
 import { awaitsMyConfirm, canDeposit, chapterFor, gifts, memories, myTurn, nextMilestone, nextMove, openMoves, redeemSent, sceneFor, unseenMilestone } from './house.ts';
 
 // Die Sichten entstehen wie im Betrieb: Regeln anwenden, dann für einen Spieler ableiten.
 const content = generated as unknown as Content;
 const chapter = content.chapters[0]!;
-const rules: RuleContext = { content, now: '2026-11-12T10:00:00.000Z', testActions: true };
+const rules: RuleContext = { content, now: '2026-11-12T10:00:00.000Z' };
 
 let n = 0;
 function act(body: ActionBody): Action {
@@ -25,8 +27,26 @@ function play(state: HouseState, slot: Slot, body: ActionBody): HouseState {
 }
 
 const paired = (): HouseState => joinHouse(createHouse('house-1', 'Ada', rules), 'Bao', rules)!;
+/**
+ * Erledigt `count` Aufgaben so, wie zwei Spieler es täten: über die echten Regeln, eine pro Tag.
+ * Reichen die Aufgaben der Inhalte nicht so weit, zählt für den Rest nur die Anzahl.
+ */
 const complete = (state: HouseState, count = 1): HouseState => {
-  for (let i = 0; i < count; i++) state = play(state, 'a', { type: 'test.completeTask' });
+  for (let i = 0; i < count; i++) {
+    const day = !state.task ? rules.now.slice(0, 10) : state.task.completedAt ? nextDay(state.task.availableOn) : state.task.availableOn;
+    const ctx: RuleContext = { content, now: `${day}T10:00:00.000Z` };
+    state = advance(state, ctx);
+    const steps = stepsToFinish(state.task, chapter);
+    if (steps.length === 0) {
+      state = completeTask(state, { taskId: `beyond-${state.done.length + 1}`, completedAt: ctx.now, progress: { type: 'puzzle', solvedBy: 'a' } }, ctx).state;
+      continue;
+    }
+    for (const step of steps) {
+      const applied = applyAction(state, step.slot, act(step.action), ctx);
+      expect(applied.result, JSON.stringify(step.action)).toMatchObject({ outcome: 'applied' });
+      state = applied.state;
+    }
+  }
   return state;
 };
 const viewOf = (state: HouseState, you: Slot): HouseView => deriveView(state, you, { content, now: rules.now, pairingCode: 'ABCD2345' });
