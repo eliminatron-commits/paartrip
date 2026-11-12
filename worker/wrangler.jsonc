@@ -28,8 +28,10 @@
     "VAPID_SUBJECT": "https://eliminatron-commits.github.io/paartrip/",
     // Push-Dienste von Apple, Google, Mozilla und Microsoft.
     "PUSH_HOSTS": "push.apple.com,fcm.googleapis.com,push.services.mozilla.com,notify.windows.com",
-    "PUSH_TEST_DELAY_MS": "5000"
+    "PUSH_TEST_DELAY_MS": "5000",
     // Test-Aufgaben (Aktion test.completeTask) nimmt der Worker nur mit "TEST_ACTIONS": "1" an.
-    // Im Betrieb steht die Variable nicht hier; lokal und in den Tests setzt worker/test/local-api.ts sie.
+    // Seit 2026-11-12 auf Wunsch des Nutzers auch im Betrieb an, damit sich Bauzug und Meilenstein
+    // auf den echten iPhones ausprobieren lassen. Entfällt mit dem Aufgabenablauf in Phase 4.
+    "TEST_ACTIONS": "1"
   }
 }

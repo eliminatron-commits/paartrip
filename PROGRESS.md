@@ -6,7 +6,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 - **Phase 1/6 – Fundament:** abgeschlossen am 2026-11-11, alle Akzeptanzpunkte P1-01 bis P1-08 erfüllt. Live unter `https://eliminatron-commits.github.io/paartrip/` (Repo `eliminatron-commits/paartrip`, öffentlich, Pages über GitHub Actions). Der Update-Ablauf ist auch live über einen echten zweiten Deploy belegt.
 - **Phase 2/6 – Abgleich und Push:** abgeschlossen am 2026-11-12, P2-01 bis P2-10 erfüllt, live seit Commit `a45b30d`. P2-11 (Push-Mitteilung auf dem iPhone) prüft der Nutzer.
-- **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Nur lokal committet – der Push (und damit das Update auf beiden iPhones) wartet auf die Zustimmung des Nutzers.
+- **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Nächste Phase:** 4/6 – Aufgaben und Rätsel | Opus 5.5 (hoch). Der Nutzer fügt dafür den Projekt-Prompt wieder ein (er liegt nicht im Repo).
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
@@ -18,7 +18,7 @@ Lief auf Fable 5.2 statt Sonnet 5.5. Subagenten: `builder` (Sonnet 5.5) für `sr
 
 **Gebaut und belegt** (Typecheck grün, 187 Vitest-Tests, 29 Playwright-Tests in WebKit):
 - Regeln in `shared/rules.ts`: `completeTask` (zählt die Aufgabe, legt den Bauzug an, öffnet am Meilenstein das Geschenk), `build.choose`, `build.place`, `piece.move`, `milestone.seen`, `coupon.requestRedeem`, `coupon.confirmRedeem`. Bauzüge laufen einer nach dem anderen; ein Zug bekommt sein Angebot erst, wenn er dran ist.
-- Test-Aufgaben: Aktion `test.completeTask`, nur wenn der Worker `TEST_ACTIONS=1` hat. Lokal und in den Tests an, im Betrieb aus (steht nicht in `worker/wrangler.jsonc`). Entfällt mit Phase 4.
+- Test-Aufgaben: Aktion `test.completeTask`, nur wenn der Worker `TEST_ACTIONS=1` hat. Lokal und in den Tests an; seit 2026-11-12 auf Wunsch des Nutzers auch im Betrieb (`worker/wrangler.jsonc`), damit sich der Bauzug auf den iPhones ausprobieren lässt. Entfällt mit Phase 4.
 - Inhalte: Wohnzimmer, Küche, Garten mit 34 Plätzen (wall 8, surface 9, floor 6, ground 8, fence 3); 16 Platzhalter-Stücke plus 3 Dekostücke (Meilensteine 5, 15, 25); 6 Platzhalter-Szenen. Schema: Platz mit `size`, Raum mit `outdoor`.
 - Oberfläche: Kopfleiste mit Einstellungs-Symbol, untere Leiste (Home, Today, Gifts) mit Punkt, wenn etwas wartet; `src/screens/` mit Haus und Bauzug, Erinnerungsstücken unter dem Dach, Meilenstein-Szene mit Geschenk, Gifts mit Einlösen, Einstellungen mit Ton-Schalter. Today zeigt bis Phase 4 nur den Stand (und, mit Test-Aktionen, den Knopf "Finish a test task").
 - Ton über WebAudio (`src/lib/sound.ts`, `audio.ts`): Platzieren, Lösen, Enthüllen; abschaltbar.
@@ -34,10 +34,10 @@ Lief auf Fable 5.2 statt Sonnet 5.5. Subagenten: `builder` (Sonnet 5.5) für `sr
 
 **Nicht belegt oder offen:**
 1. Auf den echten iPhones ist von dieser Phase nichts geprüft: Darstellung unter Uhr und Dynamic Island, Startbild, Klang (der Test-Browser hat kein Audio – geprüft ist nur der Weg von der Geste bis zum Ton).
-2. Entscheidung des Nutzers: Test-Knopf auf den echten iPhones ja oder nein (`"TEST_ACTIONS": "1"` in `worker/wrangler.jsonc`). Ohne ihn zeigt die Live-App das leere Haus, bis Phase 4 die Aufgaben bringt.
+2. Der Nutzer hat am 2026-11-12 entschieden: hochladen mit Test-Knopf (`"TEST_ACTIONS": "1"` in `worker/wrangler.jsonc`). Was damit auf den iPhones entsteht, sind Probestände.
 3. Ein Browser-Testlauf scheiterte gleich zu Beginn mit zehn Tests im 30-Sekunden-Zeitlimit (der Browser kam nicht hoch); der Lauf davor und der danach waren mit 29 von 29 grün. Die Ursache ist nicht ermittelt, vermutlich ein Hänger des Rechners. Tritt es im Workflow auf: Lauf wiederholen und dann nachsehen.
-4. P2-11 (Probe-Mitteilung auf dem iPhone) ist weiter unbestätigt – der Nutzer hat nur das Update auf `a45b30d` bestätigt.
-5. Commits seit `a45b30d` sind nur lokal. Vor dem Push fragen.
+4. P2-11 (Probe-Mitteilung auf dem iPhone) ist weiter unbestätigt – der Nutzer hat sie laut Auskunft vom 2026-11-12 noch nicht ausprobiert.
+5. Vor jedem weiteren Push fragen – er löst auf beiden iPhones einen Update-Hinweis aus.
 
 ## Phase 2/6 – Abgleich und Push: abgeschlossen am 2026-11-12
 
@@ -90,9 +90,9 @@ Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), ei
 
 ## Offene Punkte für spätere Phasen
 
-- **Tagesregel (Phase 4, vom Nutzer bestätigen lassen):** "frühestens am folgenden Kalendertag" ist im Modell als "höchstens eine neue Aufgabe pro Kalendertag" angelegt (`ActiveTask.availableOn`). Wer montags eine Aufgabe bekommt und sie mittwochs erledigt, bekäme die nächste sofort am Mittwoch, die übernächste frühestens Donnerstag. Die strengere Lesart (immer erst am Tag nach dem Erledigen) wäre mit denselben Feldern möglich.
+- **Tagesregel (Phase 4, vom Nutzer am 2026-11-12 bestätigt):** höchstens eine neue Aufgabe pro Kalendertag (`ActiveTask.availableOn`). Wer montags eine Aufgabe bekommt und sie mittwochs erledigt, bekommt die nächste sofort am Mittwoch, die übernächste frühestens am Donnerstag.
 - **Rätseldaten (Phase 4):** Nur `split-code` hat ein Datenschema, und das ist vorläufig. Die übrigen fünf Arten in `shared/content-schema.ts` bei `puzzleTask` ergänzen.
-- **Kennst-du-mich mit Freitext (Phase 4):** Wer entscheidet über den Treffer? Vorschlag: Wer die Antwort gegeben hat, bestätigt das Herz.
+- **Kennst-du-mich mit Freitext (Phase 4, vom Nutzer am 2026-11-12 entschieden):** Über den Treffer entscheidet, wer die Antwort über sich gegeben hat. Er sieht nach dem Aufdecken den Tipp des anderen und sagt, ob der zählt.
 - **Aufgabenablauf an `completeTask` anschließen (Phase 4):** Die Regeln für `puzzle.solve`, `knowme.submit` und `reallife.confirm` rufen `completeTask` auf; `test.completeTask`, `testDone`, die Variable `TEST_ACTIONS`, `HouseView.testActions` und der Abschnitt "Test mode" in `TodayScreen.svelte` entfallen dann. Eine noch installierte ältere App, die die Test-Aktion schickt, bekommt sie abgelehnt und verwirft sie.
 - **Katalog (Phase 5):** rund 45 Stücke auf 34 Plätze (wall 8, surface 9, floor 6, ground 8, fence 3). Stücke je Platzart dürfen die Plätze übersteigen – hängen bleibt nichts –, aber jede Platzart braucht genug Auswahl, und die Dekostücke (5, 15, 25) sollten auf Arten mit Reserve passen. Stück-SVG: viewBox `0 0 100 100`, Unterkante bei y ≈ 96–100 (siehe `CLAUDE.md`, Benennung).
 - **Texte (Phase 5):** Die 6 Szenen und alle Stücknamen sind Platzhalter; die Texte der Oberfläche ("Your pick", "A special piece" …) sind fertig, aber noch von niemandem außer der KI gelesen.
