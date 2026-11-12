@@ -82,7 +82,7 @@
     {#each data.code as rule, index (index)}
       <li>
         {#each ruleParts(rule) as part, at (at)}
-          {#if isGlyph(part)}<span class="inline"><Glyph glyph={part} /></span> <strong>{part}</strong>{:else}{part}{/if}{' '}
+          {#if at > 0 && part !== '.'}{' '}{/if}{#if isGlyph(part)}<span class="inline"><Glyph glyph={part} /></span> <strong>{part}</strong>{:else}{part}{/if}
         {/each}
       </li>
     {/each}

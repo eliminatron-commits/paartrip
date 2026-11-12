@@ -85,7 +85,6 @@
     <button type="button" data-testid="puzzle-check" onclick={check}>Check the order</button>
   </div>
 {:else}
-  <p class="note">Read these hints out to your partner:</p>
   <ul class="hints" data-testid="sequence-hints">
     {#each data.hints as hint, index (index)}
       <li>{hint}</li>

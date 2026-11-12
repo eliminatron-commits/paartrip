@@ -54,7 +54,6 @@
   }
 </script>
 
-<p class="note">Your shelf. Describe it to each other and mark every spot that looks different.</p>
 
 <div class="shelf" role="group" aria-label="Your shelf" style:--cols={data.cols} data-testid="puzzle-input">
   {#each version as glyph, cell (cell)}

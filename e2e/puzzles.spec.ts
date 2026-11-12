@@ -15,6 +15,8 @@ const chapter = content.chapters[0]!;
 const puzzles = chapter.tasks.filter((task) => task.type === 'puzzle');
 
 test.afterEach(closePhones);
+// Zwei Geräte, die erst bis zur gesuchten Aufgabe spielen: Unter Last reicht die übliche halbe Minute nicht.
+test.describe.configure({ timeout: 90_000 });
 
 for (const task of puzzles) {
   test(`${task.kind} · ${task.id}: jeder sieht nur seine Hälfte, zu zweit ist es lösbar`, async ({ browser }) => {

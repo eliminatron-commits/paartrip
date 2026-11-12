@@ -26,6 +26,8 @@ const forBoth = pick((t): t is RealLife => t.type === 'reallife' && t.doer === '
 const first = chapter.tasks[0]!;
 
 test.afterEach(closePhones);
+// Zwei Geräte, die erst bis zur gesuchten Aufgabe spielen: Unter Last reicht die übliche halbe Minute nicht.
+test.describe.configure({ timeout: 90_000 });
 
 const reveal = (page: Page) => page.getByTestId('reveal');
 const progress = (page: Page) => page.getByTestId('today-progress');

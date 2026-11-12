@@ -78,7 +78,6 @@
 </script>
 
 {#if role === 'lead'}
-  <p class="note">Your shelf. Describe it to your partner, square by square.</p>
   <div class="grid" style:--cols={data.cols} role="group" aria-label="The shelf to describe" data-testid="arrange-target">
     {#each data.target as tile, cell (cell)}
       <div class="cell" data-cell={cell} data-glyph-name={tile === null ? undefined : data.tiles[tile]}>
@@ -87,7 +86,6 @@
     {/each}
   </div>
 {:else}
-  <p class="note">Build the shelf from your partner's description.</p>
   <div class="grid" style:--cols={data.cols} role="group" aria-label="Your shelf" data-testid="puzzle-input">
     {#each { length: cells } as _, cell (cell)}
       {@const tile = placed[cell] ?? null}

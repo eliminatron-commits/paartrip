@@ -12,7 +12,9 @@ import {
   moveCard,
   openSettings,
   openTab,
+  openTask,
   pair,
+  passMilestone,
   phone,
   returnToApp,
   SAFE_AREA,
@@ -216,6 +218,67 @@ test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die R
   await expect(page.getByTestId('placing-bar')).toContainText('No free spot fits');
   await expect(page.locator('button.target')).toHaveCount(0);
   await check(page, 'home-no-free-spot');
+});
+
+test('Aufgaben-Bildschirme: jede Rätselart in beiden Rollen, Fragen und Aufgaben im echten Leben – nichts in den Rändern, Tap-Ziele groß genug', async ({ browser }) => {
+  test.setTimeout(240_000);
+  await mkdir('screenshots', { recursive: true });
+  shot = 50;
+  const { a, b } = await pair(browser, { safeArea: SAFE_AREA });
+
+  /** Der Bildschirm von oben und – wenn er länger ist – noch einmal vom Ende. */
+  const both = async (page: Page, name: string) => {
+    await page.locator('main').evaluate((main) => main.scrollTo(0, 0));
+    await check(page, name);
+    if (await page.locator('main').evaluate((main) => main.scrollHeight > main.clientHeight + 4)) {
+      await scrollToEnd(page);
+      await check(page, `${name}-end`);
+    }
+  };
+
+  for (const task of chapter.tasks) {
+    await openTask([a, b], task.id);
+    if (task.type === 'puzzle') {
+      const lead = task.lead === 'a' ? a : b;
+      const partner = task.lead === 'a' ? b : a;
+      await both(lead.page, `task-${task.kind}-intro`);
+      for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
+      await both(lead.page, `task-${task.kind}-lead`);
+      await both(partner.page, `task-${task.kind}-partner`);
+    } else if (task.type === 'knowme') {
+      await both(a.page, `task-knowme-${task.answer.kind}`);
+    } else {
+      await both(a.page, `task-reallife-${task.doer}-a`);
+      await both(b.page, `task-reallife-${task.doer}-b`);
+    }
+  }
+
+  // Die letzte Aufgabe ist erledigt; darunter stehen die aufgedeckten Antworten mit der offenen Entscheidung.
+  await finishTask(a);
+  await expect(a.page.getByTestId('task-done')).toBeVisible();
+  // Mit der letzten Aufgabe ist ein Meilenstein erreicht: erst an dessen Szene vorbei.
+  await passMilestone(a.page);
+  await expect(a.page.getByTestId('milestone')).toHaveCount(0);
+  await expect(a.page.getByTestId('reveal').first()).toBeVisible();
+  await both(a.page, 'task-done-reveal');
+});
+
+test('Aufgaben im Querformat: kein waagerechtes Rollen, Ränder frei', async ({ browser }) => {
+  test.setTimeout(120_000);
+  shot = 150;
+  const { a, b } = await pair(browser, { safeArea: SAFE_AREA_LANDSCAPE });
+  for (const { page } of [a, b]) await page.setViewportSize({ width: 956, height: 440 });
+  for (const task of chapter.tasks.filter((t) => t.type === 'puzzle')) {
+    await openTask([a, b], task.id);
+    for (const { page } of [a, b]) await page.getByRole('button', { name: 'Got it' }).click();
+    for (const [phone, role] of [[a, 'a'], [b, 'b']] as const) {
+      const overflow = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${task.id} ${role}`).toBeLessThanOrEqual(0);
+      const inner = await phone.page.locator('main').evaluate((main) => main.scrollWidth - main.clientWidth);
+      expect(inner, `${task.id} ${role} im Inhaltsbereich`).toBeLessThanOrEqual(0);
+      await check(phone.page, `landscape-task-${task.kind}-${role}`, SAFE_AREA_LANDSCAPE);
+    }
+  }
 });
 
 test('im Querformat bricht nichts: kein waagerechtes Rollen, Ränder frei, alles bleibt erreichbar', async ({ browser }) => {
