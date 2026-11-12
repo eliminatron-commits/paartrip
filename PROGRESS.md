@@ -8,10 +8,32 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 2/6 – Abgleich und Push:** abgeschlossen am 2026-11-12, P2-01 bis P2-10 erfüllt, live seit Commit `a45b30d`. P2-11 (Push-Mitteilung auf dem iPhone) prüft der Nutzer.
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
-- **Nächste Phase:** 5/6 – Inhalte Kapitel 1 | Sonnet 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; der Nutzer fügt ihn wieder ein, oder er wird aus dem Sitzungsverlauf geholt.
+- **Phase 5/6 – Inhalte Kapitel 1:** abgeschlossen am 2026-11-12, P5-01 bis P5-06 erfüllt. Lokal committet, **nicht hochgeladen** (zusammen mit dem Knopf "Refresh"; vor dem Hochladen den Nutzer fragen).
+- **Nächste Phase:** Optik (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch) – siehe "Wünsche des Nutzers". Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
+
+## Phase 5/6 – Inhalte Kapitel 1: abgeschlossen am 2026-11-12
+
+Lief auf dem Modell der Sitzung (Fable 5.2; geplant war Sonnet 5.5). Subagenten: `pruefer` (Opus 5.5) einmal für das Review. `fliessband` lief nicht – die 26 Stücke und 30 Aufgaben entstanden direkt, das war billiger als Aufträge zu verteilen und nachzuprüfen.
+
+**Gebaut und belegt** (Typecheck 0 Fehler, 317 Vitest-Tests, 53 Browser-Tests in WebKit, Produktions-Build und Worker-Bündel):
+- **30 Aufgaben** in `content/chapter-1/tasks/`, Reihenfolge in `chapter.json`: 12 Rätsel (je Art Variante 1 in der ersten, Variante 2 in der zweiten Hälfte, Rollen getauscht, beide führen und handeln gleich oft), 10 Fragen (6 Auswahl, 4 frei), 8 Aufgaben im echten Leben (abwechselnd an einen oder beide; a und b je zweimal allein). Nie zweimal hintereinander dieselbe Art. Die zehn Test-Aufgaben `example-*` sind umbenannt und überarbeitet.
+- **Katalog:** 45 Stücke (42 im Angebot, 3 Dekostücke), 26 davon neu gezeichnet; für jede Platzart mehr Stücke als Plätze. 12 Stücke mit vietnamesischem Zweitnamen. `content/vi-terms.json` hat 16 Begriffe.
+- **Szenen:** die sechs Texte bleiben, drei leicht geändert (keine Szene nennt mehr ein bestimmtes Geschenk).
+- **Prüfungen:** `checkComplete` (kein Meilenstein hinter der letzten Aufgabe – Befund W4 aus Phase 4 –, genau eine Szene, Geschenk nie leer) und in `checkContent` die Wortprüfung für Vietnamesisches mitten im Text; beide brechen den Bau ab. `shared/chapter-1.test.ts` hält Umfang und Rollenverteilung von Kapitel 1 fest, `worker/test/chapter.test.ts` spielt alle 30 Aufgaben samt Bauzügen mit zwei Spielern über den lokalen Worker.
+- **Reihenfolge-Rätsel:** Die Anfangslage liegt jetzt mindestens drei Handgriffe von der Lösung entfernt (`startOrder`, `MIN_START_MOVES`).
+- **Test-Geschirr:** `open-task` gilt Meilensteine auf dem Weg als gesehen (sonst müsste jedes Gerät vor einer späten Aufgabe durch jede Szene); die Bildschirm-Tests kennen zwei Varianten je Rätselart (die Erklärung erscheint nur vor der ersten).
+
+**Review durch `pruefer` (Opus 5.5):** nichts Kritisches. Wichtig: Die Anfangslage von `sequence-1` verriet fast die Lösung (behoben in `startOrder`, mit Test); Szene 15 erzählte die Papierlaterne, die mit einem geheimen Gutschein gar nicht kommt (umgeschrieben). Klein: `sequence-2` war nur länger, nicht schwerer (Hinweise verlangen jetzt Schlussfolgern); der Text von `reallife-toast` passte nicht zum Knopf "It arrived" (jetzt wird ein Toast geschickt); drei Wandstücke hingen zu hoch (nach unten gerückt); `checkComplete` meldete kein Dekostück an einem Meilenstein mit festem Gutschein (ergänzt, mit Test); ein Hinweis in `map-legend-1` war überflüssig (jetzt braucht es alle drei). Die Korrekturen hat `pruefer` nicht noch einmal gelesen.
+
+**Nicht belegt:**
+- Kein Mensch außer der KI und `pruefer` hat die Texte und Rätselhinweise gelesen; die vietnamesischen Begriffe sind ungeprüft.
+- Auf den iPhones ist von Phase 5 nichts zu sehen (nicht hochgeladen). Dort läuft Phase 4 mit einem Haus, das `example-split-code` schon gelöst hat – dieselbe Aufgabe käme nach dem Hochladen als `split-code-1` noch einmal. Vor dem echten Start beginnt ohnehin jedes Haus neu (siehe Phase 4).
+- Während der Phase liefen auf dem Rechner Testläufe anderer Projekte; unter dieser Last und bei zwei eigenen Läufen gleichzeitig scheiterten Browser-Tests an Zeitgrenzen. Belegt ist der eine Lauf allein: 53 von 53 in 3,0 Minuten.
+
+**Für die Optik-Phase notiert:** Der Titel "The spice rack, just so" passt nicht ganz zum Text der Rätselart ("how the shelf should look").
 
 ## Phase 4/6 – Aufgaben und Rätsel: abgeschlossen am 2026-11-12
 
@@ -38,7 +60,7 @@ Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für
 - Die Test-Karte war so regelmäßig angelegt (je zwei Verstecke an jedem Eckzeichen), dass sich die Auswahl ohne Legende eingrenzen ließ: neu angelegt. Die Ausnahme von der Tagesregel beim Ersetzen einer verwaisten Aufgabe steht jetzt in `CLAUDE.md`.
 - Ein drittes Review fand nicht statt; die Nachbesserungen sind durch Tests belegt.
 
-**Live seit 2026-11-12** (Commit `7947867`, Workflow-Lauf 43277756855 grün: Typecheck, alle Tests, Build, Worker, Pages; keine neue Migration). Mit Phase 4 allein hat das Kapitel zehn Test-Aufgaben (siehe W4) – gut zum Ausprobieren auf den iPhones, nicht zum echten Spielen. In WebKit von der Live-Adresse aus nennt die Versionszeile `7947867`; zwei Geräte haben sich gekoppelt, beide bekamen `example-split-code`, Rolle 1 löste, beide sahen "1 of 10 tasks done", danach A "Your pick" und B "Ada picks next"; der Test-Knopf ist weg. Das Protokoll des Worker-Deploys nennt `schedule: 0 6 * * *` und keine `TEST_`-Variable.
+**Live seit 2026-11-12** (Commit `7947867`, Workflow-Lauf 43277756855 grün: Typecheck, alle Tests, Build, Worker, Pages; keine neue Migration). Mit Phase 4 allein hat das Kapitel zehn Test-Aufgaben (siehe W4) – gut zum Ausprobieren auf den iPhones, nicht zum echten Spielen. In WebKit von der Live-Adresse aus nennt die Versionszeile `7947867`; zwei Geräte haben sich gekoppelt, beide bekamen `example-split-code`, Rolle 1 löste, beide sahen "1 of 10 tasks done", danach A "Your pick" und B "Ada picks next"; der Test-Knopf ist weg. Das Protokoll des Worker-Deploys nennt `schedule: 0 6 * * *`; die stellbare Uhr (`TEST_CLOCK`) steht nicht in `wrangler.jsonc`.
 
 **Bedingung für den echten Start (nach Phase 5/6):** Jedes Haus beginnt neu. Erledigte Test-Aufgaben bleiben im Stand und zählen für Bauzug und Meilensteine weiter mit; mit den 30 echten Aufgaben fiele Meilenstein 30 sonst schon auf etwa die zwanzigste. Also die echte Datenbank mit Zustimmung des Nutzers leeren (dort liegen auch drei Probehäuser aus den Abnahmen) – die App bietet danach auf den iPhones "Start over" an.
 
@@ -138,11 +160,9 @@ Gebaut am 2026-11-11 auf Fable 5.2 ohne Subagenten (sie waren nicht geladen), ei
 
 ## Offene Punkte für spätere Phasen
 
-- **Rätselvarianten (Phase 5):** je Art zwei Varianten als Datei unter `tasks/`, Variante 2 schwerer und mit getauschter `lead`-Rolle. Jede Variante braucht mindestens 50 mögliche Eingaben (die Inhaltsprüfung nennt die Zahl). Karte und Legende: Grundriss höchstens 6 Spalten, mehrere Verstecke (`treasures`, z. B. 3 aus 8), Zeichen ohne Bezug zur Bedeutung, Titel ohne Hinweis auf die Lösung, Verstecke nicht so regelmäßig um die Zeichen verteilt, dass sich die Auswahl ohne Legende eingrenzen lässt. Reihenfolge: mindestens fünf Schritte. Zwei Bilder: mindestens acht Felder. Geteilter Code: bei vier Symbolen mindestens vier Stellen. Wegweiser: Start und Ziel weit genug auseinander (auf 5×5 von Ecke zu Ecke). Die Inhaltsprüfung fängt Widersprüche und "ohne Partner lösbar" ab; ob frei formulierte Hinweise (Karte und Legende, Reihenfolge) eindeutig und verständlich sind, kann nur ein Mensch bzw. `pruefer` beurteilen. Der Zeichenvorrat hat 16 Symbole (`shared/puzzles/tiles.ts`); mehr brauchen eine Zeichnung in `src/components/Glyph.svelte`.
-- **Vollständigkeit des Kapitels (Phase 5, P5-02, Befund W4 aus Phase 4):** Die Prüfung muss ablehnen, dass ein Meilenstein, fester Gutschein, eine Szene oder ein Dekostück hinter der letzten Aufgabe liegt (Meilenstein ≤ Zahl der Aufgaben). Die Test-Aufgaben `example-*` werden durch die echten ersetzt; ein Haus, das schon Test-Aufgaben erledigt hat, spielt mit den neuen weiter und zählt die alten mit – deshalb die Bedingung "jedes Haus beginnt neu" im Abschnitt zu Phase 4.
-- **Kapitelende (Phase 5/6):** Nach der letzten Aufgabe zeigt Today "That was the last one". Mit 30 Aufgaben fällt das mit Meilenstein 30 zusammen.
-- **Katalog (Phase 5):** rund 45 Stücke auf 34 Plätze (wall 8, surface 9, floor 6, ground 8, fence 3). Stücke je Platzart dürfen die Plätze übersteigen – hängen bleibt nichts –, aber jede Platzart braucht genug Auswahl, und die Dekostücke (5, 15, 25) sollten auf Arten mit Reserve passen. Stück-SVG: viewBox `0 0 100 100`, Unterkante bei y ≈ 96–100 (siehe `CLAUDE.md`, Benennung).
-- **Texte (Phase 5):** Die 6 Szenen und alle Stücknamen sind Platzhalter; die Texte der Oberfläche ("Your pick", "A special piece" …) sind fertig, aber noch von niemandem außer der KI gelesen.
+- **Neue Rätselvarianten:** Was eine Variante einhalten muss, prüft der Bau (mindestens 50 mögliche Eingaben, Grundriss höchstens 6 Spalten, Zeichen ohne Bezug zur Bedeutung). Ob frei formulierte Hinweise eindeutig und verständlich sind, kann nur ein Mensch bzw. `pruefer` beurteilen. Der Zeichenvorrat hat 16 Symbole (`shared/puzzles/tiles.ts`); mehr brauchen eine Zeichnung in `src/components/Glyph.svelte`.
+- **Texte:** Fragen, Aufgaben, Szenen und Stücknamen sind fertig, aber von keinem Menschen gelesen.
+- **Kapitelende:** Nach der letzten Aufgabe zeigt Today "That was the last one"; mit 30 Aufgaben fällt das mit Meilenstein 30 zusammen. Ob das als Abschluss des Kapitels genügt, entscheidet die Abnahme.
 - **Vietnamesische Begriffe** in `content/vi-terms.json` sind ungeprüft, bis die Frau des Nutzers die Liste gesehen hat.
 - `npm audit` meldet 7 Hinweise (niedrig/mittel) in Build-Werkzeugen (glob, minimatch, deepmerge unter workbox-build). Sie laufen nur beim Bauen und stecken nicht in der App; `npm audit fix --force` würde Pakete auf alte Hauptversionen zurücksetzen und bleibt deshalb aus.
 
