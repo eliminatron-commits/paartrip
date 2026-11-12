@@ -7,7 +7,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 1/6 – Fundament:** abgeschlossen am 2026-11-11, alle Akzeptanzpunkte P1-01 bis P1-08 erfüllt. Live unter `https://eliminatron-commits.github.io/paartrip/` (Repo `eliminatron-commits/paartrip`, öffentlich, Pages über GitHub Actions). Der Update-Ablauf ist auch live über einen echten zweiten Deploy belegt.
 - **Phase 2/6 – Abgleich und Push:** abgeschlossen am 2026-11-12, P2-01 bis P2-10 erfüllt, live seit Commit `a45b30d`. P2-11 (Push-Mitteilung auf dem iPhone) prüft der Nutzer.
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
-- **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Lokal committet, **noch nicht hochgeladen** – davor ist der Nutzer zu fragen (siehe unten).
+- **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
 - **Nächste Phase:** 5/6 – Inhalte Kapitel 1 | Sonnet 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; der Nutzer fügt ihn wieder ein, oder er wird aus dem Sitzungsverlauf geholt.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
@@ -15,7 +15,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 ## Phase 4/6 – Aufgaben und Rätsel: abgeschlossen am 2026-11-12
 
-Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für die Rätsel-Bausteine MapLegend, DescribeArrange, SpotDifference, Sequence, BlindMaze samt Treibern – zwei davon brach das Nutzungslimit beim Abschlussbericht ab, ihre Dateien waren fertig; `pruefer` (Opus 5.5) zweimal: Review der Phase, danach Review der Korrekturen. `explorer` und `zusammenfasser` wurden nicht gebraucht. Alles ist lokal committet, nichts hochgeladen.
+Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für die Rätsel-Bausteine MapLegend, DescribeArrange, SpotDifference, Sequence, BlindMaze samt Treibern – zwei davon brach das Nutzungslimit beim Abschlussbericht ab, ihre Dateien waren fertig; `pruefer` (Opus 5.5) zweimal: Review der Phase, danach Review der Korrekturen. `explorer` und `zusammenfasser` wurden nicht gebraucht.
 
 **Gebaut und belegt** (Typecheck 0 Fehler, 284 Vitest-Tests, 46 Browser-Tests in WebKit, Produktions-Build läuft):
 - Regeln (`shared/rules.ts`): Tagesablauf `advance`, `puzzle.solve`, `knowme.submit`, `knowme.judge`, `reallife.confirm`, `announceTask`; jede erledigte Aufgabe läuft über `finishTask` → `completeTask` (Bauzug, Meilenstein).
@@ -38,13 +38,13 @@ Lief auf Fable 5.2 statt Opus 5.5. Subagenten: fünf `builder` (Sonnet 5.5) für
 - Die Test-Karte war so regelmäßig angelegt (je zwei Verstecke an jedem Eckzeichen), dass sich die Auswahl ohne Legende eingrenzen ließ: neu angelegt. Die Ausnahme von der Tagesregel beim Ersetzen einer verwaisten Aufgabe steht jetzt in `CLAUDE.md`.
 - Ein drittes Review fand nicht statt; die Nachbesserungen sind durch Tests belegt.
 
-**Vor dem Hochladen den Nutzer fragen.** Abzuwägen ist: Mit Phase 4 allein hat das Kapitel zehn Test-Aufgaben (siehe W4) – gut zum Ausprobieren auf den iPhones, nicht zum echten Spielen. Nach dem Hochladen: Workflow-Lauf ansehen, Live-Adresse in WebKit prüfen, im Cloudflare-Dashboard nachsehen, dass der Cron-Trigger eingetragen ist.
+**Live seit 2026-11-12** (Commit `7947867`, Workflow-Lauf 43277756855 grün: Typecheck, alle Tests, Build, Worker, Pages; keine neue Migration). Mit Phase 4 allein hat das Kapitel zehn Test-Aufgaben (siehe W4) – gut zum Ausprobieren auf den iPhones, nicht zum echten Spielen. In WebKit von der Live-Adresse aus nennt die Versionszeile `7947867`; zwei Geräte haben sich gekoppelt, beide bekamen `example-split-code`, Rolle 1 löste, beide sahen "1 of 10 tasks done", danach A "Your pick" und B "Ada picks next"; der Test-Knopf ist weg. Das Protokoll des Worker-Deploys nennt `schedule: 0 6 * * *` und keine `TEST_`-Variable.
 
-**Bedingung für den echten Start (nach Phase 5/6):** Jedes Haus beginnt neu. Erledigte Test-Aufgaben bleiben im Stand und zählen für Bauzug und Meilensteine weiter mit; mit den 30 echten Aufgaben fiele Meilenstein 30 sonst schon auf etwa die zwanzigste. Also die echte Datenbank mit Zustimmung des Nutzers leeren (dort liegen auch zwei Probehäuser aus den Abnahmen) – die App bietet danach auf den iPhones "Start over" an.
+**Bedingung für den echten Start (nach Phase 5/6):** Jedes Haus beginnt neu. Erledigte Test-Aufgaben bleiben im Stand und zählen für Bauzug und Meilensteine weiter mit; mit den 30 echten Aufgaben fiele Meilenstein 30 sonst schon auf etwa die zwanzigste. Also die echte Datenbank mit Zustimmung des Nutzers leeren (dort liegen auch drei Probehäuser aus den Abnahmen) – die App bietet danach auf den iPhones "Start over" an.
 
 **Nicht belegt:**
 - Auf echten iPhones ist von Phase 4 nichts geprüft (Bedienung der Rätsel mit dem Finger, Lesbarkeit der Symbole, Mitteilung am Morgen).
-- Der Cron-Lauf ist nur lokal über das Test-Geschirr belegt, nicht bei Cloudflare.
+- Der Cron-Trigger ist bei Cloudflare eingetragen (Protokoll des Deploys); dass er morgens läuft und die Mitteilung ankommt, ist nur lokal über das Test-Geschirr belegt.
 - Ob die Hinweise der Test-Rätsel für Menschen gut verständlich sind, hat niemand außer der KI beurteilt; die echten Varianten kommen in Phase 5.
 
 ## Phase 3/6 – Haus und Gutscheine: abgeschlossen am 2026-11-12
