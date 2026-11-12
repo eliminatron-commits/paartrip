@@ -66,6 +66,7 @@ export class SyncEngine {
   private again = false;
   /** Das Gerät wechselt gerade seine Rolle (Import, Neuanfang): solange beginnt kein Abgleich. */
   private switching = false;
+  private settingsChange: Promise<void> = Promise.resolve();
 
   constructor(store: LocalStore, transport: Pick<Transport, 'createHouse' | 'joinHouse' | 'sync'>, onChange: (snapshot: Snapshot) => void, clock: Clock = systemClock) {
     this.store = store;
@@ -190,10 +191,19 @@ export class SyncEngine {
     this.emit({ rejected: 0 });
   }
 
-  async updateSettings(patch: Partial<Settings>): Promise<void> {
-    const settings = { ...this.snapshot.settings, ...patch };
-    await this.store.saveSettings(settings);
-    this.emit({ settings });
+  /**
+   * Änderungen der Einstellungen laufen nacheinander: Jede baut auf dem auf, was die vorige hinterlassen hat.
+   * Sonst überschriebe eine zweite, die während des Speicherns der ersten beginnt, deren Ergebnis.
+   */
+  updateSettings(patch: Partial<Settings>): Promise<void> {
+    const change = this.settingsChange.then(async () => {
+      const settings = { ...this.snapshot.settings, ...patch };
+      await this.store.saveSettings(settings);
+      this.emit({ settings });
+    });
+    // Scheitert eine Änderung, läuft die nächste trotzdem.
+    this.settingsChange = change.catch(() => undefined);
+    return change;
   }
 
   async exportDevice(): Promise<DeviceFile> {

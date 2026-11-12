@@ -393,3 +393,18 @@ describe('Neuanfang', () => {
     expect(await a.store.load()).toMatchObject({ device: null, view: null, queue: [] });
   });
 });
+
+describe('Einstellungen des Geräts', () => {
+  it('zwei Änderungen kurz nacheinander gehen beide ein – auch nach einem Neustart', async () => {
+    const phone = await device('phone-a');
+    // Die Erklärung ist gelesen, und gleich danach wird der erste Zug im Rätsel gesichert.
+    await Promise.all([
+      phone.engine.updateSettings({ introSeen: ['sequence'] }),
+      phone.engine.updateSettings({ draft: { taskId: 'some-task', value: [2, 0, 1] } }),
+      phone.engine.updateSettings({ sound: false }),
+    ]);
+    const expected = { introSeen: ['sequence'], draft: { taskId: 'some-task', value: [2, 0, 1] }, sound: false };
+    expect(phone.last.settings).toMatchObject(expected);
+    expect((await device('phone-a')).last.settings).toMatchObject(expected);
+  });
+});
