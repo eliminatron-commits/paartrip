@@ -153,6 +153,89 @@ describe('Tagesablauf', () => {
   });
 });
 
+describe('Tagesablauf, wenn sich die Inhalte ändern', () => {
+  /** Spielt Tag für Tag weiter, bis keine Aufgabe mehr offen ist. */
+  function playOut(state: HouseState, from: string, source: RulesContent): HouseState {
+    let day = from;
+    for (let i = 0; i <= source.chapters[0]!.tasks.length; i++) {
+      state = advance(state, on(day, undefined, source));
+      if (!state.task || state.task.completedAt !== null) break;
+      state = finish(state, on(day, undefined, source));
+      day = nextDay(day);
+    }
+    return state;
+  }
+
+  it('die nächste Aufgabe richtet sich nach den erledigten ids: Keine erledigte kommt wieder, keine neue fällt weg', () => {
+    const before = only(anyPuzzle, choiceQuestion, forOne);
+    let state = finish(house(on(MON, undefined, before)), on(MON, undefined, before));
+    expect(state.done.map((d) => d.taskId)).toEqual([anyPuzzle!.id]);
+
+    // Neue Inhalte: Vorn kommt eine Aufgabe dazu, die erledigte steht jetzt an dritter Stelle.
+    const after = only(textQuestion, choiceQuestion, anyPuzzle, forOne);
+    expect(viewOf(state, 'a', on(MON, '20:00:00', after)).nextTaskOn).toBe(TUE);
+    state = advance(state, on(TUE, undefined, after));
+    expect(state.task).toMatchObject({ taskId: textQuestion!.id, availableOn: TUE, completedAt: null });
+
+    state = playOut(state, TUE, after);
+    expect(state.done.map((d) => d.taskId)).toEqual([anyPuzzle!.id, textQuestion!.id, choiceQuestion!.id, forOne!.id]);
+    expect(viewOf(state, 'a', on(THU, undefined, after)).nextTaskOn).toBeNull();
+  });
+
+  it('eine erledigte Aufgabe darf aus den Inhalten verschwinden: Es geht mit der nächsten weiter', () => {
+    const before = only(anyPuzzle, choiceQuestion);
+    const state = finish(house(on(MON, undefined, before)), on(MON, undefined, before));
+    const after = only(choiceQuestion, forOne);
+    const next = advance(state, on(TUE, undefined, after));
+    expect(next.task).toMatchObject({ taskId: choiceQuestion!.id, availableOn: TUE, completedAt: null });
+    expect(viewOf(next, 'b', on(TUE, undefined, after)).done).toHaveLength(1);
+    expect(playOut(next, TUE, after).done.map((d) => d.taskId)).toEqual([anyPuzzle!.id, choiceQuestion!.id, forOne!.id]);
+  });
+
+  it('eine offene Aufgabe, die es in den Inhalten nicht mehr gibt, macht sofort der nächsten Platz – das Haus hängt nicht fest', () => {
+    const before = only(choiceQuestion, anyPuzzle);
+    const [first, second] = stepsToFinish(house(on(MON, undefined, before)).task, before.chapters[0]!);
+    // Einer hat schon abgegeben, dann verschwindet die Frage aus den Inhalten.
+    let state = play(house(on(MON, undefined, before)), first!.slot, first!.action, on(MON, undefined, before));
+    const after = only(anyPuzzle, forOne);
+
+    // Zur alten Aufgabe nimmt der Server nichts mehr an – ohne Wechsel bliebe sie für immer offen.
+    expect(attempt(state, second!.slot, second!.action, on(WED, undefined, after)).result).toMatchObject({ outcome: 'rejected' });
+
+    state = advance(state, on(WED, undefined, after));
+    expect(state.done).toHaveLength(0);
+    expect(state.task).toMatchObject({ taskId: anyPuzzle!.id, availableOn: WED, completedAt: null, progress: { type: 'puzzle', solvedBy: null } });
+    expect(playOut(state, WED, after).done.map((d) => d.taskId)).toEqual([anyPuzzle!.id, forOne!.id]);
+  });
+
+  it('gibt es für die verschwundene offene Aufgabe keinen Ersatz mehr, ist das Kapitel für dieses Haus durch', () => {
+    const before = only(anyPuzzle, choiceQuestion);
+    let state = advance(finish(house(on(MON, undefined, before)), on(MON, undefined, before)), on(TUE, undefined, before));
+    expect(state.task).toMatchObject({ taskId: choiceQuestion!.id, completedAt: null });
+
+    const after = only(anyPuzzle);
+    state = advance(state, on(WED, undefined, after));
+    expect(state.task).toBeNull();
+    expect(state.done.map((d) => d.taskId)).toEqual([anyPuzzle!.id]);
+    expect(viewOf(state, 'a', on(WED, undefined, after))).toMatchObject({ task: null, nextTaskOn: null });
+    // Dabei bleibt es, bis die Inhalte wieder etwas bereithalten.
+    expect(advance(state, on(THU, undefined, after))).toBe(state);
+    expect(advance(state, on(THU, undefined, only(anyPuzzle, forOne))).task).toMatchObject({ taskId: forOne!.id, availableOn: THU });
+  });
+
+  it('dieselbe id mit einer anderen Art von Aufgabe beginnt von vorn', () => {
+    const before = only(choiceQuestion, anyPuzzle);
+    const [first] = stepsToFinish(house(on(MON, undefined, before)).task, before.chapters[0]!);
+    let state = play(house(on(MON, undefined, before)), first!.slot, first!.action, on(MON, undefined, before));
+
+    // Unter der id der Frage steht jetzt eine Aufgabe im echten Leben.
+    const after = only({ ...forOne!, id: choiceQuestion!.id }, anyPuzzle);
+    state = advance(state, on(TUE, undefined, after));
+    expect(state.task).toMatchObject({ taskId: choiceQuestion!.id, availableOn: TUE, progress: { type: 'reallife', confirmedBy: [] } });
+    expect(playOut(state, TUE, after).done.map((d) => d.taskId)).toEqual([choiceQuestion!.id, anyPuzzle!.id]);
+  });
+});
+
 describe('Erledigte Aufgabe → Bauzug → Meilenstein', () => {
   const first = chapter.milestones[0]!;
 

@@ -93,7 +93,9 @@ export function reveals(view: HouseView, chapter: Chapter, queued: Action[]): Re
 
     const free = spec.answer.kind === 'text';
     const sent = queued.some((a) => a.type === 'knowme.judge' && a.taskId === done.taskId);
-    const myVerdict = !free ? 'none' : progress.judged.includes(you) ? 'done' : sent ? 'sent' : 'open';
+    // Eine Sicht, die das Gerät noch von einer früheren Version gespeichert hat, kennt `judged` nicht.
+    const judged: Slot[] = progress.judged ?? [];
+    const myVerdict = !free ? 'none' : judged.includes(you) ? 'done' : sent ? 'sent' : 'open';
     const latest = index === view.done.length - 1;
     if (!latest && myVerdict !== 'open' && myVerdict !== 'sent') return;
 
@@ -106,7 +108,7 @@ export function reveals(view: HouseView, chapter: Chapter, queued: Action[]): Re
       myHeart: progress.hearts.includes(you),
       theirHeart: progress.hearts.includes(other),
       myVerdict,
-      theirVerdict: free && progress.judged.includes(other),
+      theirVerdict: free && judged.includes(other),
     });
   });
   // Das Neueste zuerst.

@@ -6,6 +6,7 @@
 import type { ActionOutcome } from '../../shared/actions.ts';
 import type { HouseState, Slot } from '../../shared/model.ts';
 import { CODE_ALPHABET, CODE_LENGTH } from '../../shared/limits.ts';
+import { type StoredHouseState, upgradeState } from '../../shared/stored-state.ts';
 import { b64urlEncode, type PushTarget } from './webpush.ts';
 
 export interface Device {
@@ -28,7 +29,8 @@ interface HouseRow {
   state: string;
 }
 
-const toHouse = (row: HouseRow): House => ({ id: row.id, code: row.code, rev: row.rev, state: JSON.parse(row.state) as HouseState });
+// Der gespeicherte Stand kann von einer früheren Version stammen – upgradeState bringt ihn auf die heutige Form.
+const toHouse = (row: HouseRow): House => ({ id: row.id, code: row.code, rev: row.rev, state: upgradeState(JSON.parse(row.state) as StoredHouseState) });
 
 /** Geheimes Geräte-Token: 32 Zufallsbytes. Das Gerät bekommt es genau einmal, der Server behält nur den Hash. */
 export function newToken(): string {

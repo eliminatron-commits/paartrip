@@ -78,20 +78,61 @@ describe('Tagesablauf mit gestellter Uhr', () => {
     const players = await pair(api, undefined, noon(START));
     const first = chapter.tasks[0]!;
     await playTask(api, players, noon(START));
-    // Das Gerät war offline und reicht seinen Schritt zur längst erledigten Aufgabe nach.
-    const stale =
+    // Das Gerät war offline und reicht seinen Schritt zur längst erledigten Aufgabe nach – jedes mit seiner eigenen Aktion.
+    const stale = () =>
       first.type === 'puzzle'
         ? action({ type: 'puzzle.solve', taskId: first.id })
         : first.type === 'reallife'
           ? action({ type: 'reallife.confirm', taskId: first.id })
           : action({ type: 'knowme.submit', taskId: first.id, own: { kind: 'choice', option: 0 }, guess: { kind: 'choice', option: 0 } });
     for (const token of [players.a.token, players.b.token]) {
-      const reply = await sync(api, token, [stale, action({ type: 'coupon.deposit', text: 'Later' })], noon(nextDay(START)));
+      const reply = await sync(api, token, [stale(), action({ type: 'coupon.deposit', text: 'Later' })], noon(nextDay(START)));
       expect(reply.status).toBe(200);
-      expect(reply.json.results[0]).toMatchObject({ outcome: expect.stringMatching(/rejected|duplicate/) });
+      // Die überholte Aktion wird abgelehnt, die folgende im selben Abgleich gilt.
+      expect(reply.json.results).toMatchObject([{ outcome: 'rejected' }, { outcome: 'applied' }]);
       expect(reply.json.view.done).toHaveLength(1);
       expect(reply.json.view.task).toMatchObject({ taskId: chapter.taskOrder[1] });
     }
+  });
+});
+
+describe('Stand einer früheren Version', () => {
+  it('ein Haus, wie Phase 3 es gespeichert hat, lässt sich abgleichen und spielt weiter', async () => {
+    const players = await pair(api, undefined, noon(START));
+    const houseId = players.a.view.houseId;
+    const db = await api.db();
+    const row = await db.prepare('SELECT state FROM houses WHERE id = ?').bind(houseId).first<{ state: string }>();
+    const question = chapter.tasks.find((t) => t.type === 'knowme' && t.answer.kind === 'choice')!;
+    // Damals gab es keine laufende Aufgabe, und der erledigten Frage aus dem Test-Knopf fehlt das Feld `judged`.
+    const old = {
+      ...(JSON.parse(row!.state) as object),
+      task: null,
+      done: [
+        {
+          taskId: question.id,
+          completedAt: noon(START),
+          progress: {
+            type: 'knowme',
+            submissions: {
+              a: { own: { kind: 'choice', option: 0 }, guess: { kind: 'choice', option: 1 } },
+              b: { own: { kind: 'choice', option: 1 }, guess: { kind: 'choice', option: 1 } },
+            },
+            hearts: ['a'],
+          },
+        },
+      ],
+    };
+    await db.prepare('UPDATE houses SET state = ? WHERE id = ?').bind(JSON.stringify(old), houseId).run();
+
+    const next = chapter.taskOrder.find((id) => id !== question.id);
+    for (const token of [players.a.token, players.b.token]) {
+      const reply = await sync(api, token, [], noon(START));
+      expect(reply.status).toBe(200);
+      expect(reply.json.view.done).toMatchObject([{ taskId: question.id, progress: { type: 'knowme', hearts: ['a'], judged: [] } }]);
+      expect(reply.json.view.task).toMatchObject({ taskId: next, completedAt: null });
+    }
+    await playTask(api, players, noon(START));
+    expect((await sync(api, players.b.token, [], noon(START))).json.view.done.map((d) => d.taskId)).toEqual([question.id, next]);
   });
 });
 

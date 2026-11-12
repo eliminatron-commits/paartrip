@@ -97,9 +97,19 @@ function freshProgress(task: RulesTask): TaskProgress {
   }
 }
 
-/** Die Aufgabe, die als nächste erscheint: die erste der festen Reihenfolge, die noch nicht erledigt ist. null = Kapitel durchgespielt. */
+/**
+ * Die Aufgabe, die als nächste erscheint: die erste der festen Reihenfolge, die dieses Haus noch nicht erledigt
+ * hat. Maßgeblich sind die ids, nicht die Anzahl – ändern sich Reihenfolge oder Bestand der Inhalte, kommt
+ * keine erledigte Aufgabe wieder und keine neue fällt weg. null = Kapitel durchgespielt.
+ */
 export function upcomingTask(state: Pick<HouseState, 'done'>, chapter: RulesChapter): RulesTask | null {
-  return chapter.tasks[state.done.length] ?? null;
+  const done = new Set(state.done.map((d) => d.taskId));
+  return chapter.tasks.find((task) => !done.has(task.id)) ?? null;
+}
+
+/** Kennen die Inhalte diese laufende Aufgabe noch, und in der Art, in der sie begonnen wurde? */
+function stillInContent(task: ActiveTask, chapter: RulesChapter): boolean {
+  return chapter.tasks.some((spec) => spec.id === task.taskId && spec.type === task.progress.type);
 }
 
 /**
@@ -107,13 +117,19 @@ export function upcomingTask(state: Pick<HouseState, 'done'>, chapter: RulesChap
  * von beiden erledigt, und seit ihrem Erscheinen hat ein neuer Kalendertag begonnen – höchstens eine neue
  * Aufgabe pro Tag. Wer pausiert, verliert nichts: Eine liegen gebliebene Aufgabe wartet, und ist sie erledigt,
  * rückt die nächste gleich nach. Der Worker ruft das bei jedem Abgleich und einmal am Morgen auf.
+ *
+ * Eine offene Aufgabe, die es in den Inhalten nicht mehr gibt, kann niemand erledigen: Sie macht sofort der
+ * nächsten Platz, sonst hinge das Haus an ihr fest.
  */
 export function advance(state: HouseState, ctx: RuleContext): HouseState {
   if (!state.players.b) return state;
+  const chapter = chapterOf(state, ctx.content);
   const today = dayKey(ctx.now);
-  if (state.task && (state.task.completedAt === null || today <= state.task.availableOn)) return state;
-  const next = upcomingTask(state, chapterOf(state, ctx.content));
-  if (!next) return state;
+  const task = state.task;
+  const orphaned = task !== null && task.completedAt === null && !stillInContent(task, chapter);
+  if (task && !orphaned && (task.completedAt === null || today <= task.availableOn)) return state;
+  const next = upcomingTask(state, chapter);
+  if (!next) return orphaned ? { ...state, task: null } : state;
   return { ...state, task: { taskId: next.id, availableOn: today, progress: freshProgress(next), completedAt: null } };
 }
 

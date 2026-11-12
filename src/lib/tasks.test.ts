@@ -197,4 +197,14 @@ describe('aufgedeckte Fragen', () => {
     expect(reveals(g.view(state, 'a', day3), g.chapter, []).map((r) => r.taskId)).toEqual([choiceQuestion.id]);
     expect(reveals(g.view(state, 'b', day3), g.chapter, []).map((r) => r.taskId)).toEqual([choiceQuestion.id, textQuestion.id]);
   });
+
+  it('eine Sicht, die das Gerät noch von einer früheren Version gespeichert hat, bringt nichts zum Absturz', () => {
+    const g = game(textQuestion, puzzle);
+    const view = g.view(g.finish(g.start()), 'a', nextDay(DAY));
+    // Bis Phase 3 kannten Sichten das Feld `judged` nicht.
+    const old = JSON.parse(JSON.stringify(view, (key, value: unknown) => (key === 'judged' ? undefined : value))) as HouseView;
+    expect(JSON.stringify(old)).not.toContain('judged');
+    expect(reveals(old, g.chapter, [])).toMatchObject([{ taskId: textQuestion.id, myVerdict: 'open', theirVerdict: false }]);
+    expect(todayWaits(old, g.chapter, [])).toBe(true);
+  });
 });
