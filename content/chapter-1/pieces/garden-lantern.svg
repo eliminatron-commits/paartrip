@@ -1,8 +1,62 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="46" y="56" width="8" height="34" fill="#8C5A3C"/>
-  <rect x="34" y="88" width="32" height="8" rx="2" fill="#6B3A22"/>
-  <rect x="32" y="34" width="36" height="24" rx="3" fill="#B98A5E"/>
-  <rect x="38" y="38" width="24" height="16" fill="#F2C76B"/>
-  <polygon points="26,34 74,34 50,14" fill="#46614B"/>
-  <circle cx="50" cy="11" r="3" fill="#46614B"/>
+  <defs>
+    <radialGradient id="garden-lantern-shadow">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="garden-lantern-halo" gradientUnits="userSpaceOnUse" cx="50" cy="60" r="70">
+      <stop offset="0" stop-color="#FFDD96" stop-opacity="0.8"/>
+      <stop offset="0.35" stop-color="#FFCD78" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#FFCD78" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="garden-lantern-pool">
+      <stop offset="0" stop-color="#FFE0A0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FFE0A0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="garden-lantern-glass" gradientUnits="userSpaceOnUse" cx="50" cy="62" r="30">
+      <stop offset="0" stop-color="#FFF8D6"/>
+      <stop offset="0.45" stop-color="#FFD27A"/>
+      <stop offset="1" stop-color="#E08A32"/>
+    </radialGradient>
+    <linearGradient id="garden-lantern-metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1E2226"/>
+      <stop offset="0.4" stop-color="#4A5258"/>
+      <stop offset="1" stop-color="#16191C"/>
+    </linearGradient>
+    <linearGradient id="garden-lantern-flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FFF9DE"/>
+      <stop offset="0.45" stop-color="#FFCF5E"/>
+      <stop offset="1" stop-color="#F08A36"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="60" r="70" fill="url(#garden-lantern-halo)"/>
+  <ellipse cx="50" cy="96" rx="48" ry="7" fill="url(#garden-lantern-pool)"/>
+  <ellipse cx="50" cy="96.500" rx="28" ry="3.400" fill="url(#garden-lantern-shadow)"/>
+  <!-- Tragering und Dach -->
+  <circle cx="50" cy="11" r="6.500" fill="none" stroke="url(#garden-lantern-metal)" stroke-width="2.200"/>
+  <rect x="45" y="16" width="10" height="6" rx="1.500" fill="url(#garden-lantern-metal)"/>
+  <path d="M24 37L50 20l26 17z" fill="url(#garden-lantern-metal)"/>
+  <path d="M28 35.500L50 21.500" stroke="#8A949A" stroke-width="0.900" stroke-linecap="round" opacity="0.7"/>
+  <rect x="22" y="36" width="56" height="4" rx="1.500" fill="#16191C"/>
+  <!-- Glas mit Kerze -->
+  <rect x="28" y="40" width="44" height="48" fill="url(#garden-lantern-glass)"/>
+  <rect x="42.500" y="64" width="15" height="24" rx="2" fill="#FFF8E8"/>
+  <rect x="42.500" y="64" width="15" height="24" rx="2" fill="#F2C76B" opacity="0.25"/>
+  <ellipse cx="50" cy="64.500" rx="7.500" ry="1.700" fill="#FFFDF2"/>
+  <rect x="49.500" y="59.500" width="1" height="5" fill="#3A2216"/>
+  <g class="fx-flicker">
+    <path d="M50 44c4.200 5.400 5.400 8.800 4.100 12.300c-.900 2.400-2.400 3.500-4.100 3.500s-3.200-1.100-4.100-3.500c-1.300-3.500-.100-6.900 4.100-12.300z" fill="url(#garden-lantern-flame)"/>
+    <ellipse cx="50" cy="56.500" rx="1.600" ry="2.800" fill="#FFFDF2"/>
+  </g>
+  <path d="M30 86L46 40h6L36 86z" fill="#FFFFFF" opacity="0.16"/>
+  <!-- Rahmen und Sockel -->
+  <g fill="url(#garden-lantern-metal)">
+    <rect x="26" y="40" width="4" height="48"/>
+    <rect x="70" y="40" width="4" height="48"/>
+    <rect x="48.800" y="40" width="2.400" height="48" opacity="0.85"/>
+  </g>
+  <rect x="22" y="87" width="56" height="6" rx="2" fill="#16191C"/>
+  <rect x="24" y="87.500" width="52" height="1" rx="0.500" fill="#8A949A" opacity="0.6"/>
+  <rect x="26" y="93" width="8" height="3.500" rx="1" fill="#16191C"/>
+  <rect x="66" y="93" width="8" height="3.500" rx="1" fill="#16191C"/>
 </svg>

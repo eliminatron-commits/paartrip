@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <radialGradient id="garden-front-dim" gradientUnits="userSpaceOnUse" cx="210" cy="150" r="290">
+      <stop offset="0.5" stop-color="#101C2A" stop-opacity="0"/>
+      <stop offset="1" stop-color="#101C2A" stop-opacity="0.5"/>
+    </radialGradient>
+    <radialGradient id="garden-front-firefly">
+      <stop offset="0" stop-color="#FFF7B0" stop-opacity="0.95"/>
+      <stop offset="0.3" stop-color="#F4E97A" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#F4E97A" stop-opacity="0"/>
+    </radialGradient>
+    <g id="garden-front-blades">
+      <path d="M0 0c-1-6-3-10-6-13c1.500 4 2 8 2.400 13zM3 0c0-7 .600-12 2.400-17c.600 5.500.400 11-.200 17zM7 0c1-5 3-8.500 6.400-11c-2 3.500-3 7-3.400 11z"/>
+    </g>
+  </defs>
+  <!-- Zu den Rändern hin wird es Nacht -->
+  <rect width="400" height="300" fill="url(#garden-front-dim)"/>
+  <!-- Ein Zweig ragt von links ins Bild -->
+  <path d="M0 10c30-3 64 4 98 22" fill="none" stroke="#1B2A2C" stroke-width="2.200" stroke-linecap="round"/>
+  <path d="M46 14c8 6 14 14 16 22M70 22c10-2 18-8 22-16" fill="none" stroke="#1B2A2C" stroke-width="1.200" stroke-linecap="round"/>
+  <g fill="#1F3A2E">
+    <ellipse cx="14" cy="5" rx="8" ry="3.600" transform="rotate(-20 14 5)"/>
+    <ellipse cx="22" cy="17" rx="8" ry="3.600" transform="rotate(24 22 17)"/>
+    <ellipse cx="38" cy="6" rx="8" ry="3.600" transform="rotate(-28 38 6)"/>
+    <ellipse cx="52" cy="24" rx="8" ry="3.600" transform="rotate(50 52 24)"/>
+    <ellipse cx="64" cy="38" rx="7" ry="3.200" transform="rotate(70 64 38)"/>
+    <ellipse cx="62" cy="11" rx="8" ry="3.600" transform="rotate(-24 62 11)"/>
+    <ellipse cx="84" cy="14" rx="7" ry="3.200" transform="rotate(-50 84 14)"/>
+    <ellipse cx="96" cy="6" rx="7" ry="3.200" transform="rotate(-30 96 6)"/>
+    <ellipse cx="88" cy="32" rx="7.500" ry="3.400" transform="rotate(36 88 32)"/>
+    <ellipse cx="104" cy="38" rx="7" ry="3.200" transform="rotate(30 104 38)"/>
+  </g>
+  <g fill="#3A6048">
+    <ellipse cx="30" cy="10" rx="6.500" ry="2.800" transform="rotate(14 30 10)"/>
+    <ellipse cx="74" cy="26" rx="6.500" ry="2.800" transform="rotate(30 74 26)"/>
+    <ellipse cx="50" cy="12" rx="6" ry="2.600" transform="rotate(-8 50 12)"/>
+  </g>
+  <!-- Gras im Vordergrund -->
+  <g fill="#1F3A2C">
+    <use href="#garden-front-blades" x="6" y="301"/>
+    <use href="#garden-front-blades" x="34" y="302"/>
+    <use href="#garden-front-blades" x="70" y="301"/>
+    <use href="#garden-front-blades" x="122" y="302"/>
+    <use href="#garden-front-blades" x="158" y="301"/>
+    <use href="#garden-front-blades" x="204" y="302"/>
+    <use href="#garden-front-blades" x="246" y="301"/>
+    <use href="#garden-front-blades" x="286" y="302"/>
+    <use href="#garden-front-blades" x="330" y="301"/>
+    <use href="#garden-front-blades" x="368" y="302"/>
+  </g>
+  <g fill="#4E7A52">
+    <use href="#garden-front-blades" x="18" y="302"/>
+    <use href="#garden-front-blades" x="96" y="302"/>
+    <use href="#garden-front-blades" x="182" y="302"/>
+    <use href="#garden-front-blades" x="268" y="302"/>
+    <use href="#garden-front-blades" x="350" y="302"/>
+    <use href="#garden-front-blades" x="390" y="301"/>
+  </g>
+  <!-- Glühwürmchen -->
+  <circle class="fx-twinkle" style="animation-delay:-0.300s" cx="66" cy="216" r="5" fill="url(#garden-front-firefly)"/>
+  <circle class="fx-twinkle" style="animation-delay:-1.600s" cx="206" cy="170" r="4.400" fill="url(#garden-front-firefly)"/>
+  <circle class="fx-twinkle" style="animation-delay:-2.400s" cx="282" cy="236" r="5" fill="url(#garden-front-firefly)"/>
+  <circle class="fx-twinkle" style="animation-delay:-0.900s" cx="356" cy="118" r="4" fill="url(#garden-front-firefly)"/>
+  <circle class="fx-twinkle" style="animation-delay:-2s" cx="140" cy="250" r="4.400" fill="url(#garden-front-firefly)"/>
+</svg>

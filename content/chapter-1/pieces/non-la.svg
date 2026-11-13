@@ -1,8 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="10" r="3" fill="#23373C"/>
-  <path d="M20 76 C28 100 72 100 80 76 H75 C69 93 31 93 25 76 Z" fill="#C96A45"/>
-  <ellipse cx="50" cy="76" rx="46" ry="7" fill="#B98A5E"/>
-  <polygon points="50,12 96,76 4,76" fill="#F2C76B"/>
-  <polygon points="50,12 68,76 50,76" fill="#B98A5E" opacity="0.35"/>
-  <polygon points="50,12 30,76 14,76" fill="#FAF3E7" opacity="0.4"/>
+  <defs>
+    <linearGradient id="non-la-straw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C9A860"/>
+      <stop offset="0.4" stop-color="#F6E4B4"/>
+      <stop offset="1" stop-color="#B8944C"/>
+    </linearGradient>
+    <linearGradient id="non-la-ribbon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E7A9A0"/>
+      <stop offset="1" stop-color="#C0736C"/>
+    </linearGradient>
+    <clipPath id="non-la-cone">
+      <path d="M50 22L92 62c-12 7-72 7-84 0z"/>
+    </clipPath>
+  </defs>
+  <g transform="rotate(-7 50 50)">
+    <!-- Schatten an der Wand -->
+    <path d="M53 26L95 66c-12 7-72 7-84 0z" fill="#3A2216" opacity="0.2"/>
+    <!-- Kinnband aus Seide, in einer Schlaufe -->
+    <path d="M22 64c2 18 14 30 28 30s26-12 28-30" fill="none" stroke="url(#non-la-ribbon)" stroke-width="3.400" stroke-linecap="round"/>
+    <path d="M24 66c2.500 15 13 25 26 25" fill="none" stroke="#FBE3DC" stroke-width="0.900" stroke-linecap="round" opacity="0.7"/>
+    <!-- Kegelhut aus Palmblättern -->
+    <path d="M50 22L92 62c-12 7-72 7-84 0z" fill="url(#non-la-straw)"/>
+    <g clip-path="url(#non-la-cone)" fill="none" stroke="#9A7A3A" stroke-width="0.700" opacity="0.55">
+      <path d="M40 33q10 3 20 0M33 40q17 5 34 0M26 47q24 7 48 0M19 54q31 9 62 0M12 60.500q38 10 76 0"/>
+      <path d="M50 22L20 66M50 22L35 68M50 22v47M50 22L65 68M50 22L80 66" opacity="0.5"/>
+    </g>
+    <path d="M50 22L33 40" stroke="#FFF6DA" stroke-width="2.200" stroke-linecap="round" opacity="0.55"/>
+    <path d="M8 62c12 7 72 7 84 0l.600 1.800c-12 7.600-73.200 7.600-85.200 0z" fill="#8A6A2E"/>
+  </g>
+  <!-- Nagel, an dem die Spitze hängt -->
+  <circle cx="46.600" cy="22" r="1.900" fill="#4A2C1A"/>
+  <circle cx="46.100" cy="21.500" r="0.700" fill="#C6905F"/>
 </svg>

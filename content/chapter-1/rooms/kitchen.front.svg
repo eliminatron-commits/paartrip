@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <radialGradient id="kitchen-front-dim" gradientUnits="userSpaceOnUse" cx="200" cy="140" r="275">
+      <stop offset="0.48" stop-color="#2B1710" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2B1710" stop-opacity="0.42"/>
+    </radialGradient>
+    <radialGradient id="kitchen-front-halo" gradientUnits="userSpaceOnUse" cx="200" cy="42" r="170">
+      <stop offset="0" stop-color="#FFE2A6" stop-opacity="0.5"/>
+      <stop offset="0.28" stop-color="#FFD48C" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FFD48C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="kitchen-front-cone">
+      <stop offset="0" stop-color="#FFE9B6" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FFE9B6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="kitchen-front-shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1F4E5A"/>
+      <stop offset="0.4" stop-color="#4C8B99"/>
+      <stop offset="1" stop-color="#173F49"/>
+    </linearGradient>
+    <linearGradient id="kitchen-front-cut" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#153A44"/>
+      <stop offset="1" stop-color="#235562"/>
+    </linearGradient>
+  </defs>
+  <!-- Die Ecken liegen im Halbdunkel, die Hängelampe wirft ihr Licht in die Mitte -->
+  <rect x="8" y="6" width="384" height="294" fill="url(#kitchen-front-dim)"/>
+  <ellipse cx="200" cy="166" rx="100" ry="132" fill="url(#kitchen-front-cone)"/>
+  <rect x="8" y="6" width="384" height="294" fill="url(#kitchen-front-halo)"/>
+  <g fill="#FFF6DE">
+    <circle class="fx-drift" cx="182" cy="92" r="0.700" opacity="0.7"/>
+    <circle class="fx-drift" cx="216" cy="130" r="0.600" opacity="0.6"/>
+    <circle class="fx-drift" cx="196" cy="196" r="0.700" opacity="0.5"/>
+  </g>
+  <!-- Hängelampe aus Emaille -->
+  <rect x="199.400" y="6" width="1.200" height="17" fill="#3B2A22"/>
+  <rect x="197" y="20.500" width="6" height="4.200" rx="1.500" fill="#C98F3C"/>
+  <path d="M183 42c1.200-10 7.600-17.600 17-17.600s15.800 7.600 17 17.600z" fill="url(#kitchen-front-shade)"/>
+  <path d="M188.500 33.500c2.600-4.600 6.400-7 10.500-7.400" fill="none" stroke="#9CCBD4" stroke-width="1" stroke-linecap="round" opacity="0.55"/>
+  <rect x="182.400" y="41" width="35.200" height="1.800" rx="0.900" fill="#FBF1DE"/>
+  <ellipse cx="200" cy="42.800" rx="16.600" ry="2.500" fill="#FFF8DC"/>
+  <ellipse cx="200" cy="43.200" rx="7.500" ry="1.500" fill="#FFFFFF"/>
+  <!-- Hauswände und Decke im Schnitt -->
+  <rect width="10" height="300" fill="url(#kitchen-front-cut)"/>
+  <rect x="390" width="10" height="300" fill="url(#kitchen-front-cut)" transform="translate(790 0) scale(-1 1)"/>
+  <rect x="9" y="8" width="1" height="292" fill="#4C8794" opacity="0.5"/>
+  <rect x="390" y="8" width="1" height="292" fill="#4C8794" opacity="0.5"/>
+  <rect width="400" height="8" fill="#12333C"/>
+  <rect x="10" y="7" width="380" height="1" fill="#4C8794" opacity="0.45"/>
+</svg>

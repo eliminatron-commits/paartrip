@@ -1,13 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <g transform="translate(0 12)">
-    <rect x="4" y="12" width="92" height="6" rx="3" fill="#23373C"/>
-    <rect x="23" y="18" width="4" height="26" fill="#23373C"/>
-    <circle cx="25" cy="64" r="20" fill="#23373C"/>
-    <circle cx="25" cy="64" r="13" fill="#8A9AA0"/>
-    <rect x="52" y="18" width="4" height="42" fill="#B98A5E"/>
-    <ellipse cx="54" cy="66" rx="9" ry="8" fill="#B98A5E"/>
-    <rect x="78" y="18" width="4" height="22" fill="#23373C"/>
-    <path d="M65 40 H95 V64 C95 78 65 78 65 64 Z" fill="#C96A45"/>
-    <rect x="63" y="38" width="34" height="6" rx="3" fill="#9E4526"/>
+  <defs>
+    <linearGradient id="pan-rail-brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE3A0"/>
+      <stop offset="1" stop-color="#B07A2C"/>
+    </linearGradient>
+    <radialGradient id="pan-rail-copper" cx="0.350" cy="0.300" r="0.850">
+      <stop offset="0" stop-color="#F6B98A"/>
+      <stop offset="0.5" stop-color="#D0794A"/>
+      <stop offset="1" stop-color="#8E4420"/>
+    </radialGradient>
+    <linearGradient id="pan-rail-steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8A9194"/>
+      <stop offset="0.4" stop-color="#F1F1EC"/>
+      <stop offset="1" stop-color="#7C8386"/>
+    </linearGradient>
+  </defs>
+  <!-- Schatten an der Wand -->
+  <g fill="#3A2216" opacity="0.2" transform="translate(3 3)">
+    <circle cx="27" cy="62" r="19"/>
+    <circle cx="57" cy="51" r="12"/>
+    <rect x="72.500" y="20" width="3" height="40" rx="1.500"/>
+    <ellipse cx="74" cy="68" rx="6.500" ry="8"/>
+    <ellipse cx="90" cy="54" rx="4.500" ry="10"/>
+  </g>
+  <!-- Stange mit Haltern -->
+  <rect x="9" y="8" width="3.400" height="10" rx="1.400" fill="#8A5A30"/>
+  <rect x="87.600" y="8" width="3.400" height="10" rx="1.400" fill="#8A5A30"/>
+  <rect x="4" y="13" width="92" height="3.600" rx="1.800" fill="url(#pan-rail-brass)"/>
+  <g fill="none" stroke="#B07A2C" stroke-width="1.300" stroke-linecap="round">
+    <path d="M27 13.500c-2.500 0-2.500 4 0 4.500v4M57 13.500c-2.500 0-2.500 4 0 4.500v3M74 13.500c-2.500 0-2.500 4 0 4.500v2M90 13.500c-2.500 0-2.500 4 0 4.500v2"/>
+  </g>
+  <!-- Große Kupferpfanne -->
+  <rect x="24.800" y="20" width="4.400" height="26" rx="2.200" fill="#5E3218"/>
+  <circle cx="27" cy="22.600" r="1.200" fill="#FBF1DE"/>
+  <circle cx="27" cy="62" r="19" fill="#8E4420"/>
+  <circle cx="27" cy="62" r="16.500" fill="url(#pan-rail-copper)"/>
+  <path d="M15.500 56c2-6 7-10 13-10.500" fill="none" stroke="#FFE2C8" stroke-width="1.800" stroke-linecap="round" opacity="0.6"/>
+  <!-- Kleiner Kupfertopf -->
+  <rect x="55" y="19" width="4" height="22" rx="2" fill="#5E3218"/>
+  <circle cx="57" cy="21.400" r="1.100" fill="#FBF1DE"/>
+  <circle cx="57" cy="51" r="12" fill="#8E4420"/>
+  <circle cx="57" cy="51" r="10" fill="url(#pan-rail-copper)"/>
+  <path d="M50 47.500c1.400-3.600 4.200-5.800 8-6" fill="none" stroke="#FFE2C8" stroke-width="1.400" stroke-linecap="round" opacity="0.6"/>
+  <!-- Schöpfkelle und Schneebesen -->
+  <rect x="72.600" y="18" width="2.800" height="42" rx="1.400" fill="url(#pan-rail-steel)"/>
+  <ellipse cx="74" cy="67" rx="6.500" ry="8" fill="url(#pan-rail-steel)"/>
+  <ellipse cx="74" cy="65.500" rx="4.500" ry="5.200" fill="#6E7578" opacity="0.5"/>
+  <rect x="88.700" y="18" width="2.600" height="22" rx="1.300" fill="#5E3218"/>
+  <g fill="none" stroke="url(#pan-rail-steel)" stroke-width="1.100">
+    <ellipse cx="90" cy="52" rx="4.500" ry="12"/>
+    <ellipse cx="90" cy="52" rx="2" ry="12"/>
+    <path d="M90 40v24"/>
   </g>
 </svg>

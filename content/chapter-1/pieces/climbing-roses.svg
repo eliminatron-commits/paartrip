@@ -1,18 +1,72 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M22 96 C10 70 42 60 30 36 C24 22 42 14 50 6 L55 9 C48 18 34 24 37 36 C48 60 18 72 28 96 Z" fill="#46614B"/>
-  <path d="M70 96 C86 74 56 62 66 40 C70 30 64 24 62 18 L67 16 C70 24 78 30 73 42 C64 60 92 76 77 96 Z" fill="#557A5C"/>
-  <ellipse cx="46" cy="50" rx="8" ry="4" fill="#8FA68A" transform="rotate(-30 46 50)"/>
-  <ellipse cx="56" cy="74" rx="8" ry="4" fill="#8FA68A" transform="rotate(25 56 74)"/>
-  <ellipse cx="82" cy="52" rx="8" ry="4" fill="#8FA68A" transform="rotate(-20 82 52)"/>
-  <ellipse cx="16" cy="48" rx="8" ry="4" fill="#8FA68A" transform="rotate(30 16 48)"/>
-  <circle cx="33" cy="32" r="9" fill="#C96A45"/>
-  <circle cx="33" cy="32" r="4" fill="#9E4526"/>
-  <circle cx="68" cy="38" r="9" fill="#D98A66"/>
-  <circle cx="68" cy="38" r="4" fill="#C96A45"/>
-  <circle cx="24" cy="68" r="9" fill="#D98A66"/>
-  <circle cx="24" cy="68" r="4" fill="#C96A45"/>
-  <circle cx="78" cy="72" r="9" fill="#C96A45"/>
-  <circle cx="78" cy="72" r="4" fill="#9E4526"/>
-  <circle cx="52" cy="12" r="8" fill="#C96A45"/>
-  <circle cx="52" cy="12" r="3.5" fill="#9E4526"/>
+  <defs>
+    <linearGradient id="climbing-roses-lath" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF6E0"/>
+      <stop offset="1" stop-color="#CDB993"/>
+    </linearGradient>
+    <clipPath id="climbing-roses-frame">
+      <rect x="12" y="6" width="76" height="92"/>
+    </clipPath>
+    <!-- Eine Rose; die Farbe kommt von außen -->
+    <g id="climbing-roses-bloom">
+      <circle r="6.500"/>
+      <circle r="6.500" fill="#FFFFFF" opacity="0.14"/>
+      <path d="M-3.500 1.500a3.600 3.600 0 1 1 5 3M-5 -1a5.200 5.200 0 0 1 9-2.500M3.500 4.500a5.600 5.600 0 0 1-8 0" fill="none" stroke="#7A1A30" stroke-width="1" stroke-linecap="round" opacity="0.45"/>
+      <circle cx="-.500" cy="0" r="1.300" fill="#7A1A30" opacity="0.45"/>
+    </g>
+    <g id="climbing-roses-leaf">
+      <path d="M0 0c-3.500-2-4.500-6-2.500-10c3.500 2 4.500 6 2.500 10z"/>
+    </g>
+  </defs>
+  <!-- Schatten am Zaun und Rankgitter -->
+  <rect x="13.500" y="8" width="76" height="92" rx="2" fill="#2A160E" opacity="0.18"/>
+  <g clip-path="url(#climbing-roses-frame)" stroke="url(#climbing-roses-lath)" stroke-width="2.600">
+    <path d="M12 30L36 6M12 54L60 6M12 78L84 6M12 102L88 26M36 102L88 50M60 102L88 74"/>
+    <path d="M88 30L64 6M88 54L40 6M88 78L16 6M88 102L12 26M64 102L12 50M40 102L12 74"/>
+  </g>
+  <rect x="12" y="6" width="76" height="92" rx="2" fill="none" stroke="url(#climbing-roses-lath)" stroke-width="3.400"/>
+  <!-- Ranken -->
+  <g fill="none" stroke="#3F6A3C" stroke-width="2" stroke-linecap="round">
+    <path d="M28 100c-6-16 8-22 2-38s10-22 4-36c-2-6 2-12 8-16"/>
+    <path d="M72 100c6-14-8-22-2-36s-8-20-2-34c2-5 0-10-4-14"/>
+    <path d="M30 62c10-4 20 0 28-8M70 64c-8-6-18-2-24-10M34 26c8 2 16-2 22-8"/>
+  </g>
+  <g fill="#4F8250">
+    <use href="#climbing-roses-leaf" transform="translate(24 88) rotate(-40) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(33 72) rotate(50) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(28 50) rotate(-50) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(38 36) rotate(40) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(76 86) rotate(40) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(66 70) rotate(-50) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(72 48) rotate(50) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(64 30) rotate(-40) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(48 58) rotate(20) scale(1.100)"/>
+    <use href="#climbing-roses-leaf" transform="translate(54 22) rotate(-20) scale(1.100)"/>
+  </g>
+  <g fill="#79AB6B">
+    <use href="#climbing-roses-leaf" transform="translate(30 80) rotate(60)"/>
+    <use href="#climbing-roses-leaf" transform="translate(26 60) rotate(-70)"/>
+    <use href="#climbing-roses-leaf" transform="translate(36 44) rotate(70)"/>
+    <use href="#climbing-roses-leaf" transform="translate(70 78) rotate(-60)"/>
+    <use href="#climbing-roses-leaf" transform="translate(74 58) rotate(70)"/>
+    <use href="#climbing-roses-leaf" transform="translate(66 40) rotate(-70)"/>
+    <use href="#climbing-roses-leaf" transform="translate(44 18) rotate(60)"/>
+    <use href="#climbing-roses-leaf" transform="translate(56 54) rotate(-30)"/>
+  </g>
+  <!-- Rosen in drei Tönen und ein paar Knospen -->
+  <use href="#climbing-roses-bloom" x="30" y="90" fill="#D9486E"/>
+  <use href="#climbing-roses-bloom" x="72" y="92" fill="#F2A9B8"/>
+  <use href="#climbing-roses-bloom" x="36" y="66" fill="#F6D7DC"/>
+  <use href="#climbing-roses-bloom" x="64" y="62" fill="#D9486E"/>
+  <use href="#climbing-roses-bloom" x="26" y="42" fill="#F2A9B8"/>
+  <use href="#climbing-roses-bloom" x="74" y="38" fill="#F6D7DC"/>
+  <use href="#climbing-roses-bloom" x="46" y="48" fill="#E0728A"/>
+  <use href="#climbing-roses-bloom" x="42" y="20" fill="#D9486E"/>
+  <use href="#climbing-roses-bloom" x="62" y="16" fill="#F2A9B8"/>
+  <g fill="#D9486E">
+    <ellipse cx="52" cy="78" rx="2.200" ry="3.200" transform="rotate(20 52 78)"/>
+    <ellipse cx="54" cy="34" rx="2.200" ry="3.200" transform="rotate(-20 54 34)"/>
+    <ellipse cx="20" cy="70" rx="2" ry="3" transform="rotate(-30 20 70)"/>
+    <ellipse cx="82" cy="66" rx="2" ry="3" transform="rotate(30 82 66)"/>
+  </g>
 </svg>

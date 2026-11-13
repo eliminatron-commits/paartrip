@@ -1,7 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <polygon points="50,4 88,32 12,32" fill="#9E4526"/>
-  <rect x="26" y="32" width="48" height="64" rx="2" fill="#B98A5E"/>
-  <circle cx="50" cy="50" r="8" fill="#23373C"/>
-  <rect x="40" y="58" width="20" height="3" rx="1.5" fill="#6B3A22"/>
-  <rect x="26" y="78" width="48" height="4" fill="#8C5A3C"/>
+  <defs>
+    <linearGradient id="bird-house-wall" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFF6E0"/>
+      <stop offset="1" stop-color="#D9C29C"/>
+    </linearGradient>
+    <linearGradient id="bird-house-roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4C8B99"/>
+      <stop offset="1" stop-color="#1F4E5A"/>
+    </linearGradient>
+    <linearGradient id="bird-house-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C6905F"/>
+      <stop offset="1" stop-color="#7A4A2E"/>
+    </linearGradient>
+  </defs>
+  <!-- Schatten am Zaun -->
+  <path d="M54 19l34 28l-5 6l-5-4v42H30V49l-5 4l-5-6z" fill="#2A160E" opacity="0.25"/>
+  <!-- Häuschen -->
+  <path d="M26 46l24-19l24 19v42H26z" fill="url(#bird-house-wall)"/>
+  <g fill="#B99C72" opacity="0.4">
+    <rect x="26" y="56" width="48" height="0.800"/>
+    <rect x="26" y="67" width="48" height="0.800"/>
+    <rect x="26" y="78" width="48" height="0.800"/>
+  </g>
+  <!-- Aufgemalte Ranke -->
+  <path d="M32 82c5-3 9-3 13 0M68 82c-5-3-9-3-13 0" fill="none" stroke="#7F9682" stroke-width="1.100" stroke-linecap="round"/>
+  <g fill="#7F9682">
+    <ellipse cx="35" cy="79" rx="2.200" ry="1.200" transform="rotate(-30 35 79)"/>
+    <ellipse cx="41" cy="79" rx="2.200" ry="1.200" transform="rotate(30 41 79)"/>
+    <ellipse cx="65" cy="79" rx="2.200" ry="1.200" transform="rotate(30 65 79)"/>
+    <ellipse cx="59" cy="79" rx="2.200" ry="1.200" transform="rotate(-30 59 79)"/>
+  </g>
+  <circle cx="50" cy="81" r="1.600" fill="#C96A45"/>
+  <!-- Flugloch, aus dem der kleine Vogel schaut; Sitzstange -->
+  <circle cx="50" cy="57" r="10.500" fill="#B98A5E"/>
+  <circle cx="50" cy="57" r="8.800" fill="#2A160E"/>
+  <circle cx="51" cy="60" r="5.600" fill="#DE9A92"/>
+  <path d="M46 63.500c2-2 8-2 10 0c-1 2-2.500 2.800-5 2.800s-4-.800-5-2.800z" fill="#F6CFC8"/>
+  <path d="M45.500 59.500l-4 1.500l4 1.200z" fill="#F2C76B"/>
+  <circle cx="48.800" cy="58.600" r="0.900" fill="#12222C"/>
+  <rect x="47.500" y="70" width="5" height="9" rx="2.500" fill="url(#bird-house-wood)" transform="rotate(90 50 72.500)"/>
+  <circle cx="50" cy="72.500" r="2.600" fill="#C6905F"/>
+  <circle cx="49.400" cy="71.900" r="0.900" fill="#F2CFA2"/>
+  <!-- Dach mit Schindeln, darauf der große Vogel -->
+  <path d="M50 15L86 44l-5.500 6.500L50 26L19.500 50.500L14 44z" fill="url(#bird-house-roof)"/>
+  <path d="M50 15L86 44l-1.400 1.700L50 17.500L15.400 45.700L14 44z" fill="#9CCBD4" opacity="0.6"/>
+  <g fill="none" stroke="#143842" stroke-width="0.800" opacity="0.5">
+    <path d="M38 27.500l4 5M27 36.500l4 5M62 27.500l-4 5M73 36.500l-4 5"/>
+  </g>
+  <path d="M60 17c-1-5 2-9 7-9c4 0 6.500 2.600 6.500 6l4.500 1l-4.800 2c-1 3-4 5-8 5c-2 0-4-1-6-3z" fill="#2C6370"/>
+  <path d="M61 17c3-2 7-2 10 0c-1 2.400-3.200 3.600-6 3.600c-1.600 0-3-.600-4-1.600z" fill="#7FB3BE"/>
+  <path d="M60 19l-6 3l5 .500z" fill="#1A4450"/>
+  <circle cx="70" cy="12.600" r="0.900" fill="#FBF1DE"/>
+  <!-- Bodenbrett -->
+  <rect x="21" y="86" width="58" height="5.500" rx="2" fill="url(#bird-house-wood)"/>
+  <rect x="23" y="86.500" width="54" height="1" rx="0.500" fill="#F2CFA2" opacity="0.7"/>
 </svg>

@@ -1,13 +1,95 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="22" cy="58" rx="11" ry="15" fill="#557A5C"/>
-  <ellipse cx="14" cy="64" rx="7" ry="10" fill="#46614B"/>
-  <polygon points="38,34 45,72 31,72" fill="#46614B"/>
-  <polygon points="48,26 55,72 41,72" fill="#8FA68A"/>
-  <polygon points="57,38 63,72 51,72" fill="#557A5C"/>
-  <circle cx="72" cy="54" r="11" fill="#8FA68A"/>
-  <circle cx="84" cy="62" r="9" fill="#557A5C"/>
-  <circle cx="66" cy="64" r="8" fill="#46614B"/>
-  <rect x="6" y="68" width="88" height="28" rx="3" fill="#8C5A3C"/>
-  <rect x="6" y="80" width="88" height="3" fill="#6B3A22"/>
-  <rect x="42" y="72" width="16" height="10" rx="1" fill="#FAF3E7"/>
+  <defs>
+    <radialGradient id="herb-patch-shadow">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="herb-patch-plank" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D2A87A"/>
+      <stop offset="1" stop-color="#96673F"/>
+    </linearGradient>
+    <g id="herb-patch-leaf">
+      <path d="M0 0c-4-3-5-8-2-13c4 2 5.500 8 2 13z"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="46" ry="3.800" fill="url(#herb-patch-shadow)"/>
+  <!-- Zitronengras -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M22 66C20 46 14 30 6 20" stroke="#6E9B62" stroke-width="2"/>
+    <path d="M22 66C22 44 20 26 16 12" stroke="#8BBB7A" stroke-width="2"/>
+    <path d="M22 66C24 44 26 28 26 10" stroke="#5E8F5A" stroke-width="2"/>
+    <path d="M22 66C26 48 32 34 38 22" stroke="#8BBB7A" stroke-width="2"/>
+    <path d="M22 66C18 52 12 44 4 38" stroke="#5E8F5A" stroke-width="1.700"/>
+  </g>
+  <!-- Perilla mit lila Blättern -->
+  <g fill="#6B3F6A">
+    <ellipse cx="42" cy="50" rx="7" ry="4.500" transform="rotate(-30 42 50)"/>
+    <ellipse cx="52" cy="46" rx="7" ry="4.500" transform="rotate(24 52 46)"/>
+    <ellipse cx="46" cy="40" rx="6" ry="4"/>
+    <ellipse cx="50" cy="56" rx="7" ry="4.500" transform="rotate(8 50 56)"/>
+  </g>
+  <g fill="#5F8A54">
+    <ellipse cx="40" cy="58" rx="6.500" ry="4" transform="rotate(-18 40 58)"/>
+    <ellipse cx="47" cy="48" rx="4.500" ry="2.800" transform="rotate(-10 47 48)"/>
+  </g>
+  <g fill="none" stroke="#B88AB6" stroke-width="0.600" opacity="0.8">
+    <path d="M37 53l10-6M47 44l10 4M41 40h10M44 55l12 2"/>
+  </g>
+  <!-- Thai-Basilikum mit Blütenrispen -->
+  <g fill="none" stroke="#6B3F6A" stroke-width="1.200" stroke-linecap="round">
+    <path d="M70 66V38M64 66c0-10-1-16-3-22M77 66c0-9 1-15 3-20"/>
+  </g>
+  <g fill="#9A6AAE">
+    <ellipse cx="70" cy="33" rx="2.200" ry="5"/>
+    <ellipse cx="60.500" cy="40" rx="1.900" ry="4.200" transform="rotate(-12 60.500 40)"/>
+    <ellipse cx="80.500" cy="42" rx="1.900" ry="4.200" transform="rotate(12 80.500 42)"/>
+  </g>
+  <g fill="#4F8250">
+    <use href="#herb-patch-leaf" transform="translate(70 58) rotate(-60) scale(1.100)"/>
+    <use href="#herb-patch-leaf" transform="translate(70 58) rotate(60) scale(1.100)"/>
+    <use href="#herb-patch-leaf" transform="translate(70 50) rotate(-55)"/>
+    <use href="#herb-patch-leaf" transform="translate(70 50) rotate(55)"/>
+    <use href="#herb-patch-leaf" transform="translate(63 60) rotate(-50) scale(0.900)"/>
+    <use href="#herb-patch-leaf" transform="translate(78 60) rotate(50) scale(0.900)"/>
+  </g>
+  <!-- Minze und Koriander vorn -->
+  <g fill="#79AB6B">
+    <circle cx="86" cy="60" r="3.400"/>
+    <circle cx="91" cy="64" r="3.200"/>
+    <circle cx="84" cy="65" r="3.200"/>
+    <circle cx="89" cy="56" r="2.800"/>
+  </g>
+  <g fill="#A9D08E">
+    <circle cx="87.500" cy="62" r="1.800"/>
+    <circle cx="91" cy="59" r="1.600"/>
+    <circle cx="30" cy="62" r="2.200"/>
+    <circle cx="34" cy="64.500" r="2.200"/>
+    <circle cx="27" cy="65" r="2"/>
+    <circle cx="31" cy="58.500" r="1.800"/>
+    <circle cx="36" cy="60.500" r="1.700"/>
+  </g>
+  <!-- Kiste aus Brettern, mit Schildchen -->
+  <rect x="9" y="64" width="82" height="7" fill="#3A2416"/>
+  <rect x="7" y="66" width="86" height="9" rx="1.500" fill="url(#herb-patch-plank)"/>
+  <rect x="7" y="76" width="86" height="9" rx="1.500" fill="url(#herb-patch-plank)"/>
+  <rect x="7" y="86" width="86" height="9" rx="1.500" fill="url(#herb-patch-plank)"/>
+  <g fill="#F3D2A6" opacity="0.6">
+    <rect x="9" y="66.500" width="82" height="0.900"/>
+    <rect x="9" y="76.500" width="82" height="0.900"/>
+    <rect x="9" y="86.500" width="82" height="0.900"/>
+  </g>
+  <rect x="10" y="64" width="6" height="32" rx="1.500" fill="#8C5A3C"/>
+  <rect x="84" y="64" width="6" height="32" rx="1.500" fill="#8C5A3C"/>
+  <g fill="#3A2416" opacity="0.6">
+    <circle cx="13" cy="70.500" r="0.900"/>
+    <circle cx="13" cy="80.500" r="0.900"/>
+    <circle cx="13" cy="90.500" r="0.900"/>
+    <circle cx="87" cy="70.500" r="0.900"/>
+    <circle cx="87" cy="80.500" r="0.900"/>
+    <circle cx="87" cy="90.500" r="0.900"/>
+  </g>
+  <rect x="54.500" y="62" width="1.600" height="14" fill="#C6905F"/>
+  <rect x="49" y="56" width="12.500" height="8" rx="1.200" fill="#FBF1DE"/>
+  <rect x="51" y="58.400" width="8.500" height="1.100" rx="0.500" fill="#9A8A6A"/>
+  <rect x="51" y="60.800" width="5.500" height="1.100" rx="0.500" fill="#9A8A6A"/>
 </svg>

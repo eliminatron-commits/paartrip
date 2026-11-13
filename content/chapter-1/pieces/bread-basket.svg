@@ -1,10 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="42" y="16" width="14" height="52" rx="7" fill="#D98A66" transform="rotate(26 49 60)"/>
-  <ellipse cx="32" cy="54" rx="16" ry="12" fill="#B98A5E"/>
-  <ellipse cx="62" cy="56" rx="15" ry="11" fill="#D98A66"/>
-  <path d="M8 62 H92 L84 96 H16 Z" fill="#8C5A3C"/>
-  <rect x="5" y="58" width="90" height="9" rx="4" fill="#6B3A22"/>
-  <rect x="28" y="70" width="4" height="22" rx="2" fill="#6B3A22" opacity="0.5"/>
-  <rect x="48" y="70" width="4" height="22" rx="2" fill="#6B3A22" opacity="0.5"/>
-  <rect x="68" y="70" width="4" height="22" rx="2" fill="#6B3A22" opacity="0.5"/>
+  <defs>
+    <radialGradient id="bread-basket-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bread-basket-crust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8B068"/>
+      <stop offset="1" stop-color="#A5622A"/>
+    </linearGradient>
+    <linearGradient id="bread-basket-roll" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0C484"/>
+      <stop offset="1" stop-color="#BF7D3C"/>
+    </linearGradient>
+    <pattern id="bread-basket-weave" width="10" height="8" patternUnits="userSpaceOnUse">
+      <rect width="10" height="8" fill="#9C6A3A"/>
+      <rect x="0.400" y="0.400" width="4.600" height="3.400" rx="1.200" fill="#D9A76C"/>
+      <rect x="5.400" y="4.400" width="4.600" height="3.400" rx="1.200" fill="#D9A76C"/>
+      <rect x="5.400" y="0.400" width="4.600" height="3.400" rx="1.200" fill="#C08B52"/>
+      <rect x="0.400" y="4.400" width="4.600" height="3.400" rx="1.200" fill="#C08B52"/>
+    </pattern>
+    <linearGradient id="bread-basket-round" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFE2B4" stop-opacity="0.25"/>
+      <stop offset="0.45" stop-color="#FFE2B4" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3A1C10" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="42" ry="3.800" fill="url(#bread-basket-shadow)"/>
+  <!-- Baguette, Laib und zwei Brötchen -->
+  <rect x="20" y="22" width="60" height="14" rx="7" transform="rotate(-34 50 29)" fill="url(#bread-basket-crust)"/>
+  <g stroke="#FBE3B8" stroke-width="1.600" stroke-linecap="round" transform="rotate(-34 50 29)">
+    <path d="M32 25.500l5 7M44 25.500l5 7M56 25.500l5 7M68 25.500l5 7"/>
+  </g>
+  <ellipse cx="23" cy="55" rx="12" ry="10" fill="url(#bread-basket-roll)"/>
+  <path d="M15.500 51.500q7.500-5 15 0" fill="none" stroke="#FBE3B8" stroke-width="1.700" stroke-linecap="round"/>
+  <path d="M30 62c-3.500-15 6-26 21-26s24.500 11 21 26z" fill="url(#bread-basket-crust)"/>
+  <g fill="none" stroke="#FBE8C6" stroke-width="2" stroke-linecap="round">
+    <path d="M40 46q4 5 3 12M51 43q3 6 2 15M62 46q2 5 0 12"/>
+  </g>
+  <ellipse cx="45" cy="41" rx="9" ry="2.400" fill="#FFF3D8" opacity="0.5"/>
+  <ellipse cx="78" cy="54" rx="12.500" ry="10" fill="url(#bread-basket-roll)"/>
+  <path d="M70.500 50q7.500-5 15 0" fill="none" stroke="#FBE3B8" stroke-width="1.700" stroke-linecap="round"/>
+  <g fill="#FFF6E0">
+    <circle cx="74" cy="48.500" r="0.800"/>
+    <circle cx="80" cy="47.600" r="0.800"/>
+    <circle cx="84.500" cy="50.500" r="0.800"/>
+    <circle cx="20" cy="49.500" r="0.800"/>
+    <circle cx="26" cy="49" r="0.800"/>
+  </g>
+  <!-- Geflochtener Korb mit Tuch -->
+  <path d="M11 61h78l-7.500 29.500c-.800 3-3 4.500-6 4.500h-51c-3 0-5.200-1.500-6-4.500z" fill="url(#bread-basket-weave)"/>
+  <path d="M11 61h78l-7.500 29.500c-.800 3-3 4.500-6 4.500h-51c-3 0-5.200-1.500-6-4.500z" fill="url(#bread-basket-round)"/>
+  <path d="M34 60l12 21c1.600 2.400 4 2.400 5.400 0L64 60z" fill="#FBF1DE"/>
+  <path d="M40.500 60l8.200 15M57.500 60l-8.200 15" stroke="#C96A45" stroke-width="1.500" fill="none"/>
+  <path d="M34 60l12 21c1.600 2.400 4 2.400 5.400 0L64 60z" fill="url(#bread-basket-round)" opacity="0.5"/>
+  <rect x="8" y="56.500" width="84" height="7.500" rx="3.700" fill="#C9955C"/>
+  <g stroke="#8A5A30" stroke-width="1.100" stroke-linecap="round" opacity="0.7">
+    <path d="M14 57.500l3 5.500M22 57.500l3 5.500M30 57.500l3 5.500M38 57.500l3 5.500M46 57.500l3 5.500M54 57.500l3 5.500M62 57.500l3 5.500M70 57.500l3 5.500M78 57.500l3 5.500M86 57.500l2.500 5"/>
+  </g>
+  <rect x="10" y="57" width="80" height="1.200" rx="0.600" fill="#F2CFA2" opacity="0.7"/>
 </svg>

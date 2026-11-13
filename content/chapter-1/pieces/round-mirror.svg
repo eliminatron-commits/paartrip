@@ -1,8 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="48" y="4" width="4" height="6" rx="1" fill="#6B3A22"/>
-  <circle cx="50" cy="52" r="44" fill="#8C5A3C"/>
-  <circle cx="50" cy="52" r="40" fill="#B98A5E"/>
-  <circle cx="50" cy="52" r="34" fill="#A9B7BC"/>
-  <circle cx="40" cy="42" r="9" fill="#FAF3E7"/>
-  <circle cx="60" cy="66" r="4" fill="#FAF3E7"/>
+  <defs>
+    <linearGradient id="round-mirror-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3F7F2"/>
+      <stop offset="0.5" stop-color="#C6D9D6"/>
+      <stop offset="1" stop-color="#8FAFB2"/>
+    </linearGradient>
+    <linearGradient id="round-mirror-brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="0.5" stop-color="#DFA544"/>
+      <stop offset="1" stop-color="#9A6A22"/>
+    </linearGradient>
+    <radialGradient id="round-mirror-warm" gradientUnits="userSpaceOnUse" cx="40" cy="42" r="26">
+      <stop offset="0" stop-color="#FFE2A6" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#FFE2A6" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="round-mirror-clip">
+      <circle cx="50" cy="58" r="33.500"/>
+    </clipPath>
+  </defs>
+  <!-- Schatten an der Wand -->
+  <circle cx="53" cy="61" r="38" fill="#3A2216" opacity="0.22"/>
+  <!-- Lederriemen am Holzknauf -->
+  <path d="M27 36L50 8l23 28" fill="none" stroke="#7A4A2E" stroke-width="3.400" stroke-linejoin="round"/>
+  <path d="M28.500 35L50 9.500" fill="none" stroke="#C6905F" stroke-width="0.900" opacity="0.7"/>
+  <circle cx="50" cy="8" r="4.200" fill="#8C5A3C"/>
+  <circle cx="48.800" cy="6.800" r="1.400" fill="#E0B58C"/>
+  <!-- Messingrahmen und Glas, in dem sich das Lampenlicht spiegelt -->
+  <circle cx="50" cy="58" r="38" fill="url(#round-mirror-brass)"/>
+  <circle cx="50" cy="58" r="35" fill="#7A5218"/>
+  <circle cx="50" cy="58" r="33.500" fill="url(#round-mirror-glass)"/>
+  <g clip-path="url(#round-mirror-clip)">
+    <circle cx="40" cy="42" r="26" fill="url(#round-mirror-warm)"/>
+    <path d="M8 74L52 16h12L20 74zM50 100l40-54h5l-40 54z" fill="#FFFFFF" opacity="0.4"/>
+    <path d="M16 58a34 34 0 0 0 68 0a40 40 0 0 1-68 0z" fill="#5E8388" opacity="0.25"/>
+  </g>
+  <path d="M22 40a33 33 0 0 1 22-14" fill="none" stroke="#FFFFFF" stroke-width="1.600" stroke-linecap="round" opacity="0.8"/>
 </svg>

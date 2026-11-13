@@ -1,41 +1,410 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Wand -->
-  <rect width="400" height="252" fill="#F0E4CF"/>
-  <!-- Fliesenspiegel hinter der Arbeitsplatte -->
-  <rect x="10" y="118" width="202" height="56" fill="#FAF3E7"/>
-  <rect x="10" y="145" width="202" height="2" fill="#E6D3B3"/>
-  <rect x="50" y="118" width="2" height="56" fill="#E6D3B3"/>
-  <rect x="91" y="118" width="2" height="56" fill="#E6D3B3"/>
-  <rect x="132" y="118" width="2" height="56" fill="#E6D3B3"/>
-  <rect x="173" y="118" width="2" height="56" fill="#E6D3B3"/>
-  <!-- Boden aus Terrakottafliesen -->
-  <rect y="252" width="400" height="48" fill="#C96A45"/>
-  <rect y="275" width="400" height="2" fill="#B85C3A"/>
-  <rect x="58" y="252" width="2" height="48" fill="#B85C3A"/>
-  <rect x="136" y="252" width="2" height="48" fill="#B85C3A"/>
-  <rect x="214" y="252" width="2" height="48" fill="#B85C3A"/>
-  <rect x="292" y="252" width="2" height="48" fill="#B85C3A"/>
-  <rect x="370" y="252" width="2" height="48" fill="#B85C3A"/>
-  <!-- Fenster -->
-  <rect x="92" y="34" width="96" height="78" rx="8" fill="#FAF3E7"/>
-  <rect x="100" y="42" width="80" height="62" rx="4" fill="#C7DED6"/>
-  <path d="M100 104V88q20-12 40-4t40-8v28z" fill="#8FA68A"/>
-  <rect x="137" y="42" width="6" height="62" fill="#FAF3E7"/>
-  <!-- Unterschränke -->
-  <rect x="20" y="180" width="184" height="72" fill="#1F4E5A"/>
-  <rect x="28" y="192" width="52" height="52" rx="4" fill="#2C6370"/>
-  <rect x="86" y="192" width="52" height="52" rx="4" fill="#2C6370"/>
-  <rect x="144" y="192" width="52" height="52" rx="4" fill="#2C6370"/>
-  <circle cx="72" cy="218" r="3" fill="#FAF3E7"/>
-  <circle cx="130" cy="218" r="3" fill="#FAF3E7"/>
-  <circle cx="188" cy="218" r="3" fill="#FAF3E7"/>
-  <!-- Arbeitsplatte -->
-  <rect x="16" y="170" width="192" height="12" rx="3" fill="#8FA68A"/>
-  <!-- Wandbord mit Konsolen -->
-  <path d="M262 157h10v12zM356 157h10l-10 12z" fill="#73492F"/>
-  <rect x="250" y="150" width="128" height="7" rx="2" fill="#8C5A3C"/>
-  <!-- Hauswände und Deckenbalken -->
-  <rect width="10" height="300" fill="#1F4E5A"/>
-  <rect x="390" width="10" height="300" fill="#1F4E5A"/>
-  <rect width="400" height="8" fill="#17414B"/>
+  <defs>
+    <!-- Lampenlicht: in der Mitte hell, zu den Ecken dunkler -->
+    <radialGradient id="kitchen-wall" gradientUnits="userSpaceOnUse" cx="200" cy="96" r="250">
+      <stop offset="0" stop-color="#FCEDC9"/>
+      <stop offset="0.5" stop-color="#F1D9AB"/>
+      <stop offset="1" stop-color="#C9A27A"/>
+    </radialGradient>
+    <linearGradient id="kitchen-ceil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A2C20" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#4A2C20" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="kitchen-drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B1710" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#2B1710" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="kitchen-border" x="8" y="19" width="18" height="7" patternUnits="userSpaceOnUse">
+      <path d="M9 .800c1.800 1.200 1.800 4.200 0 5.400c-1.800-1.200-1.800-4.200 0-5.400z" fill="#7F9682" opacity="0.5"/>
+      <circle cx="0" cy="3.500" r="0.900" fill="#B8623E" opacity="0.45"/>
+      <circle cx="18" cy="3.500" r="0.900" fill="#B8623E" opacity="0.45"/>
+    </pattern>
+    <!-- Fliesen im Verband, darüber eine Schmuckreihe -->
+    <pattern id="kitchen-tiles" x="8" y="126" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#F4E6CA"/>
+      <path d="M0 0h24v1H0zM0 12h24v1H0zM0 0h1v12H0zM12 12h1v12h-1z" fill="#D2B98E" opacity="0.8"/>
+      <path d="M1 1h23v.900H1zM0 13h12v.900H0zM13 13h11v.900H13z" fill="#FFFFFF" opacity="0.6"/>
+      <path d="M1 11h23v1H1zM0 23h12v1H0zM13 23h11v1H13z" fill="#B99C72" opacity="0.18"/>
+    </pattern>
+    <pattern id="kitchen-accent" x="8" y="118" width="16" height="8" patternUnits="userSpaceOnUse">
+      <rect width="16" height="8" fill="#F3E2C0"/>
+      <path d="M4 1l3 3l-3 3l-3-3z" fill="#2C6370"/>
+      <path d="M12 1l3 3l-3 3l-3-3z" fill="#C96A45"/>
+      <circle cx="8" cy="4" r="0.700" fill="#DFA544"/>
+      <circle cx="0" cy="4" r="0.700" fill="#DFA544"/>
+      <circle cx="16" cy="4" r="0.700" fill="#DFA544"/>
+    </pattern>
+    <radialGradient id="kitchen-tileshade" gradientUnits="userSpaceOnUse" cx="200" cy="170" r="240">
+      <stop offset="0" stop-color="#FFE7B4" stop-opacity="0.2"/>
+      <stop offset="0.45" stop-color="#FFE7B4" stop-opacity="0"/>
+      <stop offset="1" stop-color="#5A3A22" stop-opacity="0.34"/>
+    </radialGradient>
+    <!-- Bodenfliesen: nach vorn werden sie breiter -->
+    <pattern id="kitchen-floor-1" x="8" y="252" width="56" height="12" patternUnits="userSpaceOnUse">
+      <rect width="28" height="12" fill="#C8693F"/>
+      <rect x="28" width="28" height="12" fill="#D58056"/>
+      <path d="M0 0h1v12H0zM28 0h1v12h-1z" fill="#EBC8A2" opacity="0.55"/>
+    </pattern>
+    <pattern id="kitchen-floor-2" x="-10" y="264" width="72" height="15" patternUnits="userSpaceOnUse">
+      <rect width="36" height="15" fill="#D27C52"/>
+      <rect x="36" width="36" height="15" fill="#C2633A"/>
+      <path d="M0 0h1.100v15H0zM36 0h1.100v15h-1.100z" fill="#EBC8A2" opacity="0.55"/>
+    </pattern>
+    <pattern id="kitchen-floor-3" x="-22" y="279" width="96" height="21" patternUnits="userSpaceOnUse">
+      <rect width="48" height="21" fill="#BF6037"/>
+      <rect x="48" width="48" height="21" fill="#CE764B"/>
+      <path d="M0 0h1.300v21H0zM48 0h1.300v21h-1.300z" fill="#EBC8A2" opacity="0.55"/>
+    </pattern>
+    <linearGradient id="kitchen-floorshade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A2416" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#4A2416" stop-opacity="0.3"/>
+    </linearGradient>
+    <radialGradient id="kitchen-pool">
+      <stop offset="0" stop-color="#FFDDA6" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FFDDA6" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="kitchen-runner">
+      <path d="M40 262.500H186L197 290H29Z"/>
+    </clipPath>
+    <!-- Fenster -->
+    <linearGradient id="kitchen-sky" gradientUnits="userSpaceOnUse" x1="0" y1="43" x2="0" y2="104">
+      <stop offset="0" stop-color="#34416B"/>
+      <stop offset="0.3" stop-color="#6A5586"/>
+      <stop offset="0.55" stop-color="#C5748A"/>
+      <stop offset="0.78" stop-color="#EE9D74"/>
+      <stop offset="1" stop-color="#FBCB8A"/>
+    </linearGradient>
+    <linearGradient id="kitchen-frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8E8"/>
+      <stop offset="1" stop-color="#E6D2AF"/>
+    </linearGradient>
+    <linearGradient id="kitchen-blind" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E9D6B2"/>
+      <stop offset="1" stop-color="#FBF0DA"/>
+    </linearGradient>
+    <linearGradient id="kitchen-pot" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#D98058"/>
+      <stop offset="1" stop-color="#A34E2C"/>
+    </linearGradient>
+    <clipPath id="kitchen-glass">
+      <rect x="97" y="43" width="86" height="61" rx="2"/>
+    </clipPath>
+    <!-- Schränke, Ofen, Arbeitsplatte -->
+    <linearGradient id="kitchen-cab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A6170"/>
+      <stop offset="1" stop-color="#173F49"/>
+    </linearGradient>
+    <linearGradient id="kitchen-door" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3A7786"/>
+      <stop offset="1" stop-color="#255865"/>
+    </linearGradient>
+    <radialGradient id="kitchen-oven" gradientUnits="userSpaceOnUse" cx="112" cy="232" r="27">
+      <stop offset="0" stop-color="#FFEDB0"/>
+      <stop offset="0.35" stop-color="#FFBE62"/>
+      <stop offset="0.72" stop-color="#D8692B"/>
+      <stop offset="1" stop-color="#6E2E14"/>
+    </radialGradient>
+    <radialGradient id="kitchen-ovenglow">
+      <stop offset="0" stop-color="#FFC06A" stop-opacity="0.5"/>
+      <stop offset="0.5" stop-color="#FFB25A" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#FFB25A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="kitchen-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C08A5A"/>
+      <stop offset="1" stop-color="#8A5836"/>
+    </linearGradient>
+    <linearGradient id="kitchen-brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE3A0"/>
+      <stop offset="1" stop-color="#C98F3C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wand mit Stuckleiste, Schablonenborte und Schatten unter der Decke -->
+  <rect x="8" y="6" width="384" height="246" fill="url(#kitchen-wall)"/>
+  <rect x="8" y="8" width="384" height="6" fill="#F7E8CB"/>
+  <rect x="8" y="14" width="384" height="1.500" fill="#8A5E44" opacity="0.35"/>
+  <rect x="8" y="19" width="384" height="7" fill="url(#kitchen-border)"/>
+  <rect x="8" y="8" width="384" height="60" fill="url(#kitchen-ceil)"/>
+
+  <!-- Halbhoch gefliest: Schmuckreihe, Abschlussleiste, Sockelfliesen -->
+  <rect x="8" y="126" width="384" height="126" fill="url(#kitchen-tiles)"/>
+  <rect x="8" y="118" width="384" height="8" fill="url(#kitchen-accent)"/>
+  <rect x="8" y="118" width="384" height="134" fill="url(#kitchen-tileshade)"/>
+  <rect x="8" y="113.500" width="384" height="4.800" rx="1" fill="#FFF8E8"/>
+  <rect x="8" y="118.200" width="384" height="1.500" fill="#6B4630" opacity="0.28"/>
+  <rect x="8" y="113.500" width="384" height="1" fill="#FFFFFF" opacity="0.8"/>
+  <rect x="8" y="241" width="384" height="11" fill="#B8623E"/>
+  <rect x="8" y="241" width="384" height="1.300" fill="#E7A27C"/>
+  <g fill="#7A3A20" opacity="0.35">
+    <rect x="44" y="241" width="1" height="11"/>
+    <rect x="92" y="241" width="1" height="11"/>
+    <rect x="140" y="241" width="1" height="11"/>
+    <rect x="188" y="241" width="1" height="11"/>
+    <rect x="236" y="241" width="1" height="11"/>
+    <rect x="284" y="241" width="1" height="11"/>
+    <rect x="332" y="241" width="1" height="11"/>
+    <rect x="380" y="241" width="1" height="11"/>
+  </g>
+
+  <!-- Boden aus Terrakottafliesen, in der Mitte liegt das Licht -->
+  <rect x="8" y="252" width="384" height="12" fill="url(#kitchen-floor-1)"/>
+  <rect x="8" y="264" width="384" height="15" fill="url(#kitchen-floor-2)"/>
+  <rect x="8" y="279" width="384" height="21" fill="url(#kitchen-floor-3)"/>
+  <g fill="#EBC8A2" opacity="0.5">
+    <rect x="8" y="263.500" width="384" height="1"/>
+    <rect x="8" y="278.400" width="384" height="1.200"/>
+  </g>
+  <rect x="8" y="252" width="384" height="48" fill="url(#kitchen-floorshade)"/>
+  <ellipse cx="200" cy="272" rx="176" ry="34" fill="url(#kitchen-pool)"/>
+  <rect x="8" y="252" width="384" height="3" fill="#3A1C10" opacity="0.32"/>
+
+  <!-- Läufer vor den Schränken -->
+  <path d="M38 264.500H188L199 292.500H27Z" fill="#3A1C10" opacity="0.28"/>
+  <g stroke="#F1E2C2" stroke-width="1" stroke-linecap="round">
+    <path d="M38 264.500l-4.500-.500M35.500 270l-5 .200M33 276l-5.200.800M30.800 282l-5.400 1.200M29 288l-5.400 1.600"/>
+    <path d="M188 264.500l4.500-.500M190.500 270l5 .200M193 276l5.200.800M195.200 282l5.400 1.200M197 288l5.400 1.600"/>
+  </g>
+  <path d="M40 262.500H186L197 290H29Z" fill="#F1E2C2"/>
+  <g clip-path="url(#kitchen-runner)">
+    <rect x="20" y="265.200" width="190" height="3.400" fill="#2C6370"/>
+    <rect x="20" y="270.400" width="190" height="1.100" fill="#DFA544"/>
+    <rect x="20" y="274.600" width="190" height="3.600" fill="#C96A45" opacity="0.85"/>
+    <rect x="20" y="281.200" width="190" height="1.200" fill="#DFA544"/>
+    <rect x="20" y="284.400" width="190" height="3.800" fill="#2C6370"/>
+    <path d="M40 262.500H186L197 290H29Z" fill="url(#kitchen-floorshade)"/>
+  </g>
+
+  <!-- Fenster: Abendrot hinter den Bäumen, die Lichter der Nachbarn -->
+  <rect x="90" y="36" width="100" height="76" rx="6" fill="#6B4630" opacity="0.2" transform="translate(0 2.500)"/>
+  <rect x="90" y="36" width="100" height="76" rx="6" fill="url(#kitchen-frame)"/>
+  <rect x="94" y="40" width="92" height="67" rx="3" fill="#B49472"/>
+  <rect x="97" y="43" width="86" height="61" rx="2" fill="url(#kitchen-sky)"/>
+  <g clip-path="url(#kitchen-glass)">
+    <g fill="#FFF4D2">
+      <circle class="fx-twinkle" cx="108" cy="64" r="0.800"/>
+      <circle cx="126" cy="68" r="0.600"/>
+      <circle class="fx-twinkle" style="animation-delay:-1.700s" cx="158" cy="63" r="0.900"/>
+      <circle cx="172" cy="70" r="0.600"/>
+    </g>
+    <path d="M97 78q12-2.600 24-.600t22-1.400v2.600q-11 2.400-22 1.200t-24 .800z" fill="#F3B6A8" opacity="0.4"/>
+    <path d="M140 84q14-2.800 26-1t17-1.400v2.600q-8 2.200-17 1.200t-26 1.600z" fill="#FFD3A0" opacity="0.45"/>
+    <path d="M97 92q16-8 34-4t28-3t24 3v16H97z" fill="#6C4F7A" opacity="0.7"/>
+    <!-- Baumkronen und ein Dach mit Licht -->
+    <path d="M97 104V91c2-5 8-6 11-2c3-5 10-4 11 2c3-1 5 1 5 4v9z" fill="#1A2B3A"/>
+    <path d="M150 104v-8l8-6.500l8 6.500v-3c1-5 7-7 10-2c4-3 8 0 7 5v8z" fill="#1A2B3A"/>
+    <rect x="154.500" y="97.500" width="2.400" height="2.800" fill="#FFD480"/>
+    <rect x="159" y="97.500" width="2.400" height="2.800" fill="#FFD480"/>
+    <path d="M90 96L128 36h8L98 96zM118 104l40-64h3.500l-40 64z" fill="#FFFFFF" opacity="0.07"/>
+  </g>
+  <rect x="138" y="43" width="4" height="61" fill="#FBF1DE"/>
+  <rect x="142" y="43" width="1" height="61" fill="#10202E" opacity="0.3"/>
+  <rect x="97" y="76" width="86" height="3.600" fill="#FBF1DE"/>
+  <rect x="97" y="79.600" width="86" height="1" fill="#10202E" opacity="0.3"/>
+  <!-- Halb hochgezogenes Leinenrollo -->
+  <rect x="97" y="58" width="86" height="5" fill="url(#kitchen-drop)" opacity="0.7"/>
+  <rect x="96" y="41.500" width="88" height="17" rx="1.200" fill="url(#kitchen-blind)"/>
+  <g fill="#B99C72" opacity="0.45">
+    <rect x="96" y="46.200" width="88" height="0.800"/>
+    <rect x="96" y="50.600" width="88" height="0.800"/>
+  </g>
+  <rect x="96" y="53.800" width="88" height="1.500" fill="#C96A45"/>
+  <rect x="96" y="56.300" width="88" height="0.800" fill="#C96A45" opacity="0.7"/>
+  <rect x="95" y="40.500" width="90" height="2.400" rx="1.200" fill="#8C5A3C"/>
+  <path d="M178.500 58.500v8.500" stroke="#8C5A3C" stroke-width="0.600"/>
+  <ellipse cx="178.500" cy="68.200" rx="1.300" ry="1.700" fill="#C6905F"/>
+  <!-- Fensterbank mit Kräutern -->
+  <path d="M87 115.500h106l-4 6H91z" fill="url(#kitchen-drop)" opacity="0.8"/>
+  <rect x="86" y="108" width="108" height="4.600" rx="1.500" fill="#FFF8E8"/>
+  <rect x="87" y="112.600" width="106" height="2.900" fill="#DAC4A0"/>
+  <g>
+    <!-- Basilikum -->
+    <g fill="#4F8250">
+      <ellipse cx="105.500" cy="97" rx="3.200" ry="2.300" transform="rotate(-28 105.500 97)"/>
+      <ellipse cx="111.500" cy="96.500" rx="3.200" ry="2.300" transform="rotate(26 111.500 96.500)"/>
+      <ellipse cx="108.500" cy="92.800" rx="2.800" ry="2.200"/>
+    </g>
+    <g fill="#79AB6B">
+      <ellipse cx="106.800" cy="94.600" rx="2.400" ry="1.700" transform="rotate(-36 106.800 94.600)"/>
+      <ellipse cx="110.600" cy="93.600" rx="2.300" ry="1.600" transform="rotate(30 110.600 93.600)"/>
+      <ellipse cx="108.500" cy="98.600" rx="2.600" ry="1.700"/>
+    </g>
+    <path d="M104 100h9l-1 7.400a1 1 0 0 1-1 .600h-5a1 1 0 0 1-1-.600z" fill="url(#kitchen-pot)"/>
+    <rect x="103.400" y="99.400" width="10.200" height="2.200" rx="0.800" fill="#E39468"/>
+    <!-- Schnittlauch mit zwei Blüten -->
+    <g fill="none" stroke="#5E9159" stroke-width="0.900" stroke-linecap="round">
+      <path d="M122.500 100c-.600-5-1.400-8-2.600-11M124 100c-.200-6 0-9 .200-13M125.500 100c.400-5 1.200-8.400 2.800-11.400M126.800 100c.800-3.600 2-6 3.800-8"/>
+    </g>
+    <circle cx="119.900" cy="88.600" r="1.500" fill="#C98BB0"/>
+    <circle cx="128.400" cy="88.300" r="1.300" fill="#DCA6C4"/>
+    <path d="M120 100h9l-1 7.400a1 1 0 0 1-1 .600h-5a1 1 0 0 1-1-.600z" fill="url(#kitchen-pot)"/>
+    <rect x="119.400" y="99.400" width="10.200" height="2.200" rx="0.800" fill="#E39468"/>
+    <!-- Minze, die über den Rand wächst -->
+    <g fill="#5C9460">
+      <ellipse cx="165" cy="96.500" rx="2.400" ry="1.700" transform="rotate(-30 165 96.500)"/>
+      <ellipse cx="170" cy="94.600" rx="2.400" ry="1.700" transform="rotate(20 170 94.600)"/>
+      <ellipse cx="167.400" cy="92.200" rx="2.100" ry="1.600"/>
+      <ellipse cx="173.200" cy="98" rx="2.300" ry="1.600" transform="rotate(40 173.200 98)"/>
+      <ellipse cx="175.200" cy="102.200" rx="2" ry="1.400" transform="rotate(64 175.200 102.200)"/>
+      <ellipse cx="176" cy="105.800" rx="1.700" ry="1.200" transform="rotate(80 176 105.800)"/>
+    </g>
+    <g fill="#8BBB7A">
+      <ellipse cx="167.800" cy="96.800" rx="2" ry="1.400" transform="rotate(10 167.800 96.800)"/>
+      <ellipse cx="164.200" cy="93.600" rx="1.700" ry="1.200" transform="rotate(-40 164.200 93.600)"/>
+    </g>
+    <path d="M163.500 100h9l-1 7.400a1 1 0 0 1-1 .600h-5a1 1 0 0 1-1-.600z" fill="url(#kitchen-pot)"/>
+    <rect x="162.900" y="99.400" width="10.200" height="2.200" rx="0.800" fill="#E39468"/>
+  </g>
+
+  <!-- Unterschränke in Petrol, in der Mitte der Backofen -->
+  <rect x="10" y="180" width="194" height="72" fill="url(#kitchen-cab)"/>
+  <rect x="10" y="246.500" width="190" height="5.500" fill="#0E2930"/>
+  <g id="kitchen-unit">
+    <rect x="27" y="186" width="54" height="13" rx="1.500" fill="url(#kitchen-door)"/>
+    <rect x="27.500" y="186" width="53" height="1" fill="#7FB3BE" opacity="0.55"/>
+    <path d="M47.500 191h13v1.400a3.200 3.200 0 0 1-3.200 3.200h-6.600a3.200 3.200 0 0 1-3.200-3.200z" fill="url(#kitchen-brass)"/>
+    <rect x="47.500" y="190.600" width="13" height="1.100" rx="0.500" fill="#FFF0C4"/>
+    <rect x="27" y="202" width="54" height="42" rx="1.500" fill="url(#kitchen-door)"/>
+    <rect x="27.500" y="202" width="53" height="1" fill="#7FB3BE" opacity="0.55"/>
+    <rect x="32.500" y="207.500" width="43" height="31" rx="1" fill="#1D4B57"/>
+    <rect x="32.500" y="207.500" width="43" height="2" fill="#0B2228" opacity="0.5"/>
+    <rect x="32.500" y="207.500" width="1.500" height="31" fill="#0B2228" opacity="0.3"/>
+    <rect x="32.500" y="237.500" width="43" height="1" fill="#5C97A3" opacity="0.45"/>
+    <circle cx="78.200" cy="212.500" r="2.100" fill="url(#kitchen-brass)"/>
+    <circle cx="77.600" cy="211.900" r="0.700" fill="#FFF6DA"/>
+  </g>
+  <use href="#kitchen-unit" transform="translate(225 0) scale(-1 1)"/>
+  <!-- Backofen: drinnen backt etwas, das Licht fällt auf Schränke und Boden -->
+  <rect x="85" y="183" width="54" height="63.500" rx="2" fill="#15252B"/>
+  <rect x="85.500" y="183" width="53" height="1.100" fill="#5C7F88" opacity="0.6"/>
+  <rect x="88" y="186" width="48" height="9" rx="1.500" fill="#22363D"/>
+  <g fill="#F4E4C7">
+    <circle cx="94.500" cy="190.500" r="2.300"/>
+    <circle cx="102" cy="190.500" r="2.300"/>
+    <circle cx="129.500" cy="190.500" r="2.300"/>
+  </g>
+  <g stroke="#8A6A4A" stroke-width="0.700" stroke-linecap="round">
+    <path d="M94.500 190.500v-1.600M102 190.500l1.200-1.100M129.500 190.500l-1.200-1.100"/>
+  </g>
+  <rect x="109" y="188.500" width="14" height="4" rx="1" fill="#0A1317"/>
+  <circle cx="112" cy="190.500" r="0.900" fill="#FFB347"/>
+  <rect x="114.500" y="190" width="6" height="1" rx="0.500" fill="#FFB347" opacity="0.6"/>
+  <rect x="88" y="198" width="48" height="45.500" rx="2" fill="#1C2F36"/>
+  <rect x="92" y="207" width="40" height="30" rx="3" fill="url(#kitchen-oven)"/>
+  <rect x="93" y="229.800" width="38" height="0.900" fill="#5A2410" opacity="0.7"/>
+  <path d="M100.500 229.800h23l-1.200-4.600h-20.600z" fill="#4A2010"/>
+  <path d="M101.500 225.400c1-7.400 20-7.400 21 0z" fill="#B9662C"/>
+  <path d="M104 221.600c3.500-3 12.500-3 16 0" fill="none" stroke="#F0B062" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+  <path d="M108 222.400l1.400-1.600M112 221.800l1.400-1.600M116 222.400l1.400-1.600" stroke="#7A3A14" stroke-width="0.700" stroke-linecap="round"/>
+  <path d="M96 236l14-28h5l-14 28z" fill="#FFFFFF" opacity="0.1"/>
+  <rect x="92" y="207" width="40" height="30" rx="3" fill="none" stroke="#0A1317" stroke-width="1.300"/>
+  <rect x="91" y="200.400" width="42" height="2.800" rx="1.400" fill="url(#kitchen-brass)"/>
+  <rect x="92" y="200.600" width="40" height="0.800" rx="0.400" fill="#FFF6DA" opacity="0.8"/>
+  <!-- Geschirrtuch über dem Griff -->
+  <path d="M116.500 200h12.500v21.500l-2.100 1.400l-2.100-1.400l-2.100 1.400l-2.100-1.400l-2 1.400l-2.100-1.400z" fill="#FBF1DE"/>
+  <rect x="116.500" y="213.500" width="12.500" height="1.600" fill="#C96A45"/>
+  <rect x="116.500" y="216.300" width="12.500" height="0.900" fill="#C96A45" opacity="0.7"/>
+  <rect x="116.500" y="200" width="12.500" height="3.200" fill="#E6D2AF"/>
+  <rect x="126.500" y="203.200" width="2.500" height="18.300" fill="#CBB48E" opacity="0.4"/>
+  <ellipse cx="112" cy="224" rx="46" ry="34" fill="url(#kitchen-ovenglow)"/>
+  <ellipse cx="112" cy="262" rx="58" ry="13" fill="url(#kitchen-ovenglow)"/>
+
+  <!-- Arbeitsplatte aus Holz -->
+  <path d="M10 181h197l-3 7H10z" fill="url(#kitchen-drop)"/>
+  <rect x="10" y="168" width="200" height="4.200" rx="1" fill="#DDAE7D"/>
+  <rect x="10" y="171.500" width="200" height="9.500" rx="1.500" fill="url(#kitchen-wood)"/>
+  <g fill="#5E3A22" opacity="0.22">
+    <rect x="46" y="171.500" width="0.800" height="9.500"/>
+    <rect x="84" y="171.500" width="0.800" height="9.500"/>
+    <rect x="118" y="171.500" width="0.800" height="9.500"/>
+    <rect x="150" y="171.500" width="0.800" height="9.500"/>
+    <rect x="183" y="171.500" width="0.800" height="9.500"/>
+  </g>
+  <rect x="10" y="179.800" width="200" height="1.200" rx="0.600" fill="#4A2C1A" opacity="0.5"/>
+  <rect x="10" y="168.500" width="196" height="0.800" fill="#F9DEB8" opacity="0.8"/>
+  <rect x="10" y="171.500" width="200" height="0.800" fill="#F2CFA2" opacity="0.5"/>
+
+  <!-- Zwei Topfhandschuhe am Hakenbrett, ein großer und ein kleiner -->
+  <rect x="213" y="126.500" width="34" height="5" rx="1.500" fill="#5E3A22" opacity="0.25"/>
+  <rect x="213" y="125" width="34" height="4.600" rx="1.500" fill="url(#kitchen-wood)"/>
+  <rect x="214" y="125.300" width="32" height="0.800" fill="#F2CFA2" opacity="0.7"/>
+  <g transform="translate(1.500 2)" fill="#3A1C10" opacity="0.2">
+    <path d="M215.500 136.500h13v10.500c0 6-2.600 10-6.500 10s-6.500-4-6.500-10z"/>
+    <path d="M235 135.500h9.500v7.700c0 4.500-1.900 7.400-4.750 7.400S235 147.700 235 143.200z"/>
+  </g>
+  <path d="M222 132c-1.600-2-1.600-3.600 0-4.600c1.600 1 1.600 2.600 0 4.600z" fill="none" stroke="#F1E2C2" stroke-width="0.700"/>
+  <ellipse cx="229.400" cy="142.500" rx="2.600" ry="4.800" transform="rotate(18 229.400 142.500)" fill="#225360"/>
+  <path d="M215.500 136.500h13v10.500c0 6-2.600 10-6.500 10s-6.500-4-6.500-10z" fill="#2C6370"/>
+  <path d="M225 136.500h3.500v10.500c0 6-2.600 10-6.500 10c2.600-2.400 3-6 3-10z" fill="#1A4450" opacity="0.6"/>
+  <path d="M218 146l3.500 3.500M221.500 146l-3.500 3.500M218 151.500l3 3" stroke="#5C97A3" stroke-width="0.600" stroke-linecap="round" opacity="0.7"/>
+  <rect x="214.800" y="131.500" width="14.400" height="5.600" rx="1.600" fill="#FBF1DE"/>
+  <rect x="214.800" y="133.600" width="14.400" height="1.400" fill="#C96A45"/>
+  <circle cx="222" cy="127.300" r="1.500" fill="#8C5A3C"/>
+  <circle cx="221.600" cy="126.900" r="0.500" fill="#E0B58C"/>
+  <path d="M239.750 131.200c-1.300-1.700-1.300-3 0-3.900c1.300.900 1.300 2.200 0 3.900z" fill="none" stroke="#F1E2C2" stroke-width="0.600"/>
+  <ellipse cx="245.200" cy="140" rx="1.900" ry="3.500" transform="rotate(18 245.200 140)" fill="#C0736C"/>
+  <path d="M235 135.500h9.500v7.700c0 4.500-1.900 7.400-4.750 7.400S235 147.700 235 143.200z" fill="#DE9A92"/>
+  <path d="M242 135.500h2.500v7.700c0 4.500-1.900 7.400-4.750 7.400c1.900-1.800 2.250-4.400 2.250-7.400z" fill="#B76860" opacity="0.55"/>
+  <circle cx="238" cy="143" r="0.700" fill="#FBE3DC"/>
+  <circle cx="240.600" cy="146" r="0.700" fill="#FBE3DC"/>
+  <circle cx="238.200" cy="147.600" r="0.600" fill="#FBE3DC"/>
+  <rect x="234.400" y="131.200" width="10.700" height="4.800" rx="1.400" fill="#FBF1DE"/>
+  <rect x="234.400" y="133" width="10.700" height="1.200" fill="#DFA544"/>
+  <circle cx="239.750" cy="127.300" r="1.500" fill="#8C5A3C"/>
+  <circle cx="239.350" cy="126.900" r="0.500" fill="#E0B58C"/>
+
+  <!-- Wandbord mit Konsolen; darunter hängen Knoblauch und Chilis -->
+  <path d="M251 157h126l-5 8H256z" fill="url(#kitchen-drop)" opacity="0.85"/>
+  <path d="M263 157h7.500v2c0 6.500-3.200 10.500-7.500 11.500z" fill="#5E3A22"/>
+  <path d="M365 157h-7.500v2c0 6.500 3.200 10.500 7.500 11.500z" fill="#5E3A22"/>
+  <rect x="250" y="150" width="128" height="3" rx="1" fill="#C6905F"/>
+  <rect x="250" y="152.500" width="128" height="4.500" rx="1" fill="#8C5A3C"/>
+  <rect x="250" y="155.800" width="128" height="1.200" rx="0.600" fill="#4A2C1A" opacity="0.5"/>
+  <rect x="254" y="150.400" width="120" height="0.800" fill="#F2CFA2" opacity="0.7"/>
+  <g>
+    <path d="M286 157v5" stroke="#B99C72" stroke-width="0.700"/>
+    <g fill="#3A1C10" opacity="0.26" transform="translate(2 2)">
+      <ellipse cx="284.200" cy="165.500" rx="3.400" ry="3"/>
+      <ellipse cx="288" cy="170" rx="3.400" ry="3"/>
+      <ellipse cx="284.400" cy="174.500" rx="3.400" ry="3"/>
+      <ellipse cx="287.600" cy="179" rx="3.200" ry="2.800"/>
+    </g>
+    <path d="M286 161c-1.500 5 1.500 8 0 12s1 6 0 8" fill="none" stroke="#C9B38C" stroke-width="1.300" stroke-linecap="round"/>
+    <g fill="#FBF1DE" stroke="#A98C62" stroke-width="0.600">
+      <ellipse cx="284.200" cy="165.500" rx="3.400" ry="3"/>
+      <ellipse cx="288" cy="170" rx="3.400" ry="3"/>
+      <ellipse cx="284.400" cy="174.500" rx="3.400" ry="3"/>
+      <ellipse cx="287.600" cy="179" rx="3.200" ry="2.800"/>
+    </g>
+    <g fill="none" stroke="#C9A98A" stroke-width="0.500" opacity="0.7">
+      <path d="M284.200 162.700v5.400M288 167.200v5.400M284.400 171.700v5.400M287.600 176.400v5"/>
+    </g>
+    <g fill="#C79AB0" opacity="0.55">
+      <ellipse cx="285.400" cy="166.200" rx="1.400" ry="1.800"/>
+      <ellipse cx="289.200" cy="170.700" rx="1.400" ry="1.800"/>
+      <ellipse cx="285.600" cy="175.200" rx="1.400" ry="1.800"/>
+    </g>
+  </g>
+  <g>
+    <path d="M343 157v4" stroke="#B99C72" stroke-width="0.700"/>
+    <path d="M343 160.500v20" stroke="#8C5A3C" stroke-width="0.600"/>
+    <g fill="#3A1C10" opacity="0.16" transform="translate(1.500 1.500)">
+      <path d="M343 162c3 .500 5 3 4.600 6.500c-1.800-1.800-3.400-3-4.600-6.500zM343 166c-3 .500-5 3-4.600 6.500c1.800-1.800 3.400-3 4.600-6.500zM343 170.500c3 .500 5 3 4.600 6.500c-1.800-1.800-3.400-3-4.600-6.500zM343 174.500c-3 .500-5 3-4.600 6.500c1.800-1.800 3.400-3 4.600-6.500z"/>
+    </g>
+    <g fill="#C8402B">
+      <path d="M343 162c3 .500 5 3 4.600 6.500c-1.800-1.800-3.400-3-4.600-6.500z"/>
+      <path d="M343 170.500c3 .500 5 3 4.600 6.500c-1.800-1.800-3.400-3-4.600-6.500z"/>
+      <path d="M343 178c2.600.300 4.200 2 4 4.800c-1.500-1.300-3-2.300-4-4.800z"/>
+    </g>
+    <g fill="#A8301F">
+      <path d="M343 166c-3 .500-5 3-4.600 6.500c1.800-1.800 3.400-3 4.600-6.500z"/>
+      <path d="M343 174.500c-3 .500-5 3-4.600 6.500c1.800-1.800 3.400-3 4.600-6.500z"/>
+    </g>
+    <g fill="#5E8F5A">
+      <circle cx="343" cy="162" r="0.800"/>
+      <circle cx="343" cy="166" r="0.800"/>
+      <circle cx="343" cy="170.500" r="0.800"/>
+      <circle cx="343" cy="174.500" r="0.800"/>
+      <circle cx="343" cy="178" r="0.800"/>
+    </g>
+  </g>
 </svg>

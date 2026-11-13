@@ -1,8 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M10 46 H90 C90 66 72 72 50 72 C28 72 10 66 10 46 Z" fill="#A9B7BC"/>
-  <ellipse cx="50" cy="46" rx="34" ry="4" fill="#2C6370"/>
-  <polygon points="40,70 60,70 64,92 36,92" fill="#8A9AA0"/>
-  <rect x="28" y="92" width="44" height="4" rx="2" fill="#8A9AA0"/>
-  <ellipse cx="36" cy="40" rx="6" ry="4" fill="#C96A45"/>
-  <circle cx="42" cy="36" r="3" fill="#C96A45"/>
+  <defs>
+    <radialGradient id="deco-bird-bath-shadow">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="deco-bird-bath-stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8E877A"/>
+      <stop offset="0.4" stop-color="#DAD4C4"/>
+      <stop offset="1" stop-color="#7C7568"/>
+    </linearGradient>
+    <linearGradient id="deco-bird-bath-water" gradientUnits="userSpaceOnUse" x1="14" y1="0" x2="86" y2="0">
+      <stop offset="0" stop-color="#3C7A87"/>
+      <stop offset="0.5" stop-color="#9CCBD4"/>
+      <stop offset="1" stop-color="#C58A9A"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="32" ry="3.600" fill="url(#deco-bird-bath-shadow)"/>
+  <!-- Sockel und Säule -->
+  <rect x="32" y="88" width="36" height="8" rx="2.600" fill="url(#deco-bird-bath-stone)"/>
+  <path d="M43 88c2.500-10 2.500-20-1-28h16c-3.500 8-3.500 18-1 28z" fill="url(#deco-bird-bath-stone)"/>
+  <rect x="39" y="84.500" width="22" height="4.500" rx="2" fill="url(#deco-bird-bath-stone)"/>
+  <rect x="40" y="58" width="20" height="4.500" rx="2" fill="url(#deco-bird-bath-stone)"/>
+  <rect x="40" y="62.500" width="20" height="2.400" fill="#14261C" opacity="0.25"/>
+  <!-- Efeu am Fuß -->
+  <path d="M36 92c2-6 5-8 4-14c-.500-4 2-6 4-9" fill="none" stroke="#3F6A3C" stroke-width="1.200" stroke-linecap="round"/>
+  <g fill="#5F8A54">
+    <ellipse cx="35" cy="88" rx="3" ry="2" transform="rotate(-30 35 88)"/>
+    <ellipse cx="41.500" cy="83" rx="3" ry="2" transform="rotate(30 41.500 83)"/>
+    <ellipse cx="38" cy="77" rx="2.800" ry="1.900" transform="rotate(-40 38 77)"/>
+    <ellipse cx="43.500" cy="72" rx="2.600" ry="1.800" transform="rotate(30 43.500 72)"/>
+  </g>
+  <!-- Schale mit Wasser -->
+  <path d="M12 44h76c0 10-15 17-38 17S12 54 12 44z" fill="url(#deco-bird-bath-stone)"/>
+  <path d="M16 50c4 5 14 9 30 10" fill="none" stroke="#F3EEE0" stroke-width="1.200" stroke-linecap="round" opacity="0.6"/>
+  <ellipse cx="50" cy="44" rx="38" ry="6.500" fill="#E6E0D0"/>
+  <ellipse cx="50" cy="44.600" rx="33" ry="4.800" fill="#3A5F6A"/>
+  <ellipse cx="50" cy="45" rx="32" ry="4.200" fill="url(#deco-bird-bath-water)"/>
+  <path d="M30 45q6-1.600 12 0M58 46q6-1.600 12 0" fill="none" stroke="#FFFFFF" stroke-width="0.800" stroke-linecap="round" opacity="0.7"/>
+  <!-- Zwei Vögel, ein großer und ein kleiner; der kleine badet -->
+  <path d="M22 40c-2-7 2-13 9-13c5 0 8.500 3.500 8.500 8l5.500 1.300l-6 2.700c-1.500 4-5 6.500-10 6.500c-3 0-5.500-2-7-5.500z" fill="#2C6370"/>
+  <path d="M23.500 40c4-3 9-3 13 0c-1.500 3-4 4.600-7.500 4.600c-2.200 0-4.200-1.600-5.500-4.600z" fill="#7FB3BE"/>
+  <path d="M22 41l-8 5l7 .500z" fill="#1A4450"/>
+  <circle cx="35.200" cy="32.500" r="1.100" fill="#FBF1DE"/>
+  <path d="M27 45.500v3M31 45.500v3" stroke="#DFA544" stroke-width="1" stroke-linecap="round"/>
+  <path d="M74 43c1.500-5-1.500-9.500-6.500-9.500c-3.600 0-6 2.500-6 5.800l-4 1l4.300 2c1 2.800 3.600 4.700 7.200 4.700c2.200 0 4-1.500 5-4z" fill="#DE9A92"/>
+  <path d="M73 43c-3-2-6.400-2-9.400 0c1 2.200 2.900 3.300 5.400 3.300c1.600 0 3-1.100 4-3.300z" fill="#F6CFC8"/>
+  <path d="M74 44l5.500 3.500l-5 .400z" fill="#B76860"/>
+  <circle cx="64.600" cy="37.600" r="0.900" fill="#12222C"/>
+  <g fill="#DCEFF2">
+    <circle class="fx-twinkle" cx="78" cy="34" r="1.200"/>
+    <circle class="fx-twinkle" style="animation-delay:-1.200s" cx="82" cy="39" r="1"/>
+    <circle class="fx-twinkle" style="animation-delay:-2.300s" cx="73" cy="29" r="1"/>
+    <circle cx="58" cy="32" r="0.900"/>
+  </g>
 </svg>

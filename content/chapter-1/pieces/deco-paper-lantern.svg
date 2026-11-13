@@ -1,8 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="49" y="2" width="2" height="20" fill="#6B3A22"/>
-  <rect x="40" y="22" width="20" height="8" rx="2" fill="#6B3A22"/>
-  <ellipse cx="50" cy="62" rx="30" ry="34" fill="#C96A45"/>
-  <ellipse cx="50" cy="62" rx="12" ry="34" fill="#D98A66"/>
-  <rect x="21" y="60" width="58" height="3" fill="#F2C76B"/>
-  <rect x="40" y="94" width="20" height="2" fill="#6B3A22"/>
+  <defs>
+    <radialGradient id="deco-paper-lantern-halo" gradientUnits="userSpaceOnUse" cx="50" cy="48" r="60">
+      <stop offset="0" stop-color="#FFD98A" stop-opacity="0.75"/>
+      <stop offset="0.4" stop-color="#FFB85A" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#FFB85A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="deco-paper-lantern-silk" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="32">
+      <stop offset="0" stop-color="#FFF3C0"/>
+      <stop offset="0.35" stop-color="#FFC865"/>
+      <stop offset="0.75" stop-color="#F0803A"/>
+      <stop offset="1" stop-color="#B8402B"/>
+    </radialGradient>
+    <clipPath id="deco-paper-lantern-body">
+      <path d="M38 22h24c14 5 22 15 22 26s-8 21-22 26H38C24 69 16 59 16 48s8-21 22-26z"/>
+    </clipPath>
+  </defs>
+  <circle cx="50" cy="48" r="60" fill="url(#deco-paper-lantern-halo)"/>
+  <!-- Aufhängung -->
+  <path d="M50 2v12" stroke="#3A2216" stroke-width="1.100"/>
+  <path d="M44 20c0-5 2.500-8 6-8s6 3 6 8" fill="none" stroke="#3A2216" stroke-width="1.300"/>
+  <!-- Seidenlaterne mit Bambusrippen, von innen beleuchtet -->
+  <path d="M38 22h24c14 5 22 15 22 26s-8 21-22 26H38C24 69 16 59 16 48s8-21 22-26z" fill="url(#deco-paper-lantern-silk)"/>
+  <g clip-path="url(#deco-paper-lantern-body)" fill="none" stroke="#8E2C1C" stroke-width="0.900" opacity="0.5">
+    <path d="M50 22v52M43 22c-9 8-13 17-13 26s4 18 13 26M57 22c9 8 13 17 13 26s-4 18-13 26M39 22c-13 6-18 16-18 26s5 20 18 26M61 22c13 6 18 16 18 26s-5 20-18 26"/>
+  </g>
+  <g class="fx-flicker">
+    <ellipse cx="50" cy="52" rx="9" ry="13" fill="#FFFBE0" opacity="0.55"/>
+  </g>
+  <path d="M27 36c3-6 8-10 14-12" fill="none" stroke="#FFF6DA" stroke-width="1.800" stroke-linecap="round" opacity="0.5"/>
+  <!-- Fassungen oben und unten -->
+  <rect x="36" y="17.500" width="28" height="5.500" rx="1.800" fill="#2A1208"/>
+  <rect x="36" y="17.500" width="28" height="1.200" rx="0.600" fill="#8A5A30"/>
+  <rect x="38" y="73" width="24" height="5" rx="1.800" fill="#2A1208"/>
+  <!-- Quaste -->
+  <g class="fx-sway">
+    <rect x="49.400" y="78" width="1.200" height="5" fill="#8E2C1C"/>
+    <circle cx="50" cy="84" r="2.400" fill="#F2C76B"/>
+    <path d="M46.500 86h7l1 12.500h-9z" fill="#C8402B"/>
+    <path d="M48.200 87v11.500M50 87v11.500M51.800 87v11.500" stroke="#8E2C1C" stroke-width="0.600" opacity="0.7"/>
+  </g>
 </svg>

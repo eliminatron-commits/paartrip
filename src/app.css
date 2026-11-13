@@ -248,6 +248,13 @@ button.plain {
   animation: fx-drift 9s ease-in-out infinite alternate;
 }
 
+/* Was an einem Faden hängt, pendelt leise um seinen Aufhängepunkt. */
+.fx-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: fx-sway 5s ease-in-out infinite alternate;
+}
+
 @keyframes fx-flicker {
   0%,
   100% {
@@ -307,13 +314,23 @@ button.plain {
   }
 }
 
+@keyframes fx-sway {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* Ganz aus statt nur verkürzt: Sonst bliebe der Dampf auf seinem letzten, unsichtbaren Bild stehen. */
   .fx-flicker,
   .fx-twinkle,
   .fx-steam,
   .fx-smoke,
-  .fx-drift {
+  .fx-drift,
+  .fx-sway {
     animation: none;
   }
 

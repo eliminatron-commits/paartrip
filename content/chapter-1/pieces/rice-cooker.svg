@@ -1,10 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="42" y="32" width="16" height="10" rx="3" fill="#23373C"/>
-  <rect x="12" y="40" width="76" height="55" rx="15" fill="#A9B7BC"/>
-  <path d="M12 58 V55 C12 46 19 40 27 40 H73 C81 40 88 46 88 55 V58 Z" fill="#8A9AA0"/>
-  <rect x="36" y="66" width="28" height="16" rx="4" fill="#23373C"/>
-  <circle cx="44" cy="74" r="3.5" fill="#C96A45"/>
-  <circle cx="56" cy="74" r="3.5" fill="#F2C76B"/>
-  <rect x="22" y="93" width="12" height="4" rx="2" fill="#23373C"/>
-  <rect x="66" y="93" width="12" height="4" rx="2" fill="#23373C"/>
+  <defs>
+    <radialGradient id="rice-cooker-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rice-cooker-body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E0D2B4"/>
+      <stop offset="0.35" stop-color="#FFFDF6"/>
+      <stop offset="1" stop-color="#C6B694"/>
+    </linearGradient>
+    <linearGradient id="rice-cooker-lid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DDCFB2"/>
+    </linearGradient>
+    <radialGradient id="rice-cooker-lamp">
+      <stop offset="0" stop-color="#FFB347" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#FFB347" stop-opacity="0"/>
+    </radialGradient>
+    <g id="rice-cooker-flower">
+      <g fill="#E58FA0">
+        <circle cx="0" cy="-3.200" r="2.300"/>
+        <circle cx="3" cy="-1" r="2.300"/>
+        <circle cx="1.900" cy="2.600" r="2.300"/>
+        <circle cx="-1.900" cy="2.600" r="2.300"/>
+        <circle cx="-3" cy="-1" r="2.300"/>
+      </g>
+      <circle r="1.500" fill="#F2C76B"/>
+      <path d="M-4 5c-3 1-5 3-5.500 6c3-.500 5-2.500 5.500-6zM4 5c3 1 5 3 5.500 6c-3-.500-5-2.500-5.500-6z" fill="#7FAE6E"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="42" ry="3.800" fill="url(#rice-cooker-shadow)"/>
+  <!-- Dampf aus dem Ventil -->
+  <g fill="none" stroke="#FFF6E4" stroke-width="2.400" stroke-linecap="round" opacity="0.7">
+    <path class="fx-steam" d="M66 26c-3.600-4.600 3.600-7.200 0-12s3-6.600 0-10.500"/>
+    <path class="fx-steam" style="animation-delay:-1.800s" d="M73 28c-2.600-3.400 2.600-5.400 0-9s2.300-5 0-8"/>
+  </g>
+  <!-- Griffe und Füße -->
+  <rect x="5" y="55" width="9" height="12" rx="4" fill="#3A2A22"/>
+  <rect x="86" y="55" width="9" height="12" rx="4" fill="#3A2A22"/>
+  <rect x="24" y="90" width="10" height="5" rx="1.600" fill="#3A2A22"/>
+  <rect x="66" y="90" width="10" height="5" rx="1.600" fill="#3A2A22"/>
+  <!-- Topf und Deckel -->
+  <path d="M12 49h76v30c0 8.500-6 14-15 14H27c-9 0-15-5.500-15-14z" fill="url(#rice-cooker-body)"/>
+  <path d="M14 49c0-13.500 14-23 36-23s36 9.500 36 23z" fill="url(#rice-cooker-lid)"/>
+  <path d="M24 37c6-5 15-7.500 26-7.500" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <rect x="11" y="47.500" width="78" height="3.600" rx="1.800" fill="#CDBE9E"/>
+  <rect x="11" y="47.500" width="78" height="1" rx="0.500" fill="#FFFFFF" opacity="0.8"/>
+  <rect x="40" y="19.500" width="20" height="8.500" rx="3.600" fill="#3A2A22"/>
+  <rect x="43" y="21" width="14" height="1.400" rx="0.700" fill="#8A7466"/>
+  <ellipse cx="68" cy="31.500" rx="4" ry="1.800" fill="#8A7A5E"/>
+  <!-- Blümchen wie auf den alten Reiskochern -->
+  <use href="#rice-cooker-flower" transform="translate(25 68) scale(0.900)"/>
+  <use href="#rice-cooker-flower" transform="translate(75 68) scale(0.900)"/>
+  <!-- Bedienfeld mit Lämpchen und Hebel -->
+  <rect x="38" y="58" width="24" height="28" rx="5" fill="#EDE2CA"/>
+  <rect x="38" y="58" width="24" height="28" rx="5" fill="none" stroke="#B7A784" stroke-width="0.900"/>
+  <circle cx="45.500" cy="66" r="5" fill="url(#rice-cooker-lamp)"/>
+  <circle cx="45.500" cy="66" r="2.200" fill="#FF9F2E"/>
+  <circle cx="54.500" cy="66" r="2.200" fill="#9DB398"/>
+  <rect x="43" y="74" width="14" height="6.500" rx="3.200" fill="#3A2A22"/>
+  <rect x="45" y="75.300" width="10" height="1.200" rx="0.600" fill="#8A7466"/>
 </svg>

@@ -1,10 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="49" y="26" width="2" height="12" fill="#46614B"/>
-  <circle cx="45" cy="25" r="6" fill="#C96A45"/>
-  <circle cx="55" cy="23" r="6" fill="#F2C76B"/>
-  <rect x="43" y="36" width="14" height="16" rx="3" fill="#2C6370"/>
-  <rect x="6" y="50" width="88" height="9" rx="3" fill="#B98A5E"/>
-  <rect x="13" y="59" width="7" height="37" fill="#8C5A3C"/>
-  <rect x="80" y="59" width="7" height="37" fill="#8C5A3C"/>
-  <rect x="20" y="62" width="60" height="5" fill="#8C5A3C"/>
+  <defs>
+    <radialGradient id="dining-table-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dining-table-top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9A777"/>
+      <stop offset="1" stop-color="#A06C42"/>
+    </linearGradient>
+    <linearGradient id="dining-table-leg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#B98258"/>
+      <stop offset="1" stop-color="#6E4226"/>
+    </linearGradient>
+    <linearGradient id="dining-table-chair" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8A5A38"/>
+      <stop offset="1" stop-color="#5E3A22"/>
+    </linearGradient>
+    <!-- Ein Stuhl von der Seite; der zweite ist derselbe, gespiegelt -->
+    <g id="dining-table-seat">
+      <rect x="5" y="24" width="4" height="73" rx="1.600" fill="url(#dining-table-chair)"/>
+      <rect x="26" y="60" width="3.600" height="37" rx="1.500" fill="url(#dining-table-chair)"/>
+      <rect x="5" y="27" width="4.600" height="4.500" rx="1.200" fill="#B98258"/>
+      <rect x="5" y="36" width="4.600" height="4.500" rx="1.200" fill="#B98258"/>
+      <rect x="5" y="45" width="4.600" height="4.500" rx="1.200" fill="#B98258"/>
+      <rect x="4" y="58.500" width="27" height="4.500" rx="1.800" fill="#A06C42"/>
+      <rect x="8" y="80" width="19" height="2.400" rx="1.200" fill="#6E4226"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="46" ry="3.800" fill="url(#dining-table-shadow)"/>
+  <!-- Zwei Stühle mit Kissen: seins in Petrol, ihres in Rosé -->
+  <use href="#dining-table-seat"/>
+  <rect x="6" y="54.500" width="23" height="5" rx="2.500" fill="#2C6370"/>
+  <rect x="8" y="55.300" width="18" height="1.200" rx="0.600" fill="#7FB3BE" opacity="0.6"/>
+  <use href="#dining-table-seat" transform="translate(100 0) scale(-1 1)"/>
+  <rect x="71" y="54.500" width="23" height="5" rx="2.500" fill="#DE9A92"/>
+  <rect x="74" y="55.300" width="18" height="1.200" rx="0.600" fill="#FBE3DC" opacity="0.7"/>
+  <!-- Tisch -->
+  <rect x="24" y="52" width="5" height="45" rx="1.800" fill="url(#dining-table-leg)"/>
+  <rect x="71" y="52" width="5" height="45" rx="1.800" fill="url(#dining-table-leg)"/>
+  <rect x="26" y="52" width="48" height="6" fill="#8A5A38"/>
+  <rect x="26" y="52" width="48" height="2.500" fill="#2A160E" opacity="0.35"/>
+  <rect x="17" y="45.500" width="66" height="6.500" rx="2" fill="url(#dining-table-top)"/>
+  <rect x="19" y="46" width="62" height="1" rx="0.500" fill="#F9DEB8" opacity="0.8"/>
+  <!-- Läufer, Blumen und zwei Gläser -->
+  <path d="M36 45.500h28v10l-3-2l-3.600 2l-3.600-2l-3.800 2l-3.600-2l-3.600 2l-3.200-2l-3.600 2z" fill="#FBF1DE"/>
+  <rect x="36" y="49.500" width="28" height="1.300" fill="#C96A45"/>
+  <path d="M46 45.500c-1.500-4-1.500-7 0-9h8c1.500 2 1.500 5 0 9z" fill="#2C6370"/>
+  <rect x="46" y="36" width="8" height="1.600" rx="0.800" fill="#5C97A3"/>
+  <g fill="none" stroke="#5E9159" stroke-width="1" stroke-linecap="round">
+    <path d="M50 36v-13M48.500 36c-1-5-3-9-6-12M51.500 36c1-5 3-8 6-11"/>
+  </g>
+  <circle cx="50" cy="21" r="3.600" fill="#F2C76B"/>
+  <circle cx="50" cy="21" r="1.500" fill="#8A5212"/>
+  <circle cx="42" cy="23" r="3" fill="#E58FA0"/>
+  <circle cx="42" cy="23" r="1.200" fill="#FBE3DC"/>
+  <circle cx="58" cy="24" r="3" fill="#FBF1DE"/>
+  <circle cx="58" cy="24" r="1.200" fill="#DFA544"/>
+  <path d="M27 45.500l1-9h6l1 9z" fill="#DCEBEA" opacity="0.85"/>
+  <path d="M27.600 45.500l.500-5h6.800l.500 5z" fill="#C8402B" opacity="0.75"/>
+  <path d="M67.500 45.500l.800-7h4.600l.800 7z" fill="#DCEBEA" opacity="0.85"/>
+  <path d="M68 45.500l.400-4h5.200l.400 4z" fill="#C8402B" opacity="0.75"/>
 </svg>

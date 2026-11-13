@@ -348,6 +348,21 @@ export function checkContent(content: Content): string[] {
       needWords(piece.name, `${at} Stück "${piece.id}"`);
     }
 
+    // Alle Zeichnungen stehen inline in derselben Seite: Gleiche ids aus verschiedenen Dateien nähmen sich
+    // gegenseitig Verläufe und Muster. Deshalb beginnt jede id mit der id ihrer Datei.
+    const needOwnIds = (art: SvgArt | undefined, prefix: string, where: string, taken?: string) => {
+      for (const [, id = ''] of art?.body.matchAll(/\bid="([^"]*)"/g) ?? []) {
+        if (!id.startsWith(prefix)) problems.push(`${at}: ${where}: id "${id}" beginnt nicht mit "${prefix}"`);
+        else if (taken !== undefined && id.startsWith(taken)) problems.push(`${at}: ${where}: id "${id}" beginnt mit "${taken}", das dem Vordergrund gehört`);
+      }
+    };
+    for (const piece of chapter.pieces) needOwnIds(piece.art, `${piece.id}-`, `Zeichnung von Stück "${piece.id}"`);
+    for (const room of chapter.rooms) {
+      needOwnIds(room.art, `${room.id}-`, `Zeichnung von Raum "${room.id}"`, `${room.id}-front-`);
+      needOwnIds(room.front, `${room.id}-front-`, `Vordergrund von Raum "${room.id}"`);
+    }
+    needOwnIds(chapter.roof, 'roof-', 'Zeichnung des Dachs');
+
     needWords(chapter.title, `${at} title`);
     for (const task of chapter.tasks) needWords(task, `${at} Aufgabe "${task.id}"`);
     for (const scene of chapter.story) needWords([scene.title, scene.text], `${at} Szene "${scene.id}"`);

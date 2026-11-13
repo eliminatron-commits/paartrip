@@ -1,11 +1,62 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="78" rx="20" ry="18" fill="#A9B7BC"/>
-  <circle cx="50" cy="46" r="16" fill="#A9B7BC"/>
-  <polygon points="36,36 40,20 48,32" fill="#A9B7BC"/>
-  <polygon points="64,36 60,20 52,32" fill="#A9B7BC"/>
-  <ellipse cx="30" cy="50" rx="6" ry="9" fill="#A9B7BC"/>
-  <rect x="38" y="60" width="24" height="5" rx="2" fill="#C96A45"/>
-  <circle cx="50" cy="68" r="3" fill="#F2C76B"/>
-  <circle cx="44" cy="44" r="2" fill="#23373C"/>
-  <circle cx="56" cy="44" r="2" fill="#23373C"/>
+  <defs>
+    <radialGradient id="deco-lucky-cat-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="deco-lucky-cat-fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFEF8"/>
+      <stop offset="1" stop-color="#E2D4B6"/>
+    </linearGradient>
+    <linearGradient id="deco-lucky-cat-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="1" stop-color="#D99A32"/>
+    </linearGradient>
+    <linearGradient id="deco-lucky-cat-pad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D0563C"/>
+      <stop offset="1" stop-color="#8E2C1C"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="38" ry="3.800" fill="url(#deco-lucky-cat-shadow)"/>
+  <!-- Rotes Kissen -->
+  <rect x="14" y="85" width="72" height="10.500" rx="5.200" fill="url(#deco-lucky-cat-pad)"/>
+  <rect x="20" y="86.500" width="60" height="1.400" rx="0.700" fill="#F3A08A" opacity="0.6"/>
+  <path d="M14 90l-4 4M86 90l4 4" stroke="#F2C76B" stroke-width="1.600" stroke-linecap="round"/>
+  <!-- Erhobene Pfote -->
+  <rect x="67" y="16" width="14" height="40" rx="7" transform="rotate(10 74 36)" fill="url(#deco-lucky-cat-fur)"/>
+  <ellipse cx="77.600" cy="22" rx="4" ry="3.400" fill="#F2A9A0"/>
+  <!-- Körper und Kopf -->
+  <path d="M24 88c-5-17-.500-33 11-42h30c11.500 9 16 25 11 42z" fill="url(#deco-lucky-cat-fur)"/>
+  <ellipse cx="66" cy="76" rx="8" ry="9" fill="#E9A45A" opacity="0.8"/>
+  <path d="M30 27l-3-17l15 8z" fill="#FFFEF8"/>
+  <path d="M70 27l3-17l-15 8z" fill="#EFE3C8"/>
+  <path d="M31.500 23l-1.600-9l8 4.400z" fill="#D9584A"/>
+  <path d="M68.500 23l1.600-9l-8 4.400z" fill="#D9584A"/>
+  <ellipse cx="50" cy="36" rx="25" ry="21" fill="url(#deco-lucky-cat-fur)"/>
+  <path d="M27 30c2-8 8-13 16-14.500c1 5-2 11-7 13c-3 1.200-6 1.600-9 1.500z" fill="#E9A45A"/>
+  <!-- Gesicht -->
+  <g fill="none" stroke="#3A2216" stroke-width="1.700" stroke-linecap="round">
+    <path d="M36 37q4.500-5 9 0M55 37q4.500-5 9 0"/>
+  </g>
+  <path d="M48 42h4l-2 2.400z" fill="#D9584A"/>
+  <g fill="none" stroke="#3A2216" stroke-width="1.200" stroke-linecap="round">
+    <path d="M50 44.400q-3 4-6.500 1.200M50 44.400q3 4 6.500 1.200"/>
+    <path d="M33 43l-9-1.500M33 46l-8.500 1.500M67 43l9-1.500M67 46l8.500 1.500" stroke-width="0.800"/>
+  </g>
+  <circle cx="35.500" cy="44.500" r="3.400" fill="#F2A9A0" opacity="0.55"/>
+  <circle cx="64.500" cy="44.500" r="3.400" fill="#F2A9A0" opacity="0.55"/>
+  <!-- Halsband mit Glöckchen -->
+  <path d="M30 51c12 6 28 6 40 0l1.500 5c-13 6.500-30 6.500-43 0z" fill="#C8402B"/>
+  <circle cx="50" cy="60" r="5" fill="url(#deco-lucky-cat-gold)"/>
+  <path d="M46.500 60.500h7M50 60.500v3.500" stroke="#8A5212" stroke-width="1" stroke-linecap="round"/>
+  <!-- Goldene Münze in der anderen Pfote -->
+  <ellipse cx="37" cy="72" rx="9" ry="13" fill="url(#deco-lucky-cat-gold)" transform="rotate(-8 37 72)"/>
+  <g stroke="#8A5212" stroke-width="1.100" stroke-linecap="round" transform="rotate(-8 37 72)">
+    <path d="M37 64v16M33.500 68h7M33.500 76h7"/>
+  </g>
+  <ellipse cx="30" cy="66" rx="6" ry="5" fill="#FFFEF8"/>
+  <!-- Pfoten -->
+  <ellipse cx="38" cy="87.500" rx="9" ry="4.600" fill="#FFFEF8"/>
+  <ellipse cx="62" cy="87.500" rx="9" ry="4.600" fill="#F3E8D0"/>
+  <path d="M35 86v3M41 86v3M59 86v3M65 86v3" stroke="#C9B48C" stroke-width="0.900" stroke-linecap="round"/>
 </svg>

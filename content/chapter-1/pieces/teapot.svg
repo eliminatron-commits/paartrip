@@ -1,9 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="72" rx="30" ry="24" fill="#2C6370"/>
-  <rect x="21" y="70" width="58" height="5" fill="#F2C76B"/>
-  <ellipse cx="50" cy="46" rx="12" ry="4" fill="#1F4E5A"/>
-  <circle cx="50" cy="40" r="3" fill="#F2C76B"/>
-  <polygon points="78,66 94,38 88,36 72,60" fill="#2C6370"/>
-  <path d="M26 56 C6 56 6 88 28 88 L30 82 C16 82 16 62 28 62 Z" fill="#1F4E5A"/>
-  <rect x="32" y="92" width="36" height="4" rx="2" fill="#1F4E5A"/>
+  <defs>
+    <radialGradient id="teapot-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="teapot-body" cx="0.340" cy="0.280" r="0.850">
+      <stop offset="0" stop-color="#5C9CAA"/>
+      <stop offset="0.5" stop-color="#2C6370"/>
+      <stop offset="1" stop-color="#143842"/>
+    </radialGradient>
+    <linearGradient id="teapot-cup" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E6D6B6"/>
+      <stop offset="0.4" stop-color="#FFFAEE"/>
+      <stop offset="1" stop-color="#CDB993"/>
+    </linearGradient>
+    <linearGradient id="teapot-rose" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#CE7C68"/>
+      <stop offset="0.4" stop-color="#F0AE9A"/>
+      <stop offset="1" stop-color="#B9624F"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="44" ry="3.800" fill="url(#teapot-shadow)"/>
+  <!-- Dampf aus der Tülle -->
+  <g fill="none" stroke="#FFF6E4" stroke-width="2.400" stroke-linecap="round" opacity="0.7">
+    <path class="fx-steam" d="M9 36c-3.600-4.600 3.600-7.200 0-12s3-6.600 0-10.500"/>
+    <path class="fx-steam" style="animation-delay:-1.900s" d="M16 32c-2.600-3.400 2.600-5.400 0-9s2.300-5 0-8"/>
+  </g>
+  <!-- Tülle und Henkel -->
+  <path d="M24 74c-10-3.500-15.500-14-16.500-30l7-1.800c1.200 10.500 5.500 17 13.500 20z" fill="#225360"/>
+  <path d="M7.500 44l7-1.800l.300 2.600l-7 1.800z" fill="#5C9CAA"/>
+  <path d="M68 48c13-2.500 20 5.500 20 14.500S80.500 78 68 76" fill="none" stroke="#1A4450" stroke-width="6" stroke-linecap="round"/>
+  <path d="M70 47.500c10-1.500 15.500 4.500 16 12" fill="none" stroke="#5C9CAA" stroke-width="1.300" stroke-linecap="round" opacity="0.7"/>
+  <!-- Bauch, Deckel, Knauf -->
+  <rect x="30" y="86" width="32" height="8" rx="2.600" fill="#143842"/>
+  <ellipse cx="46" cy="64" rx="28.500" ry="26" fill="url(#teapot-body)"/>
+  <g fill="#FBF1DE">
+    <circle cx="22.500" cy="62" r="1.700"/>
+    <circle cx="31" cy="68.500" r="1.900"/>
+    <circle cx="41" cy="71.500" r="2"/>
+    <circle cx="51.500" cy="71.500" r="2"/>
+    <circle cx="61.500" cy="68.500" r="1.900"/>
+    <circle cx="70" cy="62" r="1.700"/>
+  </g>
+  <path d="M26 54c3-8 10-13 19-14" fill="none" stroke="#9CCBD4" stroke-width="2.400" stroke-linecap="round" opacity="0.5"/>
+  <path d="M30 42c0-8.500 7-12.500 16-12.500s16 4 16 12.500z" fill="#2F6B7A"/>
+  <ellipse cx="46" cy="42" rx="17" ry="3.600" fill="#3F8190"/>
+  <ellipse cx="46" cy="41.400" rx="17" ry="3" fill="#5C9CAA" opacity="0.6"/>
+  <circle cx="46" cy="27" r="4.200" fill="#F2C76B"/>
+  <circle cx="44.800" cy="25.800" r="1.400" fill="#FFF6DA"/>
+  <!-- Zwei Tassen, eine große und eine kleine -->
+  <path d="M78.500 82c5 0 5 7.500 0 7.500" fill="none" stroke="#E6D6B6" stroke-width="1.800"/>
+  <path d="M62 78h17v11c0 3-2 5-5 5h-7c-3 0-5-2-5-5z" fill="url(#teapot-cup)"/>
+  <rect x="62" y="82" width="17" height="2.600" fill="#2C6370"/>
+  <ellipse cx="70.500" cy="78" rx="8.500" ry="1.700" fill="#B8824A"/>
+  <path d="M94.500 86.500c3.600 0 3.600 5.400 0 5.400" fill="none" stroke="#CE7C68" stroke-width="1.500"/>
+  <path d="M83 84h12v6.500c0 2.300-1.500 3.700-3.800 3.700h-4.400c-2.300 0-3.800-1.400-3.800-3.700z" fill="url(#teapot-rose)"/>
+  <ellipse cx="89" cy="84" rx="6" ry="1.300" fill="#B8824A"/>
 </svg>

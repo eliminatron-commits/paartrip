@@ -1,12 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="95" rx="22" ry="3" fill="#46614B"/>
-  <rect x="45" y="56" width="10" height="40" fill="#6B3A22"/>
-  <circle cx="30" cy="44" r="17" fill="#46614B"/>
-  <circle cx="70" cy="44" r="17" fill="#46614B"/>
-  <circle cx="50" cy="32" r="28" fill="#557A5C"/>
-  <circle cx="38" cy="26" r="5" fill="#C96A45"/>
-  <circle cx="60" cy="20" r="5" fill="#C96A45"/>
-  <circle cx="67" cy="42" r="5" fill="#C96A45"/>
-  <circle cx="46" cy="46" r="5" fill="#C96A45"/>
-  <circle cx="26" cy="46" r="5" fill="#C96A45"/>
+  <defs>
+    <radialGradient id="apple-tree-shadow">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="apple-tree-trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5E3A22"/>
+      <stop offset="0.6" stop-color="#8C5A3C"/>
+      <stop offset="1" stop-color="#B98258"/>
+    </linearGradient>
+    <radialGradient id="apple-tree-crown" gradientUnits="userSpaceOnUse" cx="66" cy="20" r="66">
+      <stop offset="0" stop-color="#6FA35E"/>
+      <stop offset="0.5" stop-color="#3F7448"/>
+      <stop offset="1" stop-color="#1F4230"/>
+    </radialGradient>
+    <radialGradient id="apple-tree-fruit" cx="0.350" cy="0.300" r="0.800">
+      <stop offset="0" stop-color="#F08A72"/>
+      <stop offset="1" stop-color="#A52C1E"/>
+    </radialGradient>
+    <g id="apple-tree-apple">
+      <circle r="3.600" fill="url(#apple-tree-fruit)"/>
+      <path d="M0-3.200c0-1.400.600-2.200 1.600-2.800" fill="none" stroke="#4A2C1A" stroke-width="0.800" stroke-linecap="round"/>
+      <circle cx="-1.200" cy="-1.200" r="0.900" fill="#FFD9CC" opacity="0.7"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="36" ry="3.600" fill="url(#apple-tree-shadow)"/>
+  <!-- Stamm mit Ästen -->
+  <path d="M43 97c2.500-10 2.500-20-.500-33l-9-12l3-2l9 9l2-13h4l1 12l9-11l3 2l-8 15c-2.500 13-2 23 .500 33z" fill="url(#apple-tree-trunk)"/>
+  <path d="M47 70c1 8 1 16 0 25M53 74c0 6 .500 12 1.500 20" fill="none" stroke="#4A2C1A" stroke-width="0.800" stroke-linecap="round" opacity="0.5"/>
+  <!-- Zwei Buchstaben in einem eingeritzten Herz -->
+  <path d="M50 86.500c-3.800-2.600-4.700-4.500-3.800-6c.800-1.400 2.800-1.300 3.800.200c1-1.500 3-1.600 3.800-.200c.900 1.500 0 3.400-3.800 6z" fill="none" stroke="#3A2216" stroke-width="0.900" opacity="0.75"/>
+  <!-- Krone: rechts oben fängt sie das Abendlicht -->
+  <path d="M50 3c11-2 21 4 25 13c10 2 16 12 13 22c5 9 0 20-11 22c-6 8-19 9-27 3c-9 6-22 4-27-5C12 56 8 44 14 35c-3-11 4-21 14-23c3-6 12-11 22-9z" fill="url(#apple-tree-crown)"/>
+  <g fill="#8BBB7A" opacity="0.55">
+    <ellipse cx="62" cy="14" rx="13" ry="7"/>
+    <ellipse cx="78" cy="30" rx="9" ry="7"/>
+    <ellipse cx="44" cy="22" rx="11" ry="6"/>
+    <ellipse cx="66" cy="42" rx="12" ry="6"/>
+  </g>
+  <g fill="#173024" opacity="0.4">
+    <ellipse cx="26" cy="42" rx="11" ry="7"/>
+    <ellipse cx="40" cy="56" rx="13" ry="6"/>
+    <ellipse cx="68" cy="58" rx="12" ry="5"/>
+    <ellipse cx="24" cy="26" rx="8" ry="5"/>
+  </g>
+  <!-- Äpfel am Baum und zwei im Gras -->
+  <use href="#apple-tree-apple" x="34" y="20"/>
+  <use href="#apple-tree-apple" x="56" y="26"/>
+  <use href="#apple-tree-apple" x="74" y="22"/>
+  <use href="#apple-tree-apple" x="22" y="36"/>
+  <use href="#apple-tree-apple" x="44" y="40"/>
+  <use href="#apple-tree-apple" x="80" y="44"/>
+  <use href="#apple-tree-apple" x="32" y="54"/>
+  <use href="#apple-tree-apple" x="60" y="52"/>
+  <use href="#apple-tree-apple" x="50" y="12"/>
+  <use href="#apple-tree-apple" x="27" y="94"/>
+  <use href="#apple-tree-apple" x="74" y="95" transform="scale(1)"/>
 </svg>

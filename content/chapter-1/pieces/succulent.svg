@@ -1,9 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <polygon points="14,54 50,60 30,72" fill="#8FA68A"/>
-  <polygon points="86,54 50,60 70,72" fill="#8FA68A"/>
-  <polygon points="26,30 54,60 34,66" fill="#46614B"/>
-  <polygon points="74,30 46,60 66,66" fill="#46614B"/>
-  <polygon points="50,14 62,58 38,58" fill="#557A5C"/>
-  <polygon points="28,68 72,68 66,96 34,96" fill="#C96A45"/>
-  <rect x="24" y="62" width="52" height="8" rx="3" fill="#9E4526"/>
+  <defs>
+    <radialGradient id="succulent-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="succulent-pot" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C9704A"/>
+      <stop offset="0.35" stop-color="#E9A27D"/>
+      <stop offset="1" stop-color="#9A4628"/>
+    </linearGradient>
+    <g id="succulent-leaf">
+      <path d="M0 0c-6-7-6-18 0-27c6 9 6 20 0 27z"/>
+      <path d="M0-27c-1.600 2-2.200 4-2.200 6h4.400c0-2-.600-4-2.200-6z" fill="#E7A9A0"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="34" ry="3.800" fill="url(#succulent-shadow)"/>
+  <!-- Große Rosette und daneben eine kleine -->
+  <g fill="#4F7F68">
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(-78) scale(1.050)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(-52) scale(1.150)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(52) scale(1.150)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(78) scale(1.050)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(-26) scale(1.250)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) rotate(26) scale(1.250)"/>
+    <use href="#succulent-leaf" transform="translate(44 60) scale(1.300)"/>
+  </g>
+  <g fill="#74A688">
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(-64) scale(0.800)"/>
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(64) scale(0.800)"/>
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(-38) scale(0.920)"/>
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(38) scale(0.920)"/>
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(-13) scale(1)"/>
+    <use href="#succulent-leaf" transform="translate(44 61) rotate(13) scale(1)"/>
+  </g>
+  <g fill="#A6CFAE">
+    <use href="#succulent-leaf" transform="translate(44 62) rotate(-44) scale(0.560)"/>
+    <use href="#succulent-leaf" transform="translate(44 62) rotate(44) scale(0.560)"/>
+    <use href="#succulent-leaf" transform="translate(44 62) rotate(-18) scale(0.640)"/>
+    <use href="#succulent-leaf" transform="translate(44 62) rotate(18) scale(0.640)"/>
+  </g>
+  <g fill="#74A688">
+    <use href="#succulent-leaf" transform="translate(72 60) rotate(-58) scale(0.500)"/>
+    <use href="#succulent-leaf" transform="translate(72 60) rotate(58) scale(0.500)"/>
+    <use href="#succulent-leaf" transform="translate(72 60) rotate(-22) scale(0.580)"/>
+    <use href="#succulent-leaf" transform="translate(72 60) rotate(22) scale(0.580)"/>
+  </g>
+  <g fill="#A6CFAE">
+    <use href="#succulent-leaf" transform="translate(72 61) rotate(-36) scale(0.340)"/>
+    <use href="#succulent-leaf" transform="translate(72 61) rotate(36) scale(0.340)"/>
+    <use href="#succulent-leaf" transform="translate(72 61) scale(0.400)"/>
+  </g>
+  <!-- Topf mit heruntergelaufener Glasur -->
+  <ellipse cx="50" cy="93.500" rx="28" ry="3.400" fill="#8A4424"/>
+  <path d="M24 60h52l-5.500 30c-.500 2.600-2.600 4-5.200 4H34.700c-2.600 0-4.700-1.400-5.200-4z" fill="url(#succulent-pot)"/>
+  <path d="M24.500 62h51l-1.200 6.500c-2.400 4.500-6.400 4.500-8.200 0c-1.800 7-8.400 7-10.200 0c-1.800 5.500-7.400 5.500-9.200 0c-1.800 7-8.800 7-10.600 0c-1.800 4.500-5.600 4.500-7.600 1z" fill="#FBF1DE"/>
+  <rect x="21" y="55.500" width="58" height="8" rx="3.400" fill="#FFF8E8"/>
+  <rect x="21" y="61" width="58" height="2.500" rx="1.200" fill="#D6C29C" opacity="0.6"/>
 </svg>

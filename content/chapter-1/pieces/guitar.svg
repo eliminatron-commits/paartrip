@@ -1,9 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="45" y="4" width="10" height="14" rx="2" fill="#6B3A22"/>
-  <rect x="47" y="16" width="6" height="40" fill="#8C5A3C"/>
-  <circle cx="50" cy="54" r="15" fill="#B98A5E"/>
-  <circle cx="50" cy="75" r="21" fill="#B98A5E"/>
-  <circle cx="50" cy="64" r="7" fill="#6B3A22"/>
-  <rect x="41" y="82" width="18" height="4" rx="1" fill="#6B3A22"/>
-  <rect x="49" y="16" width="2" height="68" fill="#FAF3E7" opacity="0.6"/>
+  <defs>
+    <radialGradient id="guitar-top" gradientUnits="userSpaceOnUse" cx="48" cy="66" r="34">
+      <stop offset="0" stop-color="#F6D494"/>
+      <stop offset="0.6" stop-color="#E0A458"/>
+      <stop offset="1" stop-color="#A9662A"/>
+    </radialGradient>
+    <linearGradient id="guitar-neck" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4E2814"/>
+      <stop offset="0.5" stop-color="#7A4424"/>
+      <stop offset="1" stop-color="#3A1A0C"/>
+    </linearGradient>
+    <g id="guitar-shape">
+      <path d="M50 37c-10.500 0-16.500 6-16.500 14c0 4.500 2.300 7 2.300 10.500c0 4-7.300 7-7.300 17.500C28.500 90 38 96.500 50 96.500S71.500 90 71.500 79c0-10.500-7.300-13.500-7.300-17.500c0-3.500 2.300-6 2.300-10.500c0-8-6-14-16.500-14z"/>
+    </g>
+  </defs>
+  <g transform="rotate(8 50 52)">
+    <!-- Schatten an der Wand -->
+    <use href="#guitar-shape" transform="translate(3.500 2.500)" fill="#3A2216" opacity="0.22"/>
+    <rect x="49.500" y="10" width="8" height="30" fill="#3A2216" opacity="0.18"/>
+    <!-- Kopf mit Wirbeln, Hals mit Bünden -->
+    <g fill="#E6D6B6">
+      <rect x="40.500" y="3.800" width="19" height="2" rx="1"/>
+      <rect x="40.500" y="8.200" width="19" height="2" rx="1"/>
+    </g>
+    <path d="M44.500 1.500h11l1 12.500h-13z" fill="#3A1A0C"/>
+    <path d="M45.500 2.500h4l-.500 10h-4z" fill="#6B3A22" opacity="0.7"/>
+    <rect x="46" y="13" width="8" height="30" fill="url(#guitar-neck)"/>
+    <g fill="#C5CACB" opacity="0.85">
+      <rect x="46" y="18" width="8" height="0.700"/>
+      <rect x="46" y="23" width="8" height="0.700"/>
+      <rect x="46" y="28" width="8" height="0.700"/>
+      <rect x="46" y="33" width="8" height="0.700"/>
+      <rect x="46" y="38" width="8" height="0.700"/>
+    </g>
+    <rect x="45.500" y="12.400" width="9" height="1.500" fill="#FBF1DE"/>
+    <!-- Korpus mit Schallloch und Steg -->
+    <use href="#guitar-shape" fill="#5E3218"/>
+    <use href="#guitar-shape" fill="url(#guitar-top)" transform="translate(2 2.700) scale(0.960)"/>
+    <circle cx="50" cy="60" r="7.600" fill="#2A1208"/>
+    <circle cx="50" cy="60" r="9.300" fill="none" stroke="#7A4424" stroke-width="1.300"/>
+    <circle cx="50" cy="60" r="10.800" fill="none" stroke="#FBF1DE" stroke-width="0.500" opacity="0.8"/>
+    <rect x="40.500" y="80" width="19" height="4" rx="1.300" fill="#3A1A0C"/>
+    <rect x="43" y="80.700" width="14" height="1.100" fill="#FBF1DE"/>
+    <g stroke="#F6EBD0" stroke-width="0.500" opacity="0.9">
+      <path d="M47 13v68M48.200 13v68M49.400 13v68M50.600 13v68M51.800 13v68M53 13v68"/>
+    </g>
+    <path d="M35 74c-2.500 6-.500 13 6 17" fill="none" stroke="#FFF3D8" stroke-width="1.800" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <!-- Wandhalter -->
+  <rect x="46.500" y="13.500" width="18" height="4.200" rx="2.100" fill="#6B4630"/>
+  <circle cx="55.500" cy="15.600" r="1.200" fill="#C6905F"/>
 </svg>

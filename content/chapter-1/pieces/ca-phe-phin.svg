@@ -1,8 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M30 52h40l-5 40a6 6 0 0 1-6 5H41a6 6 0 0 1-6-5z" fill="#FAF3E7"/>
-  <path d="M33 76h34l-2 16a6 6 0 0 1-6 5H41a6 6 0 0 1-6-5z" fill="#6B3A22"/>
-  <rect x="24" y="44" width="52" height="8" rx="3" fill="#8A9AA0"/>
-  <path d="M34 22h32l-3 22H37z" fill="#A9B7BC"/>
-  <rect x="30" y="16" width="40" height="7" rx="3" fill="#8A9AA0"/>
-  <rect x="46" y="9" width="8" height="8" rx="3" fill="#8A9AA0"/>
+  <defs>
+    <radialGradient id="ca-phe-phin-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ca-phe-phin-steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9AA1A4"/>
+      <stop offset="0.3" stop-color="#F6F6F0"/>
+      <stop offset="0.6" stop-color="#C5CACB"/>
+      <stop offset="1" stop-color="#7C8386"/>
+    </linearGradient>
+    <linearGradient id="ca-phe-phin-coffee" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A1A0C"/>
+      <stop offset="0.8" stop-color="#6E3A1C"/>
+      <stop offset="1" stop-color="#B98A5E"/>
+    </linearGradient>
+    <linearGradient id="ca-phe-phin-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.3"/>
+    </linearGradient>
+    <!-- Ein Glas mit Filter obendrauf; das kleine ist dasselbe, verkleinert -->
+    <g id="ca-phe-phin-set">
+      <path d="M0 26h32l-2.600 40.500c-.200 2.300-1.700 3.500-4 3.500H6.600c-2.300 0-3.800-1.200-4-3.500z" fill="#EFE7D4"/>
+      <path d="M1.500 48.500h29l-1.200 18c-.200 2.300-1.700 3.500-4 3.500H6.700c-2.300 0-3.800-1.200-4-3.500z" fill="#FBF1DE"/>
+      <path d="M1 40h30l-.500 8.500c-9.600 2.400-19.400 2.400-29 0z" fill="url(#ca-phe-phin-coffee)"/>
+      <circle cx="16" cy="34" r="1.300" fill="#3A1A0C"/>
+      <path d="M0 26h32l-2.600 40.500c-.200 2.300-1.700 3.500-4 3.500H6.600c-2.300 0-3.800-1.200-4-3.500z" fill="url(#ca-phe-phin-glass)"/>
+      <rect x="4" y="5" width="24" height="18" rx="2" fill="url(#ca-phe-phin-steel)"/>
+      <g fill="#5E6669" opacity="0.5">
+        <circle cx="9" cy="19" r="0.600"/>
+        <circle cx="13" cy="19" r="0.600"/>
+        <circle cx="17" cy="19" r="0.600"/>
+        <circle cx="21" cy="19" r="0.600"/>
+        <circle cx="25" cy="19" r="0.600"/>
+      </g>
+      <rect x="-4" y="22" width="40" height="4" rx="2" fill="url(#ca-phe-phin-steel)"/>
+      <rect x="-4" y="25" width="40" height="1" rx="0.500" fill="#4A5053" opacity="0.4"/>
+      <rect x="2" y="1.500" width="28" height="4.200" rx="2.100" fill="url(#ca-phe-phin-steel)"/>
+      <rect x="13.800" y="-3.500" width="4.400" height="6" rx="1.800" fill="url(#ca-phe-phin-steel)"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="95.500" rx="44" ry="3.800" fill="url(#ca-phe-phin-shadow)"/>
+  <!-- Holztablett -->
+  <ellipse cx="50" cy="92.500" rx="43" ry="4.800" fill="#7A4A2E"/>
+  <ellipse cx="50" cy="91" rx="43" ry="4.400" fill="#BC8C5E"/>
+  <ellipse cx="50" cy="91" rx="37" ry="3.200" fill="#A47648"/>
+  <!-- Zwei Gläser mit Filter, ein großes und ein kleines -->
+  <use href="#ca-phe-phin-set" transform="translate(13 20.500)"/>
+  <use href="#ca-phe-phin-set" transform="translate(59 37.800) scale(0.750)"/>
 </svg>

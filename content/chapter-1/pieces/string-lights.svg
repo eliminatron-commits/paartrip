@@ -1,11 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M4 8 Q50 22 96 8 L96 11 Q50 25 4 11 Z" fill="#6B3A22"/>
-  <rect x="25" y="13" width="2" height="26" fill="#23373C"/>
-  <rect x="73" y="13" width="2" height="26" fill="#23373C"/>
-  <rect x="49" y="15" width="2" height="77" fill="#23373C"/>
-  <circle cx="26" cy="42" r="4" fill="#F2C76B"/>
-  <circle cx="74" cy="42" r="4" fill="#F2C76B"/>
-  <circle cx="50" cy="92" r="4" fill="#F2C76B"/>
-  <circle cx="38" cy="17" r="2.5" fill="#F2C76B"/>
-  <circle cx="62" cy="17" r="2.5" fill="#F2C76B"/>
+  <defs>
+    <radialGradient id="string-lights-glow">
+      <stop offset="0" stop-color="#FFE9A8" stop-opacity="0.9"/>
+      <stop offset="0.35" stop-color="#FFD27A" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FFD27A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="string-lights-wash" gradientUnits="userSpaceOnUse" cx="50" cy="52" r="62">
+      <stop offset="0" stop-color="#FFD98A" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#FFD98A" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Ein Lämpchen an seiner Fassung, mit Schein -->
+    <g id="string-lights-bulb">
+      <circle cy="6.500" r="10" fill="url(#string-lights-glow)"/>
+      <rect x="-1.600" y="-.500" width="3.200" height="3.400" rx="0.800" fill="#3A2A22"/>
+      <path d="M0 2.600c2.600 0 4 2.200 4 4.600c0 2.800-1.800 4.800-4 4.800s-4-2-4-4.800c0-2.400 1.400-4.600 4-4.600z" fill="#FFF6D0"/>
+      <ellipse cx="-1.200" cy="6" rx="1" ry="1.600" fill="#FFFFFF"/>
+    </g>
+  </defs>
+  <circle cx="50" cy="52" r="62" fill="url(#string-lights-wash)"/>
+  <!-- Zwei Bögen Kabel mit Haken -->
+  <g fill="none" stroke="#2A1F1A" stroke-width="1.200" stroke-linecap="round">
+    <path d="M3 16Q26 44 50 20Q74 44 97 16"/>
+    <path d="M3 54Q26 82 50 58Q74 82 97 54"/>
+  </g>
+  <g fill="#8C5A3C">
+    <circle cx="3" cy="16" r="1.800"/>
+    <circle cx="50" cy="20" r="1.800"/>
+    <circle cx="97" cy="16" r="1.800"/>
+    <circle cx="3" cy="54" r="1.800"/>
+    <circle cx="50" cy="58" r="1.800"/>
+    <circle cx="97" cy="54" r="1.800"/>
+  </g>
+  <!-- Lämpchen: Einige flackern leise -->
+  <use href="#string-lights-bulb" x="13" y="25"/>
+  <use href="#string-lights-bulb" class="fx-twinkle" x="26" y="31"/>
+  <use href="#string-lights-bulb" x="39" y="27"/>
+  <use href="#string-lights-bulb" x="61" y="27"/>
+  <use href="#string-lights-bulb" class="fx-twinkle" style="animation-delay:-1.500s" x="74" y="31"/>
+  <use href="#string-lights-bulb" x="87" y="25"/>
+  <use href="#string-lights-bulb" class="fx-twinkle" style="animation-delay:-2.400s" x="13" y="63"/>
+  <use href="#string-lights-bulb" x="26" y="69"/>
+  <use href="#string-lights-bulb" x="39" y="65"/>
+  <use href="#string-lights-bulb" class="fx-twinkle" style="animation-delay:-0.800s" x="61" y="65"/>
+  <use href="#string-lights-bulb" x="74" y="69"/>
+  <use href="#string-lights-bulb" x="87" y="63"/>
 </svg>

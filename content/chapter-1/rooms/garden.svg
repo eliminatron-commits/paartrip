@@ -1,31 +1,243 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Himmel -->
-  <rect width="400" height="180" fill="#E3EDE3"/>
-  <circle cx="330" cy="40" r="16" fill="#F2C76B"/>
-  <!-- Hecke links -->
-  <path d="M0 180V98q12-20 34-10 14-22 40-10 18-16 40-2 20-14 42 0 18-10 34 2 12 8 16 24v78z" fill="#46614B"/>
-  <circle cx="44" cy="124" r="14" fill="#557A5C"/>
-  <circle cx="112" cy="110" r="16" fill="#557A5C"/>
-  <circle cx="172" cy="130" r="12" fill="#557A5C"/>
-  <!-- Zaun rechts -->
-  <rect x="206" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
-  <rect x="230" y="80" width="20" height="100" rx="5" fill="#C29669"/>
-  <rect x="254" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
-  <rect x="278" y="80" width="20" height="100" rx="5" fill="#C29669"/>
-  <rect x="302" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
-  <rect x="326" y="80" width="20" height="100" rx="5" fill="#C29669"/>
-  <rect x="350" y="80" width="20" height="100" rx="5" fill="#B98A5E"/>
-  <rect x="374" y="80" width="26" height="100" rx="5" fill="#C29669"/>
-  <rect x="204" y="146" width="196" height="8" fill="#8C5A3C"/>
-  <!-- Rasen -->
-  <rect y="172" width="400" height="128" fill="#8FA68A"/>
-  <ellipse cx="96" cy="236" rx="70" ry="10" fill="#9DB398"/>
-  <ellipse cx="300" cy="262" rx="84" ry="12" fill="#9DB398"/>
-  <ellipse cx="210" cy="196" rx="60" ry="7" fill="#839C7F"/>
-  <!-- Gänseblümchen -->
-  <circle cx="22" cy="258" r="3" fill="#FAF3E7"/>
-  <circle cx="204" cy="244" r="3" fill="#FAF3E7"/>
-  <circle cx="386" cy="222" r="3" fill="#FAF3E7"/>
-  <circle cx="112" cy="194" r="3" fill="#FAF3E7"/>
-  <circle cx="264" cy="190" r="3" fill="#FAF3E7"/>
+  <defs>
+    <linearGradient id="garden-sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="176">
+      <stop offset="0" stop-color="#2A3560"/>
+      <stop offset="0.32" stop-color="#4E4A7C"/>
+      <stop offset="0.56" stop-color="#9A6289"/>
+      <stop offset="0.76" stop-color="#DE8A72"/>
+      <stop offset="0.94" stop-color="#F6BC7E"/>
+    </linearGradient>
+    <radialGradient id="garden-glow">
+      <stop offset="0" stop-color="#FFE0A8" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#FFE0A8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="garden-far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2F52"/>
+      <stop offset="1" stop-color="#4A3F66"/>
+    </linearGradient>
+    <linearGradient id="garden-hedge" gradientUnits="userSpaceOnUse" x1="0" y1="84" x2="0" y2="182">
+      <stop offset="0" stop-color="#5B8460"/>
+      <stop offset="0.45" stop-color="#3C6048"/>
+      <stop offset="1" stop-color="#1F3A2C"/>
+    </linearGradient>
+    <linearGradient id="garden-board-a" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9AE80"/>
+      <stop offset="1" stop-color="#96673F"/>
+    </linearGradient>
+    <linearGradient id="garden-board-b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C79B6C"/>
+      <stop offset="1" stop-color="#86583A"/>
+    </linearGradient>
+    <linearGradient id="garden-rail" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B98258"/>
+      <stop offset="1" stop-color="#7A4C30"/>
+    </linearGradient>
+    <linearGradient id="garden-lawn" gradientUnits="userSpaceOnUse" x1="0" y1="172" x2="0" y2="300">
+      <stop offset="0" stop-color="#7F9E6C"/>
+      <stop offset="0.4" stop-color="#5F8558"/>
+      <stop offset="1" stop-color="#3B5F44"/>
+    </linearGradient>
+    <linearGradient id="garden-drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="garden-firefly">
+      <stop offset="0" stop-color="#FFF7B0" stop-opacity="0.9"/>
+      <stop offset="0.3" stop-color="#F4E97A" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#F4E97A" stop-opacity="0"/>
+    </radialGradient>
+    <g id="garden-plank-a">
+      <path d="M0 100V6c0-4 4-6 10-6s10 2 10 6v94z" fill="url(#garden-board-a)"/>
+      <rect x="0.600" y="5" width="1.200" height="95" fill="#F3D2A6" opacity="0.5"/>
+      <rect x="18.400" y="5" width="1.600" height="95" fill="#5E3A22" opacity="0.3"/>
+      <path d="M6 16c1.500 14-1.500 26 0 42M13 30c1.200 12-1.200 24 0 40" fill="none" stroke="#7A4C30" stroke-width="0.600" opacity="0.35"/>
+    </g>
+    <g id="garden-plank-b">
+      <path d="M0 100V6c0-4 4-6 10-6s10 2 10 6v94z" fill="url(#garden-board-b)"/>
+      <rect x="0.600" y="5" width="1.200" height="95" fill="#EBC79A" opacity="0.45"/>
+      <rect x="18.400" y="5" width="1.600" height="95" fill="#5E3A22" opacity="0.3"/>
+      <path d="M8 12c-1.200 16 1.200 30 0 50M14.500 22c1 10-1 18 0 30" fill="none" stroke="#6B4630" stroke-width="0.600" opacity="0.35"/>
+      <ellipse cx="9" cy="52" rx="2" ry="3" fill="#6B4630" opacity="0.3"/>
+    </g>
+    <g id="garden-boot">
+      <path d="M0 0h6.200v9.800h3.600c2.400 0 3.900 1.400 3.900 3.400V15H0z"/>
+    </g>
+    <g id="garden-tuft">
+      <path d="M0 0c-.600-2.600-1.800-4.200-3.200-5.400M0 0c.200-3 .200-5 .800-7M0 0c.800-2.400 2-4 3.600-5" fill="none" stroke-width="0.900" stroke-linecap="round"/>
+    </g>
+    <g id="garden-daisy">
+      <circle r="1.900" fill="#FBF4E4"/>
+      <circle r="0.800" fill="#F2C76B"/>
+    </g>
+  </defs>
+
+  <!-- Abendhimmel: Die Sonne ist rechts hinter den Häusern untergegangen. Kein Mond – er steht über dem Dach. -->
+  <rect width="400" height="180" fill="url(#garden-sky)"/>
+  <ellipse cx="300" cy="150" rx="210" ry="74" fill="url(#garden-glow)"/>
+  <g fill="#FFF4D2">
+    <circle class="fx-twinkle" cx="34" cy="14" r="0.900"/>
+    <circle cx="78" cy="30" r="0.600"/>
+    <circle class="fx-twinkle" style="animation-delay:-1.400s" cx="152" cy="12" r="0.800"/>
+    <circle cx="196" cy="34" r="0.600"/>
+    <circle class="fx-twinkle" style="animation-delay:-2.600s" cx="244" cy="18" r="1"/>
+    <circle cx="286" cy="38" r="0.600"/>
+    <circle class="fx-twinkle" style="animation-delay:-0.700s" cx="338" cy="12" r="0.800"/>
+    <circle cx="378" cy="30" r="0.700"/>
+    <circle cx="118" cy="44" r="0.500"/>
+    <circle cx="318" cy="52" r="0.500"/>
+  </g>
+  <path d="M150 62q22-5 46-1.500t40-3v4q-20 4.500-40 2.500t-46 2z" fill="#E9A9B8" opacity="0.35"/>
+  <path d="M250 84q26-5 52-2t46-3v4.500q-24 4-46 2.500t-52 2.500z" fill="#FFD3A0" opacity="0.5"/>
+  <path d="M20 74q18-4 36-1t30-2.500v3.500q-14 3.500-30 2t-36 2z" fill="#C79AB8" opacity="0.3"/>
+
+  <!-- Ferne: ein großer Baum hinter der Hecke, die Dächer der Nachbarn hinter dem Zaun -->
+  <path d="M40 120c-18-6-22-30-6-40c-4-18 14-30 28-22c8-16 34-16 40 2c16-6 30 8 24 24c14 6 14 28-2 34z" fill="url(#garden-far)"/>
+  <path d="M196 110V70l14-11l14 11v-5h16V54l15-11l15 11v14l8-6l12 9V60l18-14l18 14v9l10-8l14 11v-9h14l16 12v41z" fill="url(#garden-far)"/>
+  <g fill="#FFD480">
+    <rect x="207" y="72" width="3" height="3.600"/>
+    <rect x="250.500" y="58" width="3" height="3.600"/>
+    <rect x="256" y="58" width="3" height="3.600"/>
+    <rect x="304" y="62" width="3.200" height="3.800"/>
+    <rect x="352" y="70" width="3" height="3.600"/>
+  </g>
+  <rect x="264" y="38" width="5" height="9" fill="#2B2F52"/>
+
+  <!-- Hecke links: oben fängt sie noch das Abendlicht -->
+  <path d="M0 182V98q12-20 34-10q14-22 40-10q18-16 40-2q20-14 42 0q18-10 34 2q12 8 16 24v80z" fill="url(#garden-hedge)"/>
+  <g fill="none" stroke="#A8CB8E" stroke-width="1.300" stroke-linecap="round" opacity="0.55">
+    <path d="M12 91q10-8 21-3.500M48 80q12-8 25-2.500M86 72q13-6 27 3M128 74q12-5 27 1.500M166 76q10-2.500 21 2.500"/>
+  </g>
+  <g fill="#6E9A68" opacity="0.5">
+    <ellipse cx="30" cy="104" rx="15" ry="9"/>
+    <ellipse cx="72" cy="96" rx="17" ry="10"/>
+    <ellipse cx="116" cy="92" rx="18" ry="10"/>
+    <ellipse cx="158" cy="96" rx="16" ry="9"/>
+    <ellipse cx="190" cy="108" rx="10" ry="8"/>
+    <ellipse cx="50" cy="128" rx="14" ry="8"/>
+    <ellipse cx="100" cy="122" rx="16" ry="8"/>
+    <ellipse cx="146" cy="128" rx="14" ry="8"/>
+  </g>
+  <g fill="#173024" opacity="0.4">
+    <ellipse cx="24" cy="134" rx="14" ry="8"/>
+    <ellipse cx="76" cy="142" rx="18" ry="9"/>
+    <ellipse cx="126" cy="146" rx="16" ry="8"/>
+    <ellipse cx="176" cy="142" rx="16" ry="9"/>
+    <ellipse cx="46" cy="160" rx="18" ry="8"/>
+    <ellipse cx="150" cy="164" rx="20" ry="8"/>
+  </g>
+  <g fill="#F7DDE2">
+    <circle cx="22" cy="110" r="1.300"/>
+    <circle cx="58" cy="100" r="1.200"/>
+    <circle cx="64" cy="118" r="1.300"/>
+    <circle cx="98" cy="104" r="1.200"/>
+    <circle cx="124" cy="112" r="1.300"/>
+    <circle cx="140" cy="98" r="1.200"/>
+    <circle cx="170" cy="112" r="1.300"/>
+    <circle cx="188" cy="126" r="1.200"/>
+    <circle cx="36" cy="140" r="1.200"/>
+    <circle cx="108" cy="136" r="1.300"/>
+  </g>
+
+  <!-- Holzzaun rechts mit Querlatte; an ihm hängen die Zaunstücke -->
+  <rect x="204" y="88" width="196" height="92" fill="#3A2A22"/>
+  <use href="#garden-plank-a" x="206" y="80"/>
+  <use href="#garden-plank-b" x="230" y="80"/>
+  <use href="#garden-plank-a" x="254" y="80"/>
+  <use href="#garden-plank-b" x="278" y="80"/>
+  <use href="#garden-plank-a" x="302" y="80"/>
+  <use href="#garden-plank-b" x="326" y="80"/>
+  <use href="#garden-plank-a" x="350" y="80"/>
+  <use href="#garden-plank-b" x="374" y="80"/>
+  <rect x="394" y="84" width="6" height="96" fill="url(#garden-board-a)"/>
+  <rect x="204" y="148.500" width="196" height="5" fill="url(#garden-drop)" opacity="0.7"/>
+  <rect x="204" y="141" width="196" height="7.500" fill="url(#garden-rail)"/>
+  <rect x="204" y="141" width="196" height="1" fill="#E7BE92" opacity="0.8"/>
+  <g fill="#3A2A22" opacity="0.7">
+    <circle cx="216" cy="144.800" r="0.900"/>
+    <circle cx="240" cy="144.800" r="0.900"/>
+    <circle cx="264" cy="144.800" r="0.900"/>
+    <circle cx="288" cy="144.800" r="0.900"/>
+    <circle cx="312" cy="144.800" r="0.900"/>
+    <circle cx="336" cy="144.800" r="0.900"/>
+    <circle cx="360" cy="144.800" r="0.900"/>
+    <circle cx="384" cy="144.800" r="0.900"/>
+  </g>
+  <!-- Pfosten zwischen Hecke und Zaun -->
+  <path d="M199 180V82c0-3 3-5 6-5s6 2 6 5v98z" fill="url(#garden-board-b)"/>
+  <rect x="197.500" y="76" width="15" height="4" rx="1.500" fill="#8C5A3C"/>
+  <rect x="197.500" y="76" width="15" height="1" fill="#E7BE92" opacity="0.7"/>
+
+  <!-- Rasen mit Mähstreifen, Abendlicht von rechts -->
+  <rect y="172" width="400" height="128" fill="url(#garden-lawn)"/>
+  <g fill="#FFF3C4" opacity="0.07">
+    <rect y="172" width="400" height="13"/>
+    <rect y="203" width="400" height="26"/>
+    <rect y="262" width="400" height="38"/>
+  </g>
+  <ellipse cx="300" cy="206" rx="140" ry="26" fill="url(#garden-glow)" opacity="0.45"/>
+  <rect y="172" width="400" height="16" fill="url(#garden-drop)"/>
+  <g stroke="#2A4A35">
+    <use href="#garden-tuft" x="14" y="180"/>
+    <use href="#garden-tuft" x="60" y="178"/>
+    <use href="#garden-tuft" x="118" y="181"/>
+    <use href="#garden-tuft" x="176" y="179"/>
+    <use href="#garden-tuft" x="232" y="181"/>
+    <use href="#garden-tuft" x="290" y="179"/>
+    <use href="#garden-tuft" x="340" y="181"/>
+    <use href="#garden-tuft" x="44" y="232"/>
+    <use href="#garden-tuft" x="206" y="226"/>
+    <use href="#garden-tuft" x="300" y="246"/>
+    <use href="#garden-tuft" x="112" y="268"/>
+    <use href="#garden-tuft" x="388" y="262"/>
+  </g>
+  <g stroke="#A9C98C" opacity="0.8">
+    <use href="#garden-tuft" x="92" y="204"/>
+    <use href="#garden-tuft" x="186" y="198"/>
+    <use href="#garden-tuft" x="268" y="208"/>
+    <use href="#garden-tuft" x="352" y="228"/>
+    <use href="#garden-tuft" x="18" y="262"/>
+    <use href="#garden-tuft" x="212" y="282"/>
+    <use href="#garden-tuft" x="304" y="290"/>
+  </g>
+  <use href="#garden-daisy" x="22" y="246"/>
+  <use href="#garden-daisy" x="30" y="252"/>
+  <use href="#garden-daisy" x="110" y="196"/>
+  <use href="#garden-daisy" x="204" y="246"/>
+  <use href="#garden-daisy" x="212" y="240"/>
+  <use href="#garden-daisy" x="262" y="194"/>
+  <use href="#garden-daisy" x="394" y="246"/>
+  <use href="#garden-daisy" x="300" y="296"/>
+
+  <!-- Zwei Paar Gummistiefel am Zaun, ein großes und ein kleines -->
+  <ellipse cx="364" cy="193.500" rx="13" ry="2.600" fill="#14261C" opacity="0.4"/>
+  <ellipse cx="386" cy="193.500" rx="9" ry="2" fill="#14261C" opacity="0.4"/>
+  <g transform="translate(357 177.500)">
+    <use href="#garden-boot" fill="#1D4955"/>
+    <rect width="6.200" height="1.800" fill="#3C7A87"/>
+  </g>
+  <g transform="translate(351.500 178.500)">
+    <use href="#garden-boot" fill="#2C6370"/>
+    <rect width="6.200" height="1.800" fill="#5C97A3"/>
+    <rect x="1" y="2.600" width="1.100" height="6.500" fill="#7FB3BE" opacity="0.5"/>
+    <rect y="13.700" width="13.700" height="1.300" fill="#143842"/>
+  </g>
+  <g transform="translate(382 182.300) scale(0.740)">
+    <use href="#garden-boot" fill="#B76860"/>
+    <rect width="6.200" height="1.800" fill="#E7A9A0"/>
+  </g>
+  <g transform="translate(377.500 183) scale(0.740)">
+    <use href="#garden-boot" fill="#DE9A92"/>
+    <rect width="6.200" height="1.800" fill="#F6CFC8"/>
+    <rect x="1" y="2.600" width="1.100" height="6.500" fill="#FBE3DC" opacity="0.6"/>
+    <rect y="13.700" width="13.700" height="1.300" fill="#8E4A46"/>
+  </g>
+
+  <!-- Glühwürmchen vor der Hecke -->
+  <g>
+    <circle class="fx-twinkle" cx="38" cy="152" r="4.500" fill="url(#garden-firefly)"/>
+    <circle class="fx-twinkle" style="animation-delay:-1.100s" cx="92" cy="130" r="4" fill="url(#garden-firefly)"/>
+    <circle class="fx-twinkle" style="animation-delay:-2.200s" cx="150" cy="158" r="4.500" fill="url(#garden-firefly)"/>
+    <circle class="fx-twinkle" style="animation-delay:-0.500s" cx="184" cy="122" r="3.600" fill="url(#garden-firefly)"/>
+    <circle class="fx-twinkle" style="animation-delay:-1.800s" cx="118" cy="170" r="4" fill="url(#garden-firefly)"/>
+  </g>
 </svg>

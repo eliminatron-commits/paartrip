@@ -202,6 +202,28 @@ describe('checkContent', () => {
     content.viTerms.push({ term: 'Cà phê sữa đá', meaning: 'iced coffee', where: ['t1'] }, { term: 'Phở', meaning: 'noodle soup', where: ['s1'] });
     expect(checkContent(content)).toEqual([]);
   });
+
+  it('meldet ids in Zeichnungen, die nicht mit der id ihrer Datei beginnen – sie stehen alle inline in einer Seite', () => {
+    const content = sample();
+    const chapter = content.chapters[0]!;
+    const drawn = (...ids: string[]) => ({ viewBox: '0 0 10 10', body: ids.map((id) => `<linearGradient id="${id}"/>`).join('') });
+    chapter.pieces[0]!.art = drawn('chair-shadow', 'chair-wood');
+    chapter.rooms[0]!.art = drawn('room-wall');
+    chapter.rooms[0]!.front = drawn('room-front-dim');
+    chapter.roof = drawn('roof-tiles');
+    expect(checkContent(content)).toEqual([]);
+
+    chapter.pieces[0]!.art = drawn('chair-shadow', 'shadow');
+    chapter.rooms[0]!.art = drawn('room-wall', 'room-front-halo');
+    chapter.rooms[0]!.front = drawn('room-dim');
+    chapter.roof = drawn('tiles');
+    expect(checkContent(content)).toEqual([
+      expect.stringContaining('Stück "chair": id "shadow"'),
+      expect.stringContaining('Raum "room": id "room-front-halo"'),
+      expect.stringContaining('Vordergrund von Raum "room": id "room-dim"'),
+      expect.stringContaining('Dachs: id "tiles"'),
+    ]);
+  });
 });
 
 describe('checkComplete', () => {

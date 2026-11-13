@@ -1,17 +1,72 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <g transform="translate(0 4)">
-    <rect x="5" y="12" width="90" height="80" rx="4" fill="#8C5A3C"/>
-    <rect x="10" y="17" width="80" height="70" fill="#B98A5E"/>
-    <rect x="17" y="25" width="28" height="22" fill="#FAF3E7" transform="rotate(-6 31 36)"/>
-    <rect x="54" y="23" width="26" height="30" fill="#A9B7BC" transform="rotate(5 67 38)"/>
-    <rect x="20" y="54" width="24" height="26" fill="#F2C76B" transform="rotate(4 32 67)"/>
-    <rect x="51" y="59" width="30" height="20" fill="#FAF3E7" transform="rotate(-4 66 69)"/>
-    <rect x="22" y="33" width="16" height="3" fill="#8A9AA0" transform="rotate(-6 31 36)"/>
-    <rect x="57" y="65" width="18" height="3" fill="#8A9AA0" transform="rotate(-4 66 69)"/>
-    <circle cx="67" cy="40" r="6" fill="#8FA68A"/>
-    <circle cx="30" cy="25" r="3" fill="#C96A45"/>
-    <circle cx="67" cy="24" r="3" fill="#2C6370"/>
-    <circle cx="32" cy="55" r="3" fill="#2C6370"/>
-    <circle cx="66" cy="60" r="3" fill="#C96A45"/>
+  <defs>
+    <linearGradient id="pinboard-wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C6905F"/>
+      <stop offset="1" stop-color="#7A4A2E"/>
+    </linearGradient>
+    <radialGradient id="pinboard-cork" gradientUnits="userSpaceOnUse" cx="44" cy="44" r="62">
+      <stop offset="0" stop-color="#E3B987"/>
+      <stop offset="1" stop-color="#B5854F"/>
+    </radialGradient>
+    <pattern id="pinboard-grain" width="9" height="9" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2.500" r="0.700" fill="#8A5A30" opacity="0.35"/>
+      <circle cx="6.500" cy="6" r="0.600" fill="#8A5A30" opacity="0.3"/>
+      <circle cx="5" cy="1.500" r="0.500" fill="#F6DDB4" opacity="0.5"/>
+      <circle cx="1.500" cy="7" r="0.500" fill="#F6DDB4" opacity="0.45"/>
+    </pattern>
+    <linearGradient id="pinboard-sunset" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4D4F86"/>
+      <stop offset="0.6" stop-color="#E08A72"/>
+      <stop offset="1" stop-color="#FBCB80"/>
+    </linearGradient>
+  </defs>
+  <!-- Schatten an der Wand, Rahmen und Kork -->
+  <rect x="9.500" y="15" width="86" height="80" rx="3" fill="#3A2216" opacity="0.22"/>
+  <rect x="7" y="12" width="86" height="80" rx="3" fill="url(#pinboard-wood)"/>
+  <rect x="9" y="13.500" width="82" height="1.200" fill="#F2CFA2" opacity="0.6"/>
+  <rect x="12" y="17" width="76" height="70" fill="url(#pinboard-cork)"/>
+  <rect x="12" y="17" width="76" height="70" fill="url(#pinboard-grain)"/>
+  <rect x="12" y="17" width="76" height="2.600" fill="#3A2216" opacity="0.25"/>
+  <!-- Foto: zwei am Meer, im Abendlicht -->
+  <g transform="rotate(-6 33 44)">
+    <rect x="18.500" y="26" width="30" height="36" fill="#3A2216" opacity="0.25"/>
+    <rect x="17" y="24" width="30" height="36" fill="#FFFDF6"/>
+    <rect x="19.500" y="26.500" width="25" height="24" fill="url(#pinboard-sunset)"/>
+    <rect x="19.500" y="44" width="25" height="6.500" fill="#2C6370"/>
+    <circle cx="29.500" cy="38.500" r="3" fill="#12222C"/>
+    <path d="M24.500 50.500c0-5.500 2-8.500 5-8.500s5 3 5 8.500z" fill="#12222C"/>
+    <circle cx="36.500" cy="41" r="2.500" fill="#12222C"/>
+    <path d="M32.500 50.500c0-4.500 1.600-7 4-7s4 2.500 4 7z" fill="#12222C"/>
   </g>
+  <circle cx="31" cy="25" r="2.400" fill="#C8402B"/>
+  <circle cx="30.300" cy="24.300" r="0.800" fill="#FFB8A8"/>
+  <!-- Eintrittskarte -->
+  <g transform="rotate(8 68 32)">
+    <path d="M52 24h32v5a2.500 2.500 0 0 0 0 5v5H52v-5a2.500 2.500 0 0 0 0-5z" fill="#F2C76B"/>
+    <path d="M60 24v15" stroke="#8A5212" stroke-width="0.800" stroke-dasharray="1.600 1.400"/>
+    <rect x="64" y="28" width="15" height="2" rx="1" fill="#8A5212"/>
+    <rect x="64" y="32.500" width="10" height="1.600" rx="0.800" fill="#8A5212" opacity="0.7"/>
+  </g>
+  <circle cx="70" cy="24" r="2.400" fill="#2C6370"/>
+  <circle cx="69.300" cy="23.300" r="0.800" fill="#9CCBD4"/>
+  <!-- Zettel mit Einkaufsliste -->
+  <g transform="rotate(4 72 62)">
+    <rect x="58" y="48" width="26" height="30" fill="#FFFDF6"/>
+    <g fill="#9A8A6A">
+      <rect x="62" y="54" width="18" height="1.300" rx="0.600"/>
+      <rect x="62" y="59" width="14" height="1.300" rx="0.600"/>
+      <rect x="62" y="64" width="17" height="1.300" rx="0.600"/>
+      <rect x="62" y="69" width="11" height="1.300" rx="0.600"/>
+    </g>
+    <path d="M78 76l6-6v8h-6z" fill="#E6D6B6"/>
+  </g>
+  <circle cx="72" cy="48" r="2.400" fill="#7F9682"/>
+  <circle cx="71.300" cy="47.300" r="0.800" fill="#D5DFC6"/>
+  <!-- Klebezettel mit Herz -->
+  <g transform="rotate(-5 30 74)">
+    <rect x="19" y="64" width="20" height="18" fill="#F6B8A4"/>
+    <path d="M29 78c-5.200-3.600-6.400-6.200-5.200-8.300c1.100-1.900 3.800-1.800 5.200.200c1.400-2 4.100-2.100 5.200-.200c1.200 2.100 0 4.700-5.200 8.300z" fill="#B8402B"/>
+  </g>
+  <circle cx="28" cy="65" r="2.400" fill="#DFA544"/>
+  <circle cx="27.300" cy="64.300" r="0.800" fill="#FFF0C4"/>
 </svg>

@@ -1,12 +1,71 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="38" y="6" width="4" height="14" rx="2" fill="#A9B7BC"/>
-  <rect x="50" y="2" width="4" height="16" rx="2" fill="#A9B7BC"/>
-  <rect x="60" y="8" width="4" height="12" rx="2" fill="#A9B7BC"/>
-  <polygon points="30,72 36,74 26,96 20,96" fill="#23373C"/>
-  <polygon points="70,72 64,74 74,96 80,96" fill="#23373C"/>
-  <rect x="48" y="74" width="4" height="22" fill="#23373C"/>
-  <path d="M20 50 C20 26 80 26 80 50 Z" fill="#23373C"/>
-  <rect x="45" y="24" width="10" height="6" rx="2" fill="#8C5A3C"/>
-  <path d="M18 54 H82 C82 70 68 78 50 78 C32 78 18 70 18 54 Z" fill="#9E4526"/>
-  <rect x="16" y="49" width="68" height="6" rx="3" fill="#8A9AA0"/>
+  <defs>
+    <radialGradient id="grill-shadow">
+      <stop offset="0" stop-color="#14261C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#14261C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="grill-halo" gradientUnits="userSpaceOnUse" cx="50" cy="48" r="44">
+      <stop offset="0" stop-color="#FFB45A" stop-opacity="0.6"/>
+      <stop offset="0.45" stop-color="#FF9A3C" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="grill-puff">
+      <stop offset="0" stop-color="#F3EEE4" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#F3EEE4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="grill-bowl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1A1C20"/>
+      <stop offset="0.35" stop-color="#4E545C"/>
+      <stop offset="1" stop-color="#121316"/>
+    </linearGradient>
+    <linearGradient id="grill-ember" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C8402B"/>
+      <stop offset="0.5" stop-color="#FFC25E"/>
+      <stop offset="1" stop-color="#C8402B"/>
+    </linearGradient>
+    <linearGradient id="grill-sausage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D98A4E"/>
+      <stop offset="1" stop-color="#8E4A20"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="48" r="44" fill="url(#grill-halo)"/>
+  <!-- Rauch -->
+  <circle class="fx-smoke" cx="46" cy="24" r="8" fill="url(#grill-puff)"/>
+  <circle class="fx-smoke" style="animation-delay:-2s" cx="56" cy="13" r="9.500" fill="url(#grill-puff)"/>
+  <circle class="fx-smoke" style="animation-delay:-4s" cx="48" cy="3" r="8" fill="url(#grill-puff)"/>
+  <ellipse cx="50" cy="96.500" rx="36" ry="3.600" fill="url(#grill-shadow)"/>
+  <!-- Beine, Ablage und Räder -->
+  <g fill="none" stroke="#6E757C" stroke-width="2.600" stroke-linecap="round">
+    <path d="M36 66L26 93M64 66l10 27M50 70v18"/>
+  </g>
+  <path d="M30.500 82h39" stroke="#4E545C" stroke-width="2.200" stroke-linecap="round"/>
+  <circle cx="26" cy="92" r="4.600" fill="#1A1C20"/>
+  <circle cx="26" cy="92" r="1.600" fill="#8A949A"/>
+  <rect x="71" y="92" width="6" height="3.600" rx="1.200" fill="#1A1C20"/>
+  <!-- Kessel -->
+  <path d="M21 49h58c0 15-12.500 23-29 23S21 64 21 49z" fill="url(#grill-bowl)"/>
+  <path d="M27 55c2 7 8 12 16 14" fill="none" stroke="#9AA4AC" stroke-width="1.600" stroke-linecap="round" opacity="0.45"/>
+  <rect x="46" y="71" width="8" height="4" rx="1.200" fill="#2A2D32"/>
+  <rect x="8" y="46" width="13" height="4.200" rx="2.100" fill="#8C5A3C"/>
+  <rect x="79" y="46" width="13" height="4.200" rx="2.100" fill="#8C5A3C"/>
+  <!-- Glut, Rost, Würstchen und ein Maiskolben -->
+  <ellipse cx="50" cy="49" rx="29" ry="4.600" fill="#2A160E"/>
+  <ellipse class="fx-twinkle" cx="50" cy="49.200" rx="26" ry="3.400" fill="url(#grill-ember)"/>
+  <rect x="19" y="45.500" width="62" height="3.400" rx="1.700" fill="#6E757C"/>
+  <rect x="21" y="46" width="58" height="0.900" rx="0.400" fill="#C5CACB" opacity="0.7"/>
+  <rect x="26" y="38.500" width="22" height="6.600" rx="3.300" fill="url(#grill-sausage)" transform="rotate(-5 37 42)"/>
+  <rect x="32" y="33.500" width="22" height="6.600" rx="3.300" fill="url(#grill-sausage)" transform="rotate(4 43 37)"/>
+  <g stroke="#4A2010" stroke-width="1" stroke-linecap="round" opacity="0.7">
+    <path d="M31 40l1.500 4M36 39.600l1.500 4M41 39.200l1.500 4M38 35l1.500 4M43 35.400l1.500 4M48 35.800l1.500 4"/>
+  </g>
+  <rect x="54" y="38" width="22" height="7.400" rx="3.700" fill="#F2C13C" transform="rotate(-3 65 41.500)"/>
+  <g fill="#C98F1E" opacity="0.7" transform="rotate(-3 65 41.500)">
+    <circle cx="59" cy="40.500" r="0.800"/>
+    <circle cx="63" cy="40.500" r="0.800"/>
+    <circle cx="67" cy="40.500" r="0.800"/>
+    <circle cx="71" cy="40.500" r="0.800"/>
+    <circle cx="61" cy="43" r="0.800"/>
+    <circle cx="65" cy="43" r="0.800"/>
+    <circle cx="69" cy="43" r="0.800"/>
+  </g>
 </svg>
