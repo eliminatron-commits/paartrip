@@ -3,6 +3,7 @@
   // (room.front), ganz oben die Tippflächen.
   // (x, y) eines Platzes ist die Mitte der Unterkante des Felds, in dem das Stück steht oder hängt.
   import type { Piece, Room } from '../../../shared/content-schema.ts';
+  import { puff, settle } from '../../lib/motion.ts';
 
   interface Props {
     room: Room;
@@ -44,10 +45,14 @@
   <svg viewBox={room.art.viewBox} role="img" aria-label={room.name}>
     {@html room.art.body}
     {#each standing as { spot, piece } (spot.id)}
-      <!-- overflow: Der Lichtschein einer Lampe oder Kerze reicht über das Feld des Stücks hinaus. -->
-      <svg x={spot.x - spot.size / 2} y={spot.y - spot.size} width={spot.size} height={spot.size} viewBox={piece.art.viewBox} overflow="visible" data-piece={piece.id} data-spot={spot.id}>
-        {@html piece.art.body}
-      </svg>
+      <!-- Nur ein Stück, das neu dazukommt (auch umgestellt), setzt sich ab; beim Öffnen des Hauses steht alles still da. -->
+      <ellipse class="puff" cx={spot.x} cy={spot.y - 1} rx={spot.size * 0.42} ry={spot.size * 0.07} opacity="0" in:puff={spot} />
+      <g in:settle={spot}>
+        <!-- overflow: Der Lichtschein einer Lampe oder Kerze reicht über das Feld des Stücks hinaus. -->
+        <svg x={spot.x - spot.size / 2} y={spot.y - spot.size} width={spot.size} height={spot.size} viewBox={piece.art.viewBox} overflow="visible" data-piece={piece.id} data-spot={spot.id}>
+          {@html piece.art.body}
+        </svg>
+      </g>
     {/each}
     {#if room.front}{@html room.front.body}{/if}
   </svg>
@@ -85,9 +90,15 @@
     height: 100%;
   }
 
+  .puff {
+    fill: var(--cream);
+  }
+
   .spot {
     position: absolute;
-    transform: translate(-50%, -50%);
+    /* Mitte aufs Feld über die eigene Eigenschaft translate, nicht über transform: Das gehört dem Drücken
+       (button:active in app.css) – sonst spränge der Platz unter dem Finger um eine halbe Breite weg. */
+    translate: -50% -50%;
     /* Kleine Plätze bleiben trotzdem gut zu treffen. */
     min-width: var(--tap);
     min-height: var(--tap);
@@ -96,7 +107,7 @@
 
   .piece.selected {
     box-shadow: 0 0 0 3px var(--petrol);
-    background: rgb(250 243 231 / 0.25);
+    background: color-mix(in srgb, var(--cream) 25%, transparent);
   }
 
   .target {
@@ -111,7 +122,7 @@
     background: var(--cream);
     box-shadow:
       0 0 0 3px var(--petrol),
-      0 0 0 9px rgb(31 78 90 / 0.25);
+      0 0 0 9px color-mix(in srgb, var(--petrol) 25%, transparent);
     animation: breathe 1.4s ease-in-out infinite alternate;
   }
 

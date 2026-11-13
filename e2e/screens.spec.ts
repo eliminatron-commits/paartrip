@@ -89,6 +89,10 @@ let shot = 0;
 async function check(page: Page, name: string, area: SafeArea = SAFE_AREA): Promise<void> {
   shot += 1;
   await page.evaluate(() => document.fonts.ready);
+  // Ein eben geöffneter Bildschirm blendet noch auf (arrive): erst das fertige Bild prüfen.
+  await page.evaluate(() =>
+    Promise.all([...document.querySelectorAll('main > .screen')].flatMap((screen) => screen.getAnimations().map((animation) => animation.finished.catch(() => undefined)))),
+  );
   await page.screenshot({ path: `screenshots/${String(shot).padStart(2, '0')}-${name}.png` });
   expect(await inSafeAreas(page, area), `${name}: in den Rändern`).toEqual([]);
   expect(await smallTargets(page), `${name}: zu kleine Tap-Ziele`).toEqual([]);
@@ -196,6 +200,8 @@ test('alle Bildschirme: nichts in den Rändern, Tap-Ziele groß genug', async ({
 });
 
 test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die Ränder frei', async ({ browser, request }) => {
+  // Jeder Raum des vollen Hauses einmal im Hoch- und einmal im Querformat: viele Bilder.
+  test.setTimeout(120_000);
   const { a, b, code } = await pair(browser, { safeArea: SAFE_AREA });
   // Wer im ersten Bauzug nicht wählt, hat im Haus nur das Dekostück vor sich.
   const { page } = chapter.build.firstChooser === 'a' ? b : a;
@@ -220,6 +226,24 @@ test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die R
   await expect(page.getByTestId('placing-bar')).toContainText('No free spot fits');
   await expect(page.locator('button.target')).toHaveCount(0);
   await check(page, 'home-no-free-spot');
+
+  // Das eingerichtete Haus, Raum für Raum – dann im Querformat, wo neben dem Haus die Abendlandschaft liegt.
+  await page.getByTestId('placing-bar').getByRole('button', { name: 'Cancel' }).click();
+  const rooms = () => chapter.rooms.map((room) => room.id);
+  for (const room of rooms()) {
+    await page.locator(`[data-room="${room}"]`).evaluate((element) => element.scrollIntoView({ block: 'center' }));
+    await check(page, `home-full-${room}`);
+  }
+  await page.setViewportSize({ width: 956, height: 440 });
+  await page.evaluate((area) => {
+    const style = document.createElement('style');
+    style.textContent = `:root{--safe-top:${area.top}px !important;--safe-right:${area.right}px !important;--safe-bottom:${area.bottom}px !important;--safe-left:${area.left}px !important}`;
+    document.documentElement.append(style);
+  }, SAFE_AREA_LANDSCAPE);
+  for (const room of rooms()) {
+    await page.locator(`[data-room="${room}"]`).evaluate((element) => element.scrollIntoView({ block: 'center' }));
+    await check(page, `landscape-home-full-${room}`, SAFE_AREA_LANDSCAPE);
+  }
 });
 
 /**

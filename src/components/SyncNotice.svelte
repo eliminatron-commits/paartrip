@@ -66,7 +66,7 @@
     gap: 8px;
     padding: 10px calc(var(--safe-right) + 20px) 10px calc(var(--safe-left) + 20px);
     background: var(--cream-deep);
-    box-shadow: 0 1px 0 rgb(35 55 60 / 0.12);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 12%, transparent);
     font-size: 0.95rem;
   }
 

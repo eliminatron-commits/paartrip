@@ -9,12 +9,12 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
 - **Phase 5/6 – Inhalte Kapitel 1:** abgeschlossen am 2026-11-12, P5-01 bis P5-06 erfüllt. Lokal committet, **nicht hochgeladen**: Der Nutzer hat entschieden, dass Phase 5 und der Knopf "Refresh" erst nach der Optik-Phase hochgeladen werden (dann noch einmal fragen).
-- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** in Arbeit seit 2026-11-13. Die Probe ist gebaut; der Nutzer hat sie am 2026-11-13 freigegeben ("gut nachher sieht gut aus. stil ist genehmigt") – der Stil wird ausgerollt. Stand und offene Punkte: Abschnitt "Optik-Phase" unten. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
+- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** abgeschlossen am 2026-11-13, PO-01 bis PO-06 erfüllt (Stil vom Nutzer freigegeben). Lokal committet, **nicht hochgeladen** – Phase 5, "Refresh" und die Optik gehen zusammen hoch, nach erneuter Frage an den Nutzer. Einzelheiten: Abschnitt "Optik-Phase" unten. Vor dem echten Start die echte Datenbank nur mit Zustimmung des Nutzers leeren. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
-## Optik-Phase: in Arbeit seit 2026-11-13
+## Optik-Phase: abgeschlossen am 2026-11-13
 
 **Richtung des Nutzers (2026-11-12/13, wörtlich):** "grafik soll cozy, romantic sein, ohne übertrieben in kitsch zu geraten!!!! Nur romantisch angehaucht, sehr cozy. SEHR BEEINDRUCKEND visuell." Dazu: Dinge zu zweit sollen erkennbar seins und ihres sein ("dass ihre handschuhe kleiner sind als meine zum beispie. Sowas gibt einen gewissen detailtouch"). Und zur Probe: "es stört mich den mond doppelt sehen zu können" – der Mond steht nur noch über dem Dach, nicht mehr im Fenster.
 
@@ -38,14 +38,25 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Prüfung der ids** in `checkContent`, mit Test: Jede id einer Zeichnung beginnt mit der id ihrer Datei (Raum, `<raum>-front-`, Stück, `roof-`).
 - **Übrige Bildschirme:** Today, Gifts und Einstellungen beginnen unter demselben Abendhimmel (`.dusk` in `app.css`, der Inhalt liegt als helles Blatt mit runden Ecken darüber; der Stand "x of 30" steht bei Today im Kopf). Willkommen zeigt das Dach des ersten Kapitels über dem Blatt. Meilenstein-Szene mit Himmel, Lichterkette und plastischem Geschenk. Karten, Knöpfe, Geschenk-Zeilen und die Auswahl im Bauzug liegen mit Schatten auf (`--lift`); Sterne als `--stars`.
 
-**Noch offen in der Optik-Phase:**
-- Übergänge (Stück setzt sich ab, Wechsel der Reiter).
-- Im Querformat steht neben dem Haus noch eine einfarbige Fläche (`--sage-deep`).
-- Die Rätsel-Bausteine und die Leiste beim Platzieren sind noch nicht eigens durchgesehen.
-- Das Stück `candle` zeigt zwei Kerzen (eine große, eine kleine) und heißt noch "Candle".
-- `e2e/optik-probe.spec.ts` ist ein vorübergehender Hilfs-Test für die Vorher-Nachher-Bilder: am Ende der Phase entfernen oder als Bild "eingerichtetes Haus" in `screens.spec.ts` übernehmen.
-- Dem Nutzer Bilder des ganzen Hauses und der übrigen Bildschirme zeigen.
-- Am Ende: Gestaltungsvorgaben in `CLAUDE.md` neu fassen, `tests.json` um die Punkte der Optik-Phase ergänzen, Review durch `pruefer`.
+Der Nutzer hat die Bilder von Küche, Garten und den übrigen Bildschirmen am 2026-11-13 gesehen: "bilder sind gut!".
+
+**Danach gebaut (2026-11-13):**
+- **Übergänge** (`src/lib/motion.ts`): Ein Stück, das ins Haus kommt (auch umgestellt), sinkt ein paar Einheiten ein, staucht sich beim Aufsetzen und federt nach; am Boden weitet sich ein heller Hauch und verfliegt. Beim Öffnen des Hauses steht alles still. Ein neuer Bildschirm (Reiter, Einstellungen) blendet auf und rückt ein paar Pixel nach oben. Bei "Bewegung reduzieren" nichts davon – Svelte spielt Übergänge über die Web Animations API, die die CSS-Regel nicht erreicht, deshalb fragt jede Funktion selbst nach. Belegt in `e2e/house.spec.ts` ("ein Stück, das dazukommt, setzt sich ab …") und `e2e/shell.spec.ts` ("ein neuer Bildschirm blendet auf …"); beide schlagen nachweislich an, wenn die Abfrage fehlt. Sie halten über `recordMotion` (`e2e/phones.ts`) fest, welche Bewegung begonnen hat, statt sie im Flug zu erwischen – unter Last waren 240 bzw. 620 ms oft vorbei, bevor der Test nachsah.
+- **Querformat:** Neben dem Haus liegt die Abendlandschaft statt der einfarbigen Fläche – unter der Traufe glimmt das Abendrot nach, nach unten wird es Nacht mit Sternen, auf Höhe des Sockels dunkle Hügel, neben dem Garten dunkler Boden mit Glühwürmchen. Ist neben dem Haus Platz, scheint sein warmes Licht hinaus.
+- **Durchgesehen:** Rätsel-Bausteine und die Leiste beim Platzieren passen zum neuen Stil und bleiben, wie sie sind – beim Rätseln geht Lesbarkeit vor Stimmung.
+- Das Stück `candle` heißt jetzt "Two candles" (die id bleibt).
+- **Sichtprüfung des eingerichteten Hauses:** `e2e/screens.spec.ts` legt nach dem vollen Haus jeden Raum im Hoch- und im Querformat ab und prüft die Ränder. Die Hilfsroute `fill-house` stellt dafür echte Stücke aus dem Angebot auf (vorher Platzhalter, die nicht zu sehen waren). Der vorübergehende `e2e/optik-probe.spec.ts` ist entfernt.
+- Gestaltungsvorgaben in `CLAUDE.md` neu gefasst.
+- **Fehler gefunden und behoben:** Ein leuchtender Platz (und ein Stück im Haus) sprang beim Drücken um eine halbe Breite nach rechts unten. Die Plätze standen über `transform: translate(-50%, -50%)` auf ihrem Feld, und `button:active` in `app.css` überschrieb genau dieses `transform`. Normal glitt der Platz in 0,12 s weg, mit "Bewegung reduzieren" sprang er sofort – das Loslassen landete daneben, das Antippen kam nicht an. Daran schwankte der Übergangs-Test. Jetzt zentriert die eigene Eigenschaft `translate` (RoomView). Belegt durch den neuen Test "ein gedrückter Platz bleibt unter dem Finger …" (mit dem alten Stand rot: 24–42 px Sprung) und 12 von 12 grünen Läufen beider Tests unter Last; der Übergangs-Test selbst ist unverändert.
+- Der Titel von `describe-arrange-2` heißt jetzt "The kitchen shelf, just so" (vorher "The spice rack …", passte nicht zu Tassen und zum Text der Rätselart – notiert in Phase 5).
+
+**Review durch `pruefer` (Opus 5.5):** nichts Kritisches. Wichtig: feste `rgb()`-Werte in sechs Komponenten (aus früheren Phasen), die der Farbtest nicht fand – jetzt `color-mix` mit Token, und `scripts/contrast.test.ts` sucht auch nach `rgb()`/`hsl()`; für das Aufblenden fehlte ein Browser-Test (ergänzt); `PROGRESS.md` und `tests.json` meldeten die Phase vor dem grünen Lauf als erfüllt (erst danach gesetzt). Klein: Bilder der Sichtprüfung konnten mitten im Aufblenden entstehen (`check()` wartet jetzt), ein Kommentar in `apple-tree.svg` passte nicht zur Zeichnung. `pruefer` hat die Korrekturen gegengelesen: nichts mehr offen.
+
+**Zeitgrenze der Browser-Tests:** 60 s statt 30 s (`playwright.config.ts`). Zwei-Geräte-Tests brauchen auf diesem Rechner allein bis zu 27 s; mit fremden Läufen daneben rissen sie die Grenze. Die Prüfungen sind dieselben.
+
+**Belegt am 2026-11-13 (Abschluss):** Typecheck 0 Fehler, 339 Vitest-Tests, 56 von 56 Browser-Tests in einem Lauf allein (3,4 Minuten).
+
+**Nicht belegt:** Ob Haus und Übergänge auf dem iPhone flüssig laufen, ist nicht gemessen; Bewegung lässt sich an Standbildern nicht beurteilen. Auf den iPhones ist von der Optik-Phase noch nichts zu sehen (nicht hochgeladen).
 
 **Fehler aus Phase 5, behoben am 2026-11-13:** `worker/test/chapter.test.ts` schwankte (drei von sechs Läufen rot): Am Meilenstein 25 fand das Vogelbad je nach Haus-id keinen freien Gartenplatz. Dahinter steckte ein Fehler der Regeln: War eine Platzart mit Stücken voll, die nur dorthin passen, wurde nie wieder ein Platz frei – das Dekostück wäre für immer ohne Platz geblieben. Nachgestellt für alle drei Dekostücke. Jetzt bleibt jedem ausstehenden Dekostück ein Platz frei (`placeSpotsFor`, `moveSpotsFor`, `decoNeeds` in `shared/rules.ts`; Begründung in `CLAUDE.md`). Belegt: neue Tests in `shared/rules.test.ts` (kleines Haus mit bekannten Größen; dazu das ganze Kapitel in 40 Häusern mit fünf Arten zu wählen, Dekostück sofort oder erst am Schluss, mit und ohne geheime Gutscheine), 338 Vitest-Tests, der Durchlauf über den Worker achtmal hintereinander grün. Der Test selbst ist unverändert. Ein Haus, das unter den alten Regeln schon eine Platzart gefüllt hat, repariert das nicht – vor dem echten Start beginnt ohnehin jedes Haus neu.
 
@@ -68,7 +79,7 @@ Lief auf dem Modell der Sitzung (Fable 5.2; geplant war Sonnet 5.5). Subagenten:
 - Auf den iPhones ist von Phase 5 nichts zu sehen (nicht hochgeladen). Dort läuft Phase 4 mit einem Haus, das `example-split-code` schon gelöst hat – dieselbe Aufgabe käme nach dem Hochladen als `split-code-1` noch einmal. Vor dem echten Start beginnt ohnehin jedes Haus neu (siehe Phase 4).
 - Während der Phase liefen auf dem Rechner Testläufe anderer Projekte; unter dieser Last und bei zwei eigenen Läufen gleichzeitig scheiterten Browser-Tests an Zeitgrenzen. Belegt ist der eine Lauf allein: 53 von 53 in 3,0 Minuten.
 
-**Für die Optik-Phase notiert:** Der Titel "The spice rack, just so" passt nicht ganz zum Text der Rätselart ("how the shelf should look").
+**Für die Optik-Phase notiert (dort erledigt):** Der Titel "The spice rack, just so" passt nicht ganz zum Text der Rätselart ("how the shelf should look").
 
 ## Phase 4/6 – Aufgaben und Rätsel: abgeschlossen am 2026-11-12
 

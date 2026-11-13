@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import type { Content } from '../shared/content-schema.ts';
-import { closePhones, finishTask, moveCard, openTab, pair, type Phone, pieceInHouse, returnToApp, syncStatus } from './phones.ts';
+import { closePhones, finishTask, motions, moveCard, openTab, pair, type Phone, pieceInHouse, recordMotion, returnToApp, syncStatus } from './phones.ts';
 
 test.afterEach(closePhones);
 
@@ -106,6 +106,76 @@ test('ein platziertes Stück können beide umstellen', async ({ browser }) => {
   await second.page.getByTestId('placing-bar').getByRole('button', { name: 'Cancel' }).click();
   await expect(second.page.locator('button.target')).toHaveCount(0);
   await expect(pieceInHouse(second.page, pieceId)).toHaveAttribute('data-spot', moved);
+});
+
+test('ein gedrückter Platz bleibt unter dem Finger – das Stück kommt dort an, wo losgelassen wird', async ({ browser }) => {
+  const { a, b } = await pair(browser);
+  const [first, second] = chapter.build.firstChooser === 'a' ? [a, b] : [b, a];
+  await finishTask(a);
+  for (const { page } of [first, second]) {
+    await openTab(page, 'Home');
+    await returnToApp(page);
+  }
+  const pieceId = (await first.page.getByRole('radio').first().getAttribute('data-piece')) ?? '';
+  await first.page.getByRole('radio').first().click();
+  await first.page.getByRole('button', { name: /^Choose the / }).click();
+  await expect(moveCard(first.page)).toHaveAttribute('data-kind', 'wait-place');
+
+  // Ohne Übergänge zeigt sich ein Sprung sofort und nicht erst nach und nach.
+  const placer = second.page;
+  await placer.emulateMedia({ reducedMotion: 'reduce' });
+  await returnToApp(placer);
+  await placer.getByRole('button', { name: 'Find a spot' }).click();
+  const target = placer.locator('button.target').first();
+  const spotId = (await target.getAttribute('data-spot')) ?? '';
+  const before = (await target.boundingBox())!;
+  await placer.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
+  await placer.mouse.down();
+  // Gedrückt darf der Platz kaum merklich nachgeben, aber nicht unter dem Finger wegrutschen.
+  const pressed = (await target.boundingBox())!;
+  expect(Math.abs(pressed.x + pressed.width / 2 - (before.x + before.width / 2))).toBeLessThan(2);
+  expect(Math.abs(pressed.y + pressed.height / 2 - (before.y + before.height / 2))).toBeLessThan(2);
+  await placer.mouse.up();
+  await expect(pieceInHouse(placer, pieceId)).toHaveAttribute('data-spot', spotId);
+});
+
+test('ein Stück, das dazukommt, setzt sich ab – beim Öffnen des Hauses und mit "Bewegung reduzieren" steht es still', async ({ browser }) => {
+  const { a, b } = await pair(browser);
+  const [first, second] = chapter.build.firstChooser === 'a' ? [a, b] : [b, a];
+  await finishTask(a);
+  const { pieceId, spotId } = await playTurn(first, second);
+  const mover = first.page;
+  await recordMotion(mover);
+  /** Begonnene Bewegungen an der Gruppe um das Stück (dort hängt der Übergang). */
+  const settling = async () => (await motions(mover)).filter((motion) => motion.piece === pieceId);
+  /** Zwei Bilder abwarten: Was hätte beginnen sollen, hat dann begonnen. */
+  const frames = () => mover.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+
+  async function move(from: string): Promise<string> {
+    await mover.locator(`button.piece[data-spot="${from}"]`).click();
+    await mover.getByTestId('piece-bar').getByRole('button', { name: 'Move' }).click();
+    const target = mover.locator('button.target').first();
+    const to = (await target.getAttribute('data-spot')) ?? '';
+    await target.click();
+    await expect(pieceInHouse(mover, pieceId)).toHaveAttribute('data-spot', to);
+    return to;
+  }
+
+  // Umgestellt: Am neuen Platz sinkt es ein und federt nach.
+  const moved = await move(spotId);
+  await expect.poll(settling).not.toEqual([]);
+
+  // Beim Öffnen des Hauses steht alles still da (nach dem Neuladen beginnt die Aufzeichnung von vorn).
+  await mover.reload();
+  await expect(pieceInHouse(mover, pieceId)).toHaveAttribute('data-spot', moved);
+  await frames();
+  expect(await settling()).toEqual([]);
+
+  // Mit "Bewegung reduzieren" kommt es ohne Bewegung an.
+  await mover.emulateMedia({ reducedMotion: 'reduce' });
+  await move(moved);
+  await frames();
+  expect(await settling()).toEqual([]);
 });
 
 test('eine beantwortete Kennst-du-mich-Frage hängt als Erinnerungsstück im Haus und bleibt lesbar', async ({ browser }) => {

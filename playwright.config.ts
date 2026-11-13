@@ -9,6 +9,8 @@ const API_PORT = 8788;
 export default defineConfig({
   testDir: 'e2e',
   forbidOnly: !!process.env.CI,
+  // Zwei Geräte, mehrere Abgleiche: Einzelne Tests brauchen allein bis zu 27 s; unter Last risse die Vorgabe von 30 s.
+  timeout: 60_000,
   reporter: 'list',
   use: {
     baseURL: URL,

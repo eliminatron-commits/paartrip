@@ -53,10 +53,16 @@ async function fillHouse(code: string): Promise<boolean> {
   const row = await load(code);
   if (!row) return false;
   const state = row.state;
-  const spots = chapterOf(state, rules().content).rooms.flatMap((room) => room.spots);
+  const chapter = chapterOf(state, rules().content);
   const taken = new Set(state.placements.map((p) => p.spotId));
-  for (const spot of spots) {
-    if (!taken.has(spot.id)) state.placements.push({ pieceId: `filler-${spot.id}`, spotId: spot.id });
+  // Echte Stücke aus dem Angebot, damit das Haus auf den Bildern eingerichtet aussieht; Dekostücke bleiben draußen
+  // (eines kann gerade auf seinen Platz warten). Passt keines mehr, steht dort ein Platzhalter.
+  const spare = chapter.pieces.filter((piece) => piece.milestone === undefined && !state.placements.some((p) => p.pieceId === piece.id));
+  for (const spot of chapter.rooms.flatMap((room) => room.spots)) {
+    if (taken.has(spot.id)) continue;
+    const index = spare.findIndex((piece) => piece.fits.includes(spot.kind));
+    const [piece] = index >= 0 ? spare.splice(index, 1) : [];
+    state.placements.push({ pieceId: piece?.id ?? `filler-${spot.id}`, spotId: spot.id });
   }
   await save(row, state);
   return true;

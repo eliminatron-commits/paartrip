@@ -57,17 +57,24 @@
     <svg viewBox={chapter.roof.viewBox}>{@html chapter.roof.body}</svg>
   </div>
 {/if}
-<div class="house" bind:this={house}>
-  <MemoryWall {view} {chapter} />
-  {#each indoor as room (room.id)}
-    <RoomView {room} {placed} {targets} selected={selected?.id ?? null} onspot={place} onpiece={(id) => (selectedId = selectedId === id ? null : id)} />
-  {/each}
-  <div class="plinth"></div>
-  {#each outdoor as room (room.id)}
-    <div class="outside">
-      <RoomView {room} {placed} {targets} selected={selected?.id ?? null} onspot={place} onpiece={(id) => (selectedId = selectedId === id ? null : id)} />
+<!-- Neben dem Haus (nur im Querformat und auf breiten Bildschirmen zu sehen): Der Abend wird zur Nacht, unten liegen Hügel. -->
+<div class="grounds" bind:this={house}>
+  <div class="evening">
+    <div class="house">
+      <MemoryWall {view} {chapter} />
+      {#each indoor as room (room.id)}
+        <RoomView {room} {placed} {targets} selected={selected?.id ?? null} onspot={place} onpiece={(id) => (selectedId = selectedId === id ? null : id)} />
+      {/each}
+      <div class="plinth"></div>
     </div>
-  {/each}
+  </div>
+  <div class="yard">
+    {#each outdoor as room (room.id)}
+      <div class="outside">
+        <RoomView {room} {placed} {targets} selected={selected?.id ?? null} onspot={place} onpiece={(id) => (selectedId = selectedId === id ? null : id)} />
+      </div>
+    {/each}
+  </div>
 </div>
 
 {#if placing}
@@ -95,12 +102,66 @@
 {/if}
 
 <style>
-  .house {
-    container-type: inline-size;
+  .house,
+  .outside {
     width: 100%;
     /* Im Querformat und auf breiten Bildschirmen bleibt das Haus handlich. */
     max-width: 520px;
-    margin: 0 auto;
+    margin-inline: auto;
+  }
+
+  .house {
+    position: relative;
+    container-type: inline-size;
+  }
+
+  /*
+   * Neben dem Haus: Unter der Traufe glimmt das Abendrot nach, nach unten wird es Nacht mit ein paar Sternen;
+   * auf Höhe des Sockels liegen dunkle Hügel, die in den Boden neben dem Garten übergehen.
+   */
+  .evening {
+    --ground: color-mix(in srgb, var(--sage-deep) 45%, var(--ink));
+    background:
+      radial-gradient(ellipse 34% 70px at 6% 100%, var(--ground) 97%, transparent 100%),
+      radial-gradient(ellipse 26% 52px at 30% 100%, var(--ground) 97%, transparent 100%),
+      radial-gradient(ellipse 30% 64px at 72% 100%, var(--ground) 97%, transparent 100%),
+      radial-gradient(ellipse 36% 76px at 97% 100%, var(--ground) 97%, transparent 100%),
+      radial-gradient(1.4px 1.4px at 5% 46%, var(--cream) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 13% 61%, var(--cream-deep) 50%, transparent 52%),
+      radial-gradient(1.6px 1.6px at 9% 78%, var(--cream) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 17% 88%, var(--cream-deep) 50%, transparent 52%),
+      radial-gradient(1.4px 1.4px at 86% 52%, var(--cream) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 94% 66%, var(--cream-deep) 50%, transparent 52%),
+      radial-gradient(1.6px 1.6px at 90% 83%, var(--cream) 50%, transparent 52%),
+      radial-gradient(1.2px 1.2px at 82% 92%, var(--cream-deep) 50%, transparent 52%),
+      linear-gradient(to bottom, var(--afterglow), var(--mauve) 22%, var(--dusk) 52%, var(--petrol) 82%);
+  }
+
+  /* Der Boden neben dem Garten – und im Hochformat der schmale Streifen zwischen Haus und Garten. */
+  .yard {
+    /* Der Abstand über dem Garten bleibt im Hof, statt durch ihn hindurchzufallen. */
+    display: flow-root;
+    /* Glühwürmchen über dem Boden; der Garten selbst hat seine eigenen. */
+    background:
+      radial-gradient(5px 5px at 7% 24%, var(--lantern) 25%, transparent),
+      radial-gradient(4px 4px at 15% 58%, var(--lantern) 25%, transparent),
+      radial-gradient(5px 5px at 4% 82%, var(--lantern) 25%, transparent),
+      radial-gradient(4px 4px at 88% 34%, var(--lantern) 25%, transparent),
+      radial-gradient(5px 5px at 95% 64%, var(--lantern) 25%, transparent),
+      radial-gradient(4px 4px at 84% 86%, var(--lantern) 25%, transparent), linear-gradient(to bottom, color-mix(in srgb, var(--sage-deep) 45%, var(--ink)), color-mix(in srgb, var(--sage-deep) 30%, var(--ink)));
+  }
+
+  /* Ist neben dem Haus Platz, scheint sein warmes Licht in die Nacht hinaus. */
+  @media (min-width: 560px) {
+    .house {
+      box-shadow:
+        0 0 60px 6px color-mix(in srgb, var(--lantern) 26%, transparent),
+        0 0 140px 30px color-mix(in srgb, var(--afterglow) 14%, transparent);
+    }
+
+    .outside {
+      box-shadow: 0 0 50px 4px color-mix(in srgb, var(--lantern) 12%, transparent);
+    }
   }
 
   /* Setzt den Himmel von Home fort: von der Dämmerung ins Abendrot an der Traufe. */
@@ -122,6 +183,7 @@
   }
 
   .outside {
+    position: relative;
     margin-top: 14px;
     overflow: hidden;
     border-radius: var(--radius) var(--radius) 0 0;
@@ -141,7 +203,7 @@
     background: var(--cream);
     box-shadow:
       0 0 0 2px var(--petrol),
-      0 6px 20px rgb(35 55 60 / 0.3);
+      0 6px 20px color-mix(in srgb, var(--ink) 30%, transparent);
   }
 
   .bar p {

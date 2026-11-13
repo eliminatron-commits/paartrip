@@ -75,7 +75,8 @@
   .home {
     /* Platz unter dem Garten, damit die Leiste zum Platzieren nichts verdeckt. */
     padding-bottom: 20px;
-    background: var(--sage-deep);
+    /* Wie der Boden am Ende des Gartens (House: .yard). */
+    background: color-mix(in srgb, var(--sage-deep) 30%, var(--ink));
   }
 
   /* Abendhimmel: schließt oben an die Kopfleiste an, unten an den Himmel über dem Dach (House). Dazu ein paar Sterne. */

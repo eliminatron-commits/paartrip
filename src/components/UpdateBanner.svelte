@@ -30,7 +30,7 @@
     background: var(--petrol);
     color: var(--cream);
     font-weight: 700;
-    box-shadow: 0 6px 20px rgb(35 55 60 / 0.3);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 30%, transparent);
   }
 
   /* Höhe der unteren Leiste: 52 px Knöpfe + 2 × 6 px Rand. */

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { closeSettings, motions, openSettings, recordMotion } from './phones.ts';
 
 test('die App startet und zeigt Namen und Versionszeile', async ({ page }) => {
   await page.goto('./');
@@ -9,6 +10,24 @@ test('die App startet und zeigt Namen und Versionszeile', async ({ page }) => {
   // (Dass Inhalte aus content/ in der App ankommen, belegt e2e/house.spec.ts am Kapiteltitel und an den Räumen.)
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByTestId('version-line')).toHaveText(/^Version \d+\.\d+\.\d+ · \d{4}-\d{2}-\d{2} \d{2}:\d{2} · e2e0001$/);
+});
+
+test('ein neuer Bildschirm blendet auf – beim Start und mit "Bewegung reduzieren" steht er sofort da', async ({ page }) => {
+  await recordMotion(page);
+  const moved = async () => (await motions(page)).filter((motion) => motion.screen);
+
+  await page.goto('./');
+  await expect(page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+  expect(await moved()).toEqual([]);
+
+  await openSettings(page);
+  await expect.poll(moved).not.toEqual([]);
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const before = (await moved()).length;
+  await closeSettings(page);
+  await expect(page.getByRole('heading', { name: 'Welcome home' })).toBeVisible();
+  expect(await moved()).toHaveLength(before);
 });
 
 test('ist installierbar: Manifest, Icons und iOS-Angaben stimmen', async ({ page, request }) => {

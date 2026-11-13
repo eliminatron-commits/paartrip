@@ -10,6 +10,7 @@
   import { awaitsMyConfirm, chapterFor, myTurn, nextMove, openMoves, unseenMilestone } from './lib/house.ts';
   import { session } from './lib/session.svelte.ts';
   import { todayWaits } from './lib/tasks.ts';
+  import { arrive } from './lib/motion.ts';
   import { ui } from './lib/ui.svelte.ts';
   import GiftsScreen from './screens/gifts/GiftsScreen.svelte';
   import HomeScreen from './screens/home/HomeScreen.svelte';
@@ -44,27 +45,32 @@
   <SyncNotice />
 
   <main bind:this={main}>
-    {#if ui.settings}
-      <SettingsScreen />
-    {:else if session.status === 'unpaired'}
-      <!-- Willkommen: Über dem Blatt steht schon das Dach des Hauses, in das die beiden einziehen. -->
-      <div class="dusk welcome" aria-hidden="true">
-        {#if roof}<svg viewBox={roof.viewBox}>{@html roof.body}</svg>{/if}
+    <!-- Beim Wechsel des Bildschirms blendet der neue weich auf. -->
+    {#key ui.settings ? 'settings' : ui.tab}
+      <div class="screen" in:arrive>
+        {#if ui.settings}
+          <SettingsScreen />
+        {:else if session.status === 'unpaired'}
+          <!-- Willkommen: Über dem Blatt steht schon das Dach des Hauses, in das die beiden einziehen. -->
+          <div class="dusk welcome" aria-hidden="true">
+            {#if roof}<svg viewBox={roof.viewBox}>{@html roof.body}</svg>{/if}
+          </div>
+          <div class="page"><Pairing /></div>
+        {:else if view && chapter}
+          {#if ui.tab === 'home'}
+            <HomeScreen {view} {chapter} {move} />
+          {:else if ui.tab === 'today'}
+            <TodayScreen {view} {chapter} {move} />
+          {:else}
+            <GiftsScreen {view} {chapter} />
+          {/if}
+        {:else if view}
+          <div class="page">
+            <p>This house is further along than this version of the app. Please update it in the settings.</p>
+          </div>
+        {/if}
       </div>
-      <div class="page"><Pairing /></div>
-    {:else if view && chapter}
-      {#if ui.tab === 'home'}
-        <HomeScreen {view} {chapter} {move} />
-      {:else if ui.tab === 'today'}
-        <TodayScreen {view} {chapter} {move} />
-      {:else}
-        <GiftsScreen {view} {chapter} />
-      {/if}
-    {:else if view}
-      <div class="page">
-        <p>This house is further along than this version of the app. Please update it in the settings.</p>
-      </div>
-    {/if}
+    {/key}
   </main>
 
   {#if view && !ui.settings}

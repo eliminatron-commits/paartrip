@@ -81,6 +81,44 @@ export async function returnToApp(page: Page): Promise<void> {
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
 }
 
+/** Eine Bewegung, die Svelte über element.animate begonnen hat (Übergänge aus src/lib/motion.ts). */
+export interface Motion {
+  /** Am Bildschirm selbst (main > .screen, Übergang arrive). */
+  screen: boolean;
+  /** id des Stücks, wenn die Bewegung an der Gruppe um ein Stück im Haus hängt (Übergang settle). */
+  piece: string | null;
+  /** Dauer in ms; 0 heißt: keine sichtbare Bewegung. */
+  ms: number;
+}
+
+/**
+ * Hält ab jetzt jede begonnene Bewegung fest – auch nach dem Neuladen. Die Übergänge dauern nur Bruchteile
+ * einer Sekunde; unter Last sind sie oft vorbei, bevor ein Test nachsieht. So prüft er, was begonnen hat.
+ */
+export async function recordMotion(page: Page): Promise<void> {
+  const install = () => {
+    const w = window as unknown as { motions?: Motion[] };
+    if (w.motions) return;
+    const motions: Motion[] = [];
+    w.motions = motions;
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function (this: Element, keyframes, options) {
+      motions.push({
+        screen: this.matches('main > .screen'),
+        piece: this.querySelector(':scope > svg[data-piece]')?.getAttribute('data-piece') ?? null,
+        ms: typeof options === 'number' ? options : Number(options?.duration ?? 0),
+      });
+      return animate.call(this, keyframes, options);
+    };
+  };
+  await page.addInitScript(install);
+  await page.evaluate(install);
+}
+
+/** Die seit `recordMotion` bzw. seit dem letzten Laden begonnenen sichtbaren Bewegungen (Dauer über 0). */
+export const motions = (page: Page): Promise<Motion[]> =>
+  page.evaluate(() => ((window as unknown as { motions?: Motion[] }).motions ?? []).filter((motion) => motion.ms > 0));
+
 export async function startHouse(page: Page, name: string): Promise<string> {
   await page.getByLabel('Your first name').fill(name);
   await page.getByRole('button', { name: 'Open the door' }).click();

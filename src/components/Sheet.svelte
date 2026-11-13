@@ -27,7 +27,7 @@
     z-index: 20;
     display: flex;
     align-items: flex-end;
-    background: rgb(35 55 60 / 0.45);
+    background: color-mix(in srgb, var(--ink) 45%, transparent);
   }
 
   /* Das Blatt reicht bis zum unteren Rand; sein Inhalt rollt nur oberhalb des Home-Indikators. */

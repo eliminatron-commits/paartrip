@@ -90,7 +90,8 @@ describe('Farben im Code', () => {
   });
 
   it('Komponenten nutzen die Tokens statt eigener Farbwerte', () => {
-    const own = styles.filter(({ path, style }) => !path.endsWith('app.css') && /#[0-9a-fA-F]{3,8}\b/.test(style)).map(({ path }) => path);
+    // Hexwerte ebenso wie rgb()/hsl(): Durchscheinendes entsteht über color-mix mit einem Token.
+    const own = styles.filter(({ path, style }) => !path.endsWith('app.css') && /#[0-9a-fA-F]{3,8}\b|\b(rgba?|hsla?)\(/.test(style)).map(({ path }) => path);
     expect(own).toEqual([]);
   });
 });
