@@ -4,7 +4,7 @@
   // Plätze; sonst lässt sich ein platziertes Stück antippen und umstellen.
   import type { Chapter } from '../../../shared/content-schema.ts';
   import type { HouseView } from '../../../shared/model.ts';
-  import { freeSpotsFor, moveSpotsFor } from '../../../shared/rules.ts';
+  import { moveSpotsFor, placeSpotsFor } from '../../../shared/rules.ts';
   import PieceArt from '../../components/PieceArt.svelte';
   import { playSound } from '../../lib/audio.ts';
   import { pieceMap } from '../../lib/house.ts';
@@ -21,10 +21,11 @@
   const outdoor = $derived(chapter.rooms.filter((room) => room.outdoor));
 
   const placing = $derived(ui.placing ? (pieces.get(ui.placing.pieceId) ?? null) : null);
-  // Aus einem Bauzug darf das Stück auf jeden passenden freien Platz; beim Umstellen hat der offene Bauzug Vorrang.
+  // Welche Plätze leuchten, sagen die Spielregeln: Ein ausstehendes Dekostück behält seinen Platz, beim Umstellen
+  // auch der offene Bauzug.
   const targets = $derived.by(() => {
     if (!placing || !ui.placing) return new Set<string>();
-    const spots = ui.placing.kind === 'turn' ? freeSpotsFor(placing, view.placements, chapter) : moveSpotsFor(placing, view, chapter);
+    const spots = ui.placing.kind === 'turn' ? placeSpotsFor(placing, view, chapter) : moveSpotsFor(placing, view, chapter);
     return new Set(spots.map((spot) => spot.id));
   });
 

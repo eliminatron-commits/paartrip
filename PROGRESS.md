@@ -9,7 +9,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
 - **Phase 5/6 – Inhalte Kapitel 1:** abgeschlossen am 2026-11-12, P5-01 bis P5-06 erfüllt. Lokal committet, **nicht hochgeladen**: Der Nutzer hat entschieden, dass Phase 5 und der Knopf "Refresh" erst nach der Optik-Phase hochgeladen werden (dann noch einmal fragen).
-- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** in Arbeit seit 2026-11-13. Die Probe ist gebaut und dem Nutzer als Vorher-Nachher-Bild geschickt; **sein Urteil steht aus** – erst nach seinem Ja ausrollen. Stand und offene Punkte: Abschnitt "Optik-Phase" unten. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
+- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** in Arbeit seit 2026-11-13. Die Probe ist gebaut; der Nutzer hat sie am 2026-11-13 freigegeben ("gut nachher sieht gut aus. stil ist genehmigt") – der Stil wird ausgerollt. Stand und offene Punkte: Abschnitt "Optik-Phase" unten. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
@@ -18,7 +18,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 **Richtung des Nutzers (2026-11-12/13, wörtlich):** "grafik soll cozy, romantic sein, ohne übertrieben in kitsch zu geraten!!!! Nur romantisch angehaucht, sehr cozy. SEHR BEEINDRUCKEND visuell." Dazu: Dinge zu zweit sollen erkennbar seins und ihres sein ("dass ihre handschuhe kleiner sind als meine zum beispie. Sowas gibt einen gewissen detailtouch"). Und zur Probe: "es stört mich den mond doppelt sehen zu können" – der Mond steht nur noch über dem Dach, nicht mehr im Fenster.
 
-**Die Probe (gebaut, lokal gesichert, Urteil des Nutzers steht aus):** Home-Bildschirm mit Abendhimmel, Dach, Dachboden und Wohnzimmer samt sechs Stücken (Sofa, Sessel, Stehlampe, Monstera, Bild, Kerzen). Bilder: `screenshots/probe/vorher-nachher-home.png` und `nachher-detail.png` (nicht im Repo). Küche, Garten, die übrigen 39 Stücke und alle anderen Bildschirme sind noch im alten Stil.
+**Die Probe (gebaut, lokal gesichert, vom Nutzer am 2026-11-13 freigegeben):** Home-Bildschirm mit Abendhimmel, Dach, Dachboden und Wohnzimmer samt sechs Stücken (Sofa, Sessel, Stehlampe, Monstera, Bild, Kerzen). Bilder: `screenshots/probe/vorher-nachher-home.png` und `nachher-detail.png` (nicht im Repo). Küche, Garten, die übrigen 39 Stücke und alle anderen Bildschirme sind noch im alten Stil.
 
 **Was dafür gebaut ist:**
 - **Vordergrund je Raum:** `rooms/<id>.front.svg` liegt über den Stücken (Licht der Hängelampe, Halbdunkel in den Ecken, Hauswände im Schnitt) – `Room.front`, optional. So liegt das Licht auch auf den Stücken, und ein Lichtschein endet an der Hauswand.
@@ -30,7 +30,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 **Belegt am 2026-11-13:** Typecheck 0 Fehler, 323 Vitest-Tests, 54 Playwright-Tests (53 und der Hilfs-Test der Probe) in einem Lauf.
 
-**Offen, wenn der Nutzer Ja sagt (Ausrollen):**
+**Ausrollen (freigegeben, in Arbeit):**
 - Küche und Garten im neuen Stil, jeweils mit Vordergrund; die übrigen 39 Stücke; je Raum ein Paar "seins und ihres".
 - Karten (MoveCard, Today, Gifts), Meilenstein-Szene, Willkommen, Einstellungen, untere Leiste; Übergänge (Stück setzt sich ab, Wechsel der Reiter).
 - Im Querformat steht neben dem Haus noch eine einfarbige Fläche (`--sage-deep`).
@@ -39,7 +39,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - `e2e/optik-probe.spec.ts` ist ein vorübergehender Hilfs-Test für die Vorher-Nachher-Bilder: am Ende der Phase entfernen oder als Bild "eingerichtetes Haus" in `screens.spec.ts` übernehmen.
 - Am Ende: Gestaltungsvorgaben in `CLAUDE.md` neu fassen, `tests.json` um die Punkte der Optik-Phase ergänzen, Review durch `pruefer`.
 
-**Fehler aus Phase 5, beim Testlauf aufgefallen (noch nicht behoben):** `worker/test/chapter.test.ts` schwankt (am 2026-11-13 drei von sechs Läufen rot): Am Meilenstein 25 findet das Dekostück Vogelbad je nach Haus-id keinen freien Gartenplatz. Dahinter steckt mehr als der Test: Sind alle acht Gartenplätze mit Stücken belegt, die nur in den Garten passen, wird nie wieder einer frei – das Vogelbad bliebe für immer ohne Platz ("wartet, bis einer frei wird" stimmt dann nicht). Betrifft genauso die anderen Dekostücke, wenn ihre Platzart voll ist. Lösung steht aus (etwa: der Bauzug bietet kein Stück an, das einem noch ausstehenden Dekostück den letzten Platz nähme). Vor dem Hochladen beheben; den Test nicht abschwächen.
+**Fehler aus Phase 5, behoben am 2026-11-13:** `worker/test/chapter.test.ts` schwankte (drei von sechs Läufen rot): Am Meilenstein 25 fand das Vogelbad je nach Haus-id keinen freien Gartenplatz. Dahinter steckte ein Fehler der Regeln: War eine Platzart mit Stücken voll, die nur dorthin passen, wurde nie wieder ein Platz frei – das Dekostück wäre für immer ohne Platz geblieben. Nachgestellt für alle drei Dekostücke. Jetzt bleibt jedem ausstehenden Dekostück ein Platz frei (`placeSpotsFor`, `moveSpotsFor`, `decoNeeds` in `shared/rules.ts`; Begründung in `CLAUDE.md`). Belegt: neue Tests in `shared/rules.test.ts` (kleines Haus mit bekannten Größen; dazu das ganze Kapitel in 40 Häusern mit fünf Arten zu wählen, Dekostück sofort oder erst am Schluss, mit und ohne geheime Gutscheine), 338 Vitest-Tests, der Durchlauf über den Worker achtmal hintereinander grün. Der Test selbst ist unverändert. Ein Haus, das unter den alten Regeln schon eine Platzart gefüllt hat, repariert das nicht – vor dem echten Start beginnt ohnehin jedes Haus neu.
 
 ## Phase 5/6 – Inhalte Kapitel 1: abgeschlossen am 2026-11-12
 

@@ -196,30 +196,71 @@ export function activeTurn(built: Pick<HouseState, 'buildTurns'>): BuildTurn | n
   return built.buildTurns.find((turn) => turn.placedAt === null) ?? null;
 }
 
-/** Findet der offene Bauzug bei diesen Platzierungen noch einen Platz – für das gewählte Stück oder, vor der Wahl, für mindestens eines aus dem Angebot? */
-function turnStillFits(turn: BuildTurn | null, placements: Placement[], chapter: RulesChapter): boolean {
-  if (!turn) return true;
-  const ids = turn.chosen !== null ? [turn.chosen] : turn.offer;
-  return ids.some((id) => {
-    const piece = chapter.pieces.find((p) => p.id === id);
-    return piece !== undefined && freeSpotsFor(piece, placements, chapter).length > 0;
-  });
-}
-
-/**
- * Plätze, auf die ein Stück umziehen darf (auch das Dekostück beim ersten Aufstellen): frei, passend – und so,
- * dass der offene Bauzug danach noch einen Platz findet. Sonst könnte Umstellen einen Zug für immer blockieren.
- */
-export function moveSpotsFor(piece: Pick<RulesPiece, 'id' | 'fits'>, built: Pick<HouseState, 'placements' | 'buildTurns'>, chapter: RulesChapter): RulesSpot[] {
-  const turn = activeTurn(built);
-  const others = built.placements.filter((p) => p.pieceId !== piece.id);
-  return freeSpotsFor(piece, built.placements, chapter).filter((spot) => turnStillFits(turn, [...others, { pieceId: piece.id, spotId: spot.id }], chapter));
-}
-
 /** Dekostücke aus Meilenstein-Geschenken, die noch keinen Platz im Haus haben. */
 export function unplacedDeco(built: Pick<HouseState, 'placements' | 'milestones'>): string[] {
   const placed = new Set(built.placements.map((p) => p.pieceId));
   return built.milestones.flatMap((m) => (m.decoPiece !== null && !placed.has(m.decoPiece) ? [m.decoPiece] : []));
+}
+
+// Was noch ins Haus muss, behält seinen Platz. Ein Stück, das nur auf eine Platzart passt, gibt seinen Platz nie
+// wieder für eine andere frei: Wäre die Art einmal voll, bliebe ein Dekostück oder ein Bauzug für immer draußen.
+// Deshalb gilt ein Platz nur als zu haben, wenn danach jeder "Bedarf" noch einen eigenen findet. Ein Bedarf ist
+// eine Liste von Platzarten, von denen eine genügt; Plätze derselben Art sind dabei gleichwertig.
+type Need = RulesSpot['kind'][];
+
+/** Der Bedarf des offenen Bauzugs: ein Platz für das gewählte Stück oder, vor der Wahl, für eines aus dem Angebot. */
+function turnNeed(turn: BuildTurn | null, chapter: RulesChapter): Need[] {
+  if (!turn) return [];
+  const ids = turn.chosen !== null ? [turn.chosen] : turn.offer;
+  return [ids.flatMap((id) => chapter.pieces.find((p) => p.id === id)?.fits ?? [])];
+}
+
+/**
+ * Der Bedarf der Dekostücke: je ein Platz für die aus geöffneten Geschenken, die noch nicht stehen, und für die
+ * der Meilensteine, die noch kommen. Ob dort wirklich eines liegt, zeigt sich erst am Meilenstein (ein geheimer
+ * Gutschein tritt an seine Stelle) – bis dahin gilt es als ausstehend. `except`: das Stück, das gerade aufgestellt wird.
+ */
+function decoNeeds(built: Pick<HouseState, 'placements' | 'milestones'>, chapter: RulesChapter, except?: string): Need[] {
+  const waiting = unplacedDeco(built);
+  const reached = new Set(built.milestones.map((m) => m.at));
+  return chapter.pieces.filter((p) => p.milestone !== undefined && p.id !== except && (waiting.includes(p.id) || !reached.has(p.milestone))).map((p) => p.fits);
+}
+
+/** Bekommt jeder Bedarf einen eigenen freien Platz? Es sind wenige Bedarfe mit wenigen Platzarten: Durchprobieren genügt. */
+function roomFor(needs: Need[], free: Map<string, number>): boolean {
+  const [kinds, ...rest] = needs;
+  if (!kinds) return true;
+  return kinds.some((kind) => {
+    const left = free.get(kind) ?? 0;
+    return left > 0 && roomFor(rest, new Map(free).set(kind, left - 1));
+  });
+}
+
+/** Freie, passende Plätze für das Stück, die jedem Bedarf in `needs` einen eigenen Platz lassen. `placements`: alle anderen Stücke. */
+function spotsLeaving(needs: Need[], piece: Pick<RulesPiece, 'fits'>, placements: Placement[], chapter: RulesChapter): RulesSpot[] {
+  const taken = new Set(placements.map((p) => p.spotId));
+  const free = new Map<string, number>();
+  for (const spot of spotsOf(chapter)) if (!taken.has(spot.id)) free.set(spot.kind, (free.get(spot.kind) ?? 0) + 1);
+  // Das Stück selbst ist der erste Bedarf: einmal je Platzart, auf die es dürfte.
+  const kinds = piece.fits.filter((kind) => roomFor([[kind], ...needs], free));
+  return freeSpotsFor(piece, placements, chapter).filter((spot) => kinds.includes(spot.kind));
+}
+
+/** Plätze für das Stück eines Bauzugs: frei, passend – und so, dass jedes ausstehende Dekostück danach noch einen Platz findet. */
+export function placeSpotsFor(piece: Pick<RulesPiece, 'fits'>, built: Pick<HouseState, 'placements' | 'milestones'>, chapter: RulesChapter): RulesSpot[] {
+  return spotsLeaving(decoNeeds(built, chapter), piece, built.placements, chapter);
+}
+
+/**
+ * Plätze, auf die ein Stück umziehen darf (auch das Dekostück beim ersten Aufstellen): frei, passend – und so,
+ * dass der offene Bauzug und jedes ausstehende Dekostück danach noch einen Platz finden.
+ */
+export function moveSpotsFor(piece: Pick<RulesPiece, 'id' | 'fits'>, built: Pick<HouseState, 'placements' | 'buildTurns' | 'milestones'>, chapter: RulesChapter): RulesSpot[] {
+  const needs = [...turnNeed(activeTurn(built), chapter), ...decoNeeds(built, chapter, piece.id)];
+  const own = built.placements.find((p) => p.pieceId === piece.id)?.spotId;
+  // Sein alter Platz wird frei und zählt für die anderen mit; als Ziel kommt er nicht in Frage.
+  const others = built.placements.filter((p) => p.pieceId !== piece.id);
+  return spotsLeaving(needs, piece, others, chapter).filter((spot) => spot.id !== own);
 }
 
 /** Stellt ein Stück auf einen Platz. Liefert die neuen Platzierungen oder den Grund, warum es nicht geht. */
@@ -245,14 +286,14 @@ function hash(text: string): number {
 }
 
 /**
- * Angebot für Bauzug n: Stücke aus dem Katalog, die noch zu haben sind und gerade irgendwo hinpassen.
- * Die Auswahl hängt nur von Haus und Zugnummer ab – so bleibt die Regel eine reine Funktion und jedes
- * Haus bekommt trotzdem seine eigene Reihenfolge.
+ * Angebot für Bauzug n: Stücke aus dem Katalog, die noch zu haben sind und gerade irgendwo hinpassen, ohne
+ * einem ausstehenden Dekostück den Platz zu nehmen. Die Auswahl hängt nur von Haus und Zugnummer ab – so
+ * bleibt die Regel eine reine Funktion und jedes Haus bekommt trotzdem seine eigene Reihenfolge.
  */
-function offerFor(state: Pick<HouseState, 'id' | 'placements'>, chapter: RulesChapter, n: number): string[] {
+function offerFor(state: Pick<HouseState, 'id' | 'placements' | 'milestones'>, chapter: RulesChapter, n: number): string[] {
   const placed = new Set(state.placements.map((p) => p.pieceId));
   return chapter.pieces
-    .filter((p) => p.milestone === undefined && !placed.has(p.id) && freeSpotsFor(p, state.placements, chapter).length > 0)
+    .filter((p) => p.milestone === undefined && !placed.has(p.id) && placeSpotsFor(p, state, chapter).length > 0)
     .map((p) => ({ id: p.id, rank: hash(`${state.id}:${n}:${p.id}`) }))
     .sort((x, y) => x.rank - y.rank || (x.id < y.id ? -1 : 1))
     .slice(0, chapter.build.offerSize)
@@ -263,7 +304,7 @@ function offerFor(state: Pick<HouseState, 'id' | 'placements'>, chapter: RulesCh
  * Gibt dem Bauzug, der jetzt dran ist, sein Angebot. Es entsteht erst in diesem Moment – aus dem, was dann
  * noch zu haben ist und ins Haus passt. Passt nichts mehr, entfällt der Zug und der nächste rückt nach.
  */
-function withActiveOffer(state: Pick<HouseState, 'id' | 'placements' | 'buildTurns'>, chapter: RulesChapter): BuildTurn[] {
+function withActiveOffer(state: Pick<HouseState, 'id' | 'placements' | 'buildTurns' | 'milestones'>, chapter: RulesChapter): BuildTurn[] {
   const turns = [...state.buildTurns];
   for (;;) {
     const index = turns.findIndex((turn) => turn.placedAt === null);
@@ -288,11 +329,6 @@ export function completeTask(state: HouseState, done: DoneTask, ctx: RuleContext
   const n = state.done.length + 1;
   const effects: PushEffect[] = [];
 
-  // Die Rollen wechseln je Zug. Sein Angebot bekommt der Zug, sobald er dran ist (withActiveOffer).
-  const first = chapter.build.firstChooser;
-  const turn: BuildTurn = { n, chooser: n % 2 === 1 ? first : otherSlot(first), offer: [], chosen: null, placedAt: null };
-  const buildTurns = withActiveOffer({ ...state, buildTurns: [...state.buildTurns, turn] }, chapter);
-
   let coupons = state.coupons;
   let milestones = state.milestones;
   if (chapter.milestones.includes(n) && !milestones.some((m) => m.at === n)) {
@@ -302,6 +338,12 @@ export function completeTask(state: HouseState, done: DoneTask, ctx: RuleContext
     const decoPiece = opened.size === 0 ? (chapter.pieces.find((p) => p.milestone === n)?.id ?? null) : null;
     milestones = [...milestones, { at: n, reachedAt: ctx.now, decoPiece, seenBy: [] }];
   }
+
+  // Die Rollen wechseln je Zug. Sein Angebot bekommt der Zug, sobald er dran ist (withActiveOffer) – nach dem
+  // Meilenstein, denn erst dort steht fest, ob dessen Dekostück kommt und einen Platz braucht.
+  const first = chapter.build.firstChooser;
+  const turn: BuildTurn = { n, chooser: n % 2 === 1 ? first : otherSlot(first), offer: [], chosen: null, placedAt: null };
+  const buildTurns = withActiveOffer({ ...state, milestones, buildTurns: [...state.buildTurns, turn] }, chapter);
 
   return {
     state: {
@@ -392,7 +434,7 @@ function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleConte
       const piece = chapter.pieces.find((p) => p.id === action.pieceId);
       if (!piece || !turn.offer.includes(piece.id)) return reject('invalid');
       // Seit dem Angebot kann Umstellen diesem einen Stück den Platz genommen haben (allen aus dem Angebot nie).
-      if (freeSpotsFor(piece, state.placements, chapter).length === 0) return reject('stale');
+      if (placeSpotsFor(piece, state, chapter).length === 0) return reject('stale');
       const buildTurns = state.buildTurns.map((t) => (t === turn ? { ...t, chosen: piece.id } : t));
       return apply({ ...state, buildTurns }, [{ to: otherSlot(slot), kind: 'partner_done' }]);
     }
@@ -404,9 +446,12 @@ function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleConte
       if (turn !== activeTurn(state) || turn.chosen === null) return reject('stale');
       const placements = putPiece(state, chapter, turn.chosen, action.spotId);
       if (typeof placements === 'string') return reject(placements);
+      // Ein ausstehendes Dekostück behält seinen Platz: Nähme dieser ihm den letzten, bleibt alles, wie es ist.
+      const chosen = chapter.pieces.find((p) => p.id === turn.chosen);
+      if (!chosen || !placeSpotsFor(chosen, state, chapter).some((spot) => spot.id === action.spotId)) return reject('stale');
       const finished = state.buildTurns.map((t) => (t === turn ? { ...t, placedAt: action.spotId } : t));
       // Der nächste wartende Zug ist jetzt dran und bekommt sein Angebot.
-      const buildTurns = withActiveOffer({ id: state.id, placements, buildTurns: finished }, chapter);
+      const buildTurns = withActiveOffer({ ...state, placements, buildTurns: finished }, chapter);
       return apply({ ...state, buildTurns, placements });
     }
 
@@ -416,8 +461,10 @@ function applyRule(state: HouseState, slot: Slot, action: Action, ctx: RuleConte
       if (!inHouse) return reject('invalid');
       const placements = putPiece(state, chapter, action.pieceId, action.spotId);
       if (typeof placements === 'string') return reject(placements);
-      // Der offene Bauzug hat Vorrang: Nimmt ihm dieser Platz die letzte Möglichkeit, bleibt alles, wie es ist.
-      if (!turnStillFits(activeTurn(state), placements, chapter)) return reject('stale');
+      // Der offene Bauzug und jedes ausstehende Dekostück behalten ihren Platz: Nähme dieser einem von ihnen
+      // die letzte Möglichkeit, bleibt alles, wie es ist.
+      const moving = chapter.pieces.find((p) => p.id === action.pieceId);
+      if (!moving || !moveSpotsFor(moving, state, chapter).some((spot) => spot.id === action.spotId)) return reject('stale');
       return apply({ ...state, placements });
     }
 

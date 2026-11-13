@@ -11,6 +11,7 @@ import {
   joinHouse,
   milestoneForDeposit,
   moveSpotsFor,
+  placeSpotsFor,
   type RuleContext,
   spotsOf,
   unplacedDeco,
@@ -503,6 +504,173 @@ describe('Meilenstein', () => {
     const state = complete(paired(), free - 1);
     const spot = freeSpotsFor(deco!, state.placements, chapter)[0]!;
     expect(applyAction(state, 'a', act({ type: 'piece.move', pieceId: deco!.id, spotId: spot.id }), ctx).result).toMatchObject({ reason: 'invalid' });
+  });
+
+  describe('jedem Dekostück bleibt ein Platz frei', () => {
+    // Ein kleines Haus mit bekannten Größen: zwei Bodenplätze, ein Wandplatz. Am Meilenstein 2 wartet eine Vase,
+    // die nur auf den Boden passt.
+    const small: RulesContent = {
+      chapters: [
+        {
+          number: 1,
+          title: 'Small',
+          titleVi: 'Small',
+          taskOrder: ['task'],
+          milestones: [2],
+          build: { offerSize: 3, firstChooser: 'a' },
+          tasks: [{ id: 'task', type: 'reallife', title: 'Task', text: 'Do it.', doer: 'both' }],
+          coupons: [],
+          rooms: [
+            {
+              id: 'room',
+              name: 'Room',
+              spots: [
+                { id: 'room-floor-1', kind: 'floor', x: 0, y: 0, size: 1 },
+                { id: 'room-floor-2', kind: 'floor', x: 0, y: 0, size: 1 },
+                { id: 'room-wall-1', kind: 'wall', x: 0, y: 0, size: 1 },
+              ],
+            },
+          ],
+          pieces: [
+            { id: 'chair', name: 'Chair', fits: ['floor'] },
+            { id: 'lamp', name: 'Lamp', fits: ['floor'] },
+            { id: 'banner', name: 'Banner', fits: ['floor', 'wall'] },
+            { id: 'vase', name: 'Vase', fits: ['floor'], milestone: 2 },
+          ],
+        },
+      ],
+    };
+    const smallCtx: RuleContext = { content: small, now: ctx.now };
+    const smallChapter = small.chapters[0]!;
+    const house = (): HouseState => joinHouse(createHouse('small-house', 'Ada', smallCtx), 'Bao', smallCtx)!;
+    const banner = smallChapter.pieces.find((p) => p.id === 'banner')!;
+    const done = (state: HouseState) => completeTask(state, finished(state), smallCtx).state;
+    const apply = (state: HouseState, slot: Slot, body: ActionBody) => applyAction(state, slot, act(body), smallCtx);
+
+    it('der Bauzug bietet nichts an, was der Vase den letzten Platz nähme, und stellt nichts dorthin', () => {
+      // Ein Bodenplatz ist besetzt, der andere bleibt der Vase: Die Lampe (nur Boden) kommt nicht ins Angebot.
+      let state = done({ ...house(), placements: [{ pieceId: 'chair', spotId: 'room-floor-1' }] });
+      expect(state.buildTurns).toMatchObject([{ n: 1, offer: ['banner'] }]);
+
+      state = apply(state, 'a', { type: 'build.choose', turn: 1, pieceId: 'banner' }).state;
+      // Das Banner passt auf Boden und Wand – erlaubt ist nur die Wand.
+      expect(placeSpotsFor(banner, state, smallChapter).map((s) => s.id)).toEqual(['room-wall-1']);
+      const onFloor = apply(state, 'b', { type: 'build.place', turn: 1, spotId: 'room-floor-2' });
+      expect(onFloor.result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
+      expect(onFloor.state).toBe(state);
+      expect(apply(state, 'b', { type: 'build.place', turn: 1, spotId: 'room-wall-1' }).result).toMatchObject({ outcome: 'applied' });
+    });
+
+    it('Umstellen lässt der Vase ihren Platz – auch solange ihr Meilenstein noch nicht erreicht ist', () => {
+      const state: HouseState = {
+        ...house(),
+        placements: [
+          { pieceId: 'chair', spotId: 'room-floor-1' },
+          { pieceId: 'banner', spotId: 'room-wall-1' },
+        ],
+      };
+      expect(moveSpotsFor(banner, state, smallChapter)).toEqual([]);
+      const moved = apply(state, 'a', { type: 'piece.move', pieceId: 'banner', spotId: 'room-floor-2' });
+      expect(moved.result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
+      expect(moved.state).toBe(state);
+    });
+
+    it('Umstellen lässt Platz für beide: den offenen Bauzug und die Vase', () => {
+      // Der Stuhl ist gewählt und braucht einen Bodenplatz, die Vase den anderen.
+      const state: HouseState = {
+        ...house(),
+        placements: [{ pieceId: 'banner', spotId: 'room-wall-1' }],
+        buildTurns: [{ n: 1, chooser: 'a', offer: ['chair'], chosen: 'chair', placedAt: null }],
+      };
+      expect(moveSpotsFor(banner, state, smallChapter)).toEqual([]);
+      expect(apply(state, 'a', { type: 'piece.move', pieceId: 'banner', spotId: 'room-floor-1' }).result).toMatchObject({ outcome: 'rejected', reason: 'stale' });
+    });
+
+    it('die Vase selbst kommt auf ihren Platz, sobald ihr Meilenstein erreicht ist', () => {
+      let state = done(done({ ...house(), placements: [{ pieceId: 'chair', spotId: 'room-floor-1' }] }));
+      expect(unplacedDeco(state)).toEqual(['vase']);
+      const vase = smallChapter.pieces.find((p) => p.id === 'vase')!;
+      expect(moveSpotsFor(vase, state, smallChapter).map((s) => s.id)).toEqual(['room-floor-2']);
+      state = apply(state, 'b', { type: 'piece.move', pieceId: 'vase', spotId: 'room-floor-2' }).state;
+      expect(state.placements).toContainEqual({ pieceId: 'vase', spotId: 'room-floor-2' });
+    });
+
+    it('liegt am Meilenstein ein Gutschein statt der Vase, ist der freigehaltene Platz mit dem Meilenstein wieder zu haben', () => {
+      let state: HouseState = {
+        ...house(),
+        placements: [
+          { pieceId: 'chair', spotId: 'room-floor-1' },
+          { pieceId: 'banner', spotId: 'room-wall-1' },
+        ],
+      };
+      state = apply(state, 'a', { type: 'coupon.deposit', text: 'Tea for two' }).state;
+      // Vor dem Meilenstein gilt die Vase als ausstehend: Für die Lampe ist nichts frei, der Bauzug entfällt.
+      state = done(state);
+      expect(state.buildTurns).toEqual([]);
+      // Am Meilenstein liegt der Gutschein, die Vase kommt nicht – der Bauzug dieser Aufgabe bekommt den Platz.
+      state = done(state);
+      expect(state.milestones).toMatchObject([{ at: 2, decoPiece: null }]);
+      expect(state.buildTurns).toMatchObject([{ n: 2, offer: ['lamp'] }]);
+    });
+
+    describe('im ganzen Kapitel', () => {
+      const decos = chapter.pieces.filter((p) => p.milestone !== undefined);
+      const turns = chapter.taskOrder.length;
+      /** Wer wählt, nimmt möglichst ein Stück, das auf einen Platz von `rival` passt – so wird es dort am schnellsten eng. */
+      const crowding = (rival: { fits: string[] }) => (offer: string[]) => offer.find((id) => piece(id).fits.some((kind) => rival.fits.includes(kind))) ?? offer[0]!;
+      const strategies: [string, (offer: string[], turn: number) => string][] = [
+        ['wer wählt, nimmt das erste Angebot', (offer) => offer[0]!],
+        ['wer wählt, nimmt reihum ein anderes', (offer, turn) => offer[turn % offer.length]!],
+        ...decos.map((deco): [string, (offer: string[]) => string] => [`wer wählt, macht es für ${deco.id} eng`, crowding(deco)]),
+      ];
+
+      /**
+       * Spielt das ganze Kapitel nur mit den Regeln: jede Aufgabe, jeden Bauzug. Dekostücke kommen sofort ins Haus
+       * oder bleiben bis zum Schluss liegen; mit `gifted` liegt an jedem freien Meilenstein ein geheimer Gutschein.
+       */
+      function playChapter(id: string, pick: (offer: string[], turn: number) => string, decoAtOnce: boolean, gifted: boolean): HouseState {
+        let state: HouseState = { ...paired(), id };
+        if (gifted) for (const deco of decos) state = play(state, 'a', { type: 'coupon.deposit', text: `instead of ${deco.id}` });
+        const placeDeco = () => {
+          for (const decoId of unplacedDeco(state)) {
+            const spot = moveSpotsFor(piece(decoId), state, chapter)[0];
+            expect(spot, `Platz für ${decoId} in ${id}`).toBeDefined();
+            state = play(state, 'b', { type: 'piece.move', pieceId: decoId, spotId: spot!.id });
+          }
+        };
+        for (let turn = 1; turn <= turns; turn++) {
+          state = complete(state);
+          const open = state.buildTurns.find((t) => t.n === turn);
+          expect(open?.offer.length, `Angebot im Bauzug ${turn} in ${id}`).toBeGreaterThan(0);
+          const chosen = pick(open!.offer, turn);
+          state = play(state, open!.chooser, { type: 'build.choose', turn, pieceId: chosen });
+          const spot = placeSpotsFor(piece(chosen), state, chapter)[0]!;
+          state = play(state, otherSlot(open!.chooser), { type: 'build.place', turn, spotId: spot.id });
+          if (decoAtOnce) placeDeco();
+        }
+        placeDeco();
+        return state;
+      }
+
+      it.each(strategies)('%s: jeder Bauzug bringt ein Stück, und jedes Dekostück findet seinen Platz – sofort oder erst am Schluss', (_, pick) => {
+        for (let house = 0; house < 40; house++) {
+          for (const decoAtOnce of [true, false]) {
+            const end = playChapter(`house-${house}`, pick, decoAtOnce, false);
+            expect(end.buildTurns.filter((t) => t.placedAt !== null)).toHaveLength(turns);
+            expect(unplacedDeco(end)).toEqual([]);
+            expect(end.placements).toHaveLength(turns + decos.length);
+          }
+        }
+      });
+
+      it.each(strategies)('%s: auch ohne Dekostücke (überall ein geheimer Gutschein) bringt jeder Bauzug ein Stück', (_, pick) => {
+        for (let house = 0; house < 40; house++) {
+          const end = playChapter(`house-${house}`, pick, true, true);
+          expect(end.milestones.every((m) => m.decoPiece === null)).toBe(true);
+          expect(end.placements).toHaveLength(turns);
+        }
+      });
+    });
   });
 
   it('jeder merkt für sich, dass er Szene und Geschenk gesehen hat', () => {

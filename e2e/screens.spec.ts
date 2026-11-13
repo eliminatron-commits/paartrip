@@ -212,7 +212,8 @@ test('Geschenk mit Dekostück und volles Haus: auch diese Zustände halten die R
   await expect(moveCard(page)).toHaveAttribute('data-kind', 'deco');
   await check(page, 'home-deco-card');
 
-  // Jeder Platz ist besetzt (Hilfsroute des lokalen Testservers): Für das Dekostück ist nichts mehr frei.
+  // Jeder Platz ist besetzt (Hilfsroute des lokalen Testservers; die Spielregeln lassen dem Dekostück immer einen
+  // frei): So sieht die Leiste aus, wenn für ein Stück nichts frei ist.
   expect((await request.post(`${LOCAL_API}/__test/fill-house?code=${code.replace('-', '')}`)).status()).toBe(204);
   await returnToApp(page);
   await page.getByRole('button', { name: 'Find a spot' }).click();
