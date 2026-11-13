@@ -54,6 +54,18 @@ test('ist installierbar: Manifest, Icons und iOS-Angaben stimmen', async ({ page
   const touchIcon = (await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')) ?? '';
   expect((await request.get(new URL(touchIcon, page.url()).href)).headers()['content-type']).toBe('image/png');
   await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', /viewport-fit=cover/);
+  // black-translucent brachte unter iOS 26/27 einen Schleier oben und einen Streifen unten (siehe index.html).
+  await expect(page.locator('meta[name="apple-mobile-web-app-status-bar-style"]')).toHaveAttribute('content', 'default');
+});
+
+test('die Kopfleiste ist einfarbig und haftet am oberen Rand – so setzt iOS die Statusleiste in ihrer Farbe fort', async ({ page }) => {
+  await page.goto('./');
+  const bar = page.locator('header.top');
+  await expect(bar).toHaveCSS('position', 'sticky');
+  await expect(bar).toHaveCSS('background-image', 'none');
+  expect(await bar.evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
+  // Undurchsichtig: ohne Alpha unter 1.
+  expect(await bar.evaluate((el) => getComputedStyle(el).backgroundColor)).toMatch(/^rgb\(/);
 });
 
 test('lädt nichts von fremden Adressen (Schriften sind lokal eingebunden)', async ({ page, baseURL }) => {

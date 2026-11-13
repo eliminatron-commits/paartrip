@@ -15,6 +15,14 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
+## Nach der Abnahme: Kopf und unterer Rand auf dem iPhone (2026-11-13)
+
+**Nutzer (Screenshot vom iPhone 16 Pro Max; seine Frau hat ein iPhone 18 Pro Max):** Unter der unteren Leiste ein heller Streifen, oben ein milchiger Schleier über "Nhà Mình"; der Platz oben soll besser genutzt, die Uhr gut ins Design eingebunden werden, mit Rücksicht auf die Dynamic Island. Hinweis des Nutzers: Sein Việt-Trainer hat das Problem nicht.
+
+**Ursache:** `black-translucent` unter iOS 26/27 – das System legt einen Schleier über den oberen Rand, und `100dvh` ist um die Statusleiste (~62 pt) zu klein, daher der Streifen. Der Việt-Trainer nutzt `default` mit einer festen, einfarbigen Fläche unter der Uhr.
+
+**Geändert:** Statusleiste `default`; Kopfleiste als haftende, einfarbige Fläche in Petrol mit drei Spalten wie die Statusleiste (Refresh unter der Uhr, Name unter der Dynamic Island, Einstellungen unter dem Akku); Abstände im Abendhimmel knapper; unter der App die Farbe der unteren Leiste, falls iOS die Höhe doch zu klein meldet. Belegt: Typecheck 0 Fehler, Vitest 339/339, Playwright 57/57 (neu: Statusleisten-Einstellung und einfarbige, haftende Kopfleiste). Ob Schleier und Streifen auf den iPhones weg sind, zeigt erst das Gerät – und erst nachdem die App neu zum Home-Bildschirm hinzugefügt ist (iOS merkt sich die Einstellung beim Hinzufügen).
+
 ## Phase 6/6 – Abnahme: abgeschlossen am 2026-11-13
 
 **Nutzer am 2026-11-13:** "update angekommen. sieht gut aus. Wenn sonst alles fertig ist, können wir die stände zurücksetzen und wir koppeln neu."

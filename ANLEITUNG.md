@@ -53,7 +53,7 @@ Ihr bekommt dann eine Nachricht, wenn ihr an der Reihe seid oder ein Geschenk au
   - Bis dahin sieht der andere nur ein verpacktes Geschenk von dir.
 - Pro Tag kommt höchstens eine neue Aufgabe. Pausen sind kein Problem, es geht einfach dort weiter.
 - Ein Punkt an einem Reiter zeigt, wo etwas auf dich wartet.
-- Wartest du mit offener App auf den anderen, tippe oben auf den runden Pfeil links neben dem Zahnrad. Damit holst du seinen Schritt (**Refresh**).
+- Wartest du mit offener App auf den anderen, tippe oben links auf den runden Pfeil. Damit holst du seinen Schritt (**Refresh**).
 
 ## 5. Updates
 

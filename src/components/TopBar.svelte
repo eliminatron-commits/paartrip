@@ -25,12 +25,10 @@
   }
 </script>
 
+<!-- Drei Spalten wie die Statusleiste darüber: unter der Uhr "Refresh", unter der Dynamic Island der Name,
+     unter Empfang und Akku die Einstellungen. -->
 <header class="top">
-  <div>
-    <h1>Nhà Mình</h1>
-    <p class="sub">PaarTrip</p>
-  </div>
-  <div class="actions">
+  <div class="slot start">
     {#if session.status === 'paired'}
       <button type="button" class="plain icon" class:refreshing aria-label="Refresh" aria-busy={refreshing} onclick={refresh}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -39,6 +37,12 @@
         </svg>
       </button>
     {/if}
+  </div>
+  <div class="brand">
+    <h1>Nhà Mình</h1>
+    <p class="sub">PaarTrip</p>
+  </div>
+  <div class="slot end">
     <button type="button" class="plain icon" aria-label={ui.settings ? 'Close settings' : 'Settings'} onclick={() => (ui.settings = !ui.settings)}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         {#if ui.settings}
@@ -56,25 +60,57 @@
 
 <style>
   .top {
-    display: flex;
+    /*
+     * Eine einfarbige, am oberen Rand haftende Fläche: Dann malt iOS (ab 26) keinen milchigen Schleier über
+     * Uhr und Kopf, sondern setzt die Statusleiste in ihrer Farbe fort. Die Uhr steht so im selben Petrol
+     * wie der Name. sticky ändert hier nichts an der Lage – die App selbst rollt nicht, nur ihr Inhalt.
+     */
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    /* Der Hintergrund reicht bis an den oberen Rand; Text und Knopf beginnen erst unterhalb der Safe Area. */
-    padding: calc(var(--safe-top) + 8px) calc(var(--safe-right) + 12px) 10px calc(var(--safe-left) + 20px);
+    gap: 8px;
+    /* Der Hintergrund reicht bis an den oberen Rand; Text und Knöpfe beginnen erst unterhalb der Safe Area. */
+    padding: var(--safe-top) calc(var(--safe-right) + 12px) 4px calc(var(--safe-left) + 12px);
     background: var(--petrol);
+  }
+
+  /* Im Hochformat stehen die Knöpfe mittig unter Uhr bzw. Akku, im Querformat (ohne Statusleiste) am Rand. */
+  .slot {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (orientation: landscape) {
+    .start {
+      justify-content: flex-start;
+    }
+
+    .end {
+      justify-content: flex-end;
+    }
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
   }
 
   h1 {
     color: var(--cream);
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    line-height: 1.1;
   }
 
   .sub {
     color: var(--cream-deep);
-    font-size: 0.75rem;
+    font-size: 0.66rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
   }
 
@@ -95,12 +131,6 @@
 
   .icon:focus-visible {
     outline-color: var(--cream);
-  }
-
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
   }
 
   /* Blasser, solange geholt wird – das bleibt auch sichtbar, wenn Bewegung abgeschaltet ist. */

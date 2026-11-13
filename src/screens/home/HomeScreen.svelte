@@ -87,7 +87,7 @@
   }
 
   .sky .page {
-    padding-top: 18px;
+    padding-top: 8px;
     padding-bottom: 8px;
   }
 

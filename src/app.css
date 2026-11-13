@@ -46,7 +46,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  background: var(--cream);
+  /* Falls iOS die Höhe doch zu klein meldet, setzt sich unter der App die untere Leiste fort statt eines Streifens. */
+  background: var(--cream-deep);
 }
 
 body {
@@ -219,7 +220,7 @@ button.plain {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 16px calc(var(--safe-right) + 20px) 58px calc(var(--safe-left) + 20px);
+  padding: 6px calc(var(--safe-right) + 20px) 52px calc(var(--safe-left) + 20px);
   background:
     var(--stars),
     linear-gradient(to bottom, var(--petrol), var(--dusk) calc(100% - 52px), var(--mauve) calc(100% - 26px), var(--afterglow));
