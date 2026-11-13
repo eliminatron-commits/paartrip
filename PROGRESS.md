@@ -9,10 +9,25 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
 - **Phase 5/6 – Inhalte Kapitel 1:** abgeschlossen am 2026-11-12, P5-01 bis P5-06 erfüllt. Zusammen mit "Refresh" und der Optik-Phase hochgeladen (siehe nächste Zeile).
-- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** abgeschlossen am 2026-11-13, PO-01 bis PO-06 erfüllt (Stil vom Nutzer freigegeben). Phase 5, "Refresh" und die Optik mit Zustimmung des Nutzers am 2026-11-13 hochgeladen, live seit Commit `396507d` (Workflow grün: Build samt aller Tests 11 Minuten, Worker, Pages; die Live-Adresse liefert den neuen Stand). Ob das Update auf beiden iPhones ankommt, meldet der Nutzer. Einzelheiten: Abschnitt "Optik-Phase" unten. Vor dem echten Start die echte Datenbank nur mit Zustimmung des Nutzers leeren. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
+- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** abgeschlossen am 2026-11-13, PO-01 bis PO-06 erfüllt (Stil vom Nutzer freigegeben). Phase 5, "Refresh" und die Optik mit Zustimmung des Nutzers am 2026-11-13 hochgeladen, live seit Commit `396507d` (Workflow grün: Build samt aller Tests 11 Minuten, Worker, Pages; die Live-Adresse liefert den neuen Stand). Laut Nutzer am 2026-11-13 auf beiden iPhones angekommen. Einzelheiten: Abschnitt "Optik-Phase" unten. Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
+- **Phase 6/6 – Abnahme:** abgeschlossen am 2026-11-13, P6-01 bis P6-06, P6-09 bis P6-11 und P6-13 bis P6-15 erfüllt; P6-07 (Ton) und P6-08 (Push) prüft der Nutzer auf den iPhones, bei P6-12 den Tarif im Cloudflare-Dashboard. Anleitung für beide Spieler: `ANLEITUNG.md`. Einzelheiten: Abschnitt "Phase 6/6" unten.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
+
+## Phase 6/6 – Abnahme: abgeschlossen am 2026-11-13
+
+**Nutzer am 2026-11-13:** "update angekommen. sieht gut aus. Wenn sonst alles fertig ist, können wir die stände zurücksetzen und wir koppeln neu."
+
+**Belegt am 2026-11-13** (Einzelheiten je Punkt in `tests.json`, Block Phase 6):
+- Typecheck 0 Fehler, Vitest 339/339 (darunter der Durchlauf des ganzen Kapitels gegen den echten Worker, `worker/test/chapter.test.ts`), Build grün.
+- Playwright: Zwei volle Läufe liefen unter starker Last durch andere Sitzungen auf dem Rechner (9,7 bzw. 7,6 statt sonst 3,4 Minuten). Sie endeten mit 5 bzw. 3 roten Tests, alle wegen Zeitüberschreitung oder zu knapper Wartezeit. Jeder dieser Tests war einzeln wiederholt grün, `e2e/puzzles.spec.ts` auch komplett (14/14). Der Code ist seit dem letzten vollen grünen Lauf (56/56, Optik-Phase) und dem grünen Workflow für `396507d` unverändert.
+- Keine Secrets in Arbeitsbaum und Git-Historie. Cloudflare nur im Rahmen des Gratis-Tarifs (Worker-Bündel 117,5 KiB, gzip 29,3 KiB; 1 Cron; 1 D1).
+- Das Update ist auf beiden iPhones angekommen (Nutzer).
+
+**Vom Nutzer zu prüfen:** Ton nach Sperre und App-Wechsel (P6-07), Push auf beiden iPhones nach dem neuen Koppeln (P6-08), Darstellung unter Uhr und Dynamic Island auf dem Gerät.
+
+**Beobachtung:** Unter Last scheitern im vollen Lauf am ehesten die Zwei-Geräte-Tests mit vielen Abgleichen (`puzzles.spec.ts` split-code-1 und sequence-1, `house.spec.ts`). Der Grund ist Zeit, nicht der Code. Wird das lästig, hilft im vollen Lauf ein Worker weniger (`workers` in `playwright.config.ts`), statt Zeitgrenzen weiter anzuheben.
 
 ## Optik-Phase: abgeschlossen am 2026-11-13
 
