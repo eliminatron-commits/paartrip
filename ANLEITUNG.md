@@ -55,6 +55,11 @@ Ihr bekommt dann eine Nachricht, wenn ihr an der Reihe seid oder ein Geschenk au
 - Ein Punkt an einem Reiter zeigt, wo etwas auf dich wartet.
 - Wartest du mit offener App auf den anderen, tippe oben links auf den runden Pfeil. Damit holst du seinen Schritt (**Refresh**).
 
+- **Musik:** Leise Hintergrundmusik. Tagsüber läuft ein warmes Lied, ab 19 Uhr ein ruhigeres und bei den Aufgaben ein lebhafteres.
+  - Sie beginnt beim ersten Tippen in der App.
+  - Abschalten: Settings → **Music**. Das gilt nur für dein iPhone.
+  - Bei eingeschaltetem Stummschalter bleibt sie still. Hörst du gerade etwas anderes, mischt sie sich darunter.
+
 ## 5. Updates
 
 - Gibt es eine neue Version, erscheint unten der Hinweis „New version“. Tippe dort auf **Update**, dann lädt die App neu.
@@ -75,4 +80,4 @@ Ihr bekommt dann eine Nachricht, wenn ihr an der Reihe seid oder ein Geschenk au
   1. Prüfe, ob die App vom Home-Bildschirm aus geöffnet wurde.
   2. Schalte in Settings die Mitteilungen aus und wieder ein.
   3. Prüfe in den iPhone-Einstellungen unter **Mitteilungen → PaarTrip**, ob sie erlaubt sind.
-- **Kein Ton:** Prüfe, ob in Settings → **Sound** der Ton an ist. Prüfe auch den Stummschalter und die Lautstärke des iPhones.
+- **Kein Ton oder keine Musik:** Prüfe, ob in Settings → **Sound** bzw. **Music** eingeschaltet ist. Prüfe auch den Stummschalter und die Lautstärke des iPhones.

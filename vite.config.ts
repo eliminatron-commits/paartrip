@@ -83,7 +83,9 @@ export default defineConfig(({ command, mode }) => {
               },
               injectManifest: {
                 rollupFormat: 'iife',
-                globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+                globPatterns: ['**/*.{js,css,html,svg,png,woff2,m4a}'],
+                // Die drei Lieder (public/music, je rund 2,3 MB) gehören zum Offline-Stand; die Vorgabe von 2 MB ließe sie aus.
+                maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
                 // Startbilder holt iOS beim Ablegen auf dem Home-Bildschirm; im Precache wären sie nur Ballast.
                 globIgnores: ['splash/**'],
               },

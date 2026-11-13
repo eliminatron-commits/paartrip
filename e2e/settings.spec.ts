@@ -6,7 +6,7 @@ import { otherSlot } from '../shared/model.ts';
 import type { PuzzleData } from '../shared/puzzles/index.ts';
 import { canSolve, type PuzzleKind } from '../shared/puzzles/kinds.ts';
 import { receiversOf } from '../shared/rules.ts';
-import { closePhones, closeSettings, openSettings, openTask, pair, phone } from './phones.ts';
+import { closePhones, closeSettings, openSettings, openTab, openTask, pair, phone } from './phones.ts';
 import type { PuzzleDriver } from './puzzle-drivers/driver.ts';
 import { DRIVERS } from './puzzle-drivers/index.ts';
 
@@ -102,4 +102,100 @@ test('eingeschaltet erklingt beim Lösen ein Klang, ausgeschaltet nicht', async 
   await openSettings(page);
   await page.getByRole('switch', { name: 'Sound' }).click();
   await expect.poll(() => tones(page)).toBeGreaterThan(before);
+});
+
+/**
+ * Hält fest, welche Lieder die Seite holt und wie viele Quellen gerade klingen. Wie beim Ton steht an Stelle
+ * des AudioContext ein Zähler mit derselben Schnittstelle; geprüft wird der Weg von Geste und Bildschirm bis
+ * zum Lied, nicht der Klang.
+ */
+async function recordMusic(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const scope = window as unknown as { AudioContext: unknown; music: { fetched: string[]; started: number; playing: number } };
+    scope.music = { fetched: [], started: 0, playing: 0 };
+    const realFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = input instanceof Request ? input.url : String(input);
+      if (url.includes('/music/')) scope.music.fetched.push(url.split('/music/')[1]!);
+      return realFetch(input, init);
+    };
+    const param = () => ({ value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {} });
+    scope.AudioContext = class {
+      state = 'suspended';
+      currentTime = 0;
+      destination = {};
+      resume() {
+        this.state = 'running';
+        return Promise.resolve();
+      }
+      close() {
+        this.state = 'closed';
+        return Promise.resolve();
+      }
+      createOscillator() {
+        return { type: 'sine', frequency: param(), connect() {}, start() {}, stop() {} };
+      }
+      createGain() {
+        return { gain: param(), connect() {} };
+      }
+      createBufferSource() {
+        return {
+          buffer: null,
+          loop: false,
+          connect() {},
+          start() {
+            scope.music.started += 1;
+            scope.music.playing += 1;
+          },
+          stop() {
+            scope.music.playing -= 1;
+          },
+        };
+      }
+      decodeAudioData() {
+        return Promise.resolve({ duration: 120 });
+      }
+    };
+  });
+}
+const music = (page: Page) =>
+  page.evaluate(() => (window as unknown as { music: { fetched: string[]; started: number; playing: number } }).music);
+
+test('Musik: an als Voreinstellung, startet erst mit dem ersten Tippen, bei den Aufgaben ein anderes Lied, abgeschaltet still', async ({ browser }) => {
+  const { a } = await pair(browser);
+  const { page } = a;
+  await recordMusic(page);
+  await page.reload();
+  await expect(page.getByTestId('house-names')).toBeVisible();
+  // Ohne Geste erlaubt iOS keinen Ton – und die App versucht es auch nicht.
+  expect((await music(page)).started).toBe(0);
+
+  // Erstes Tippen im Haus: Tag- oder Abendlied, je nach Uhrzeit des Geräts.
+  await page.getByTestId('house-names').click();
+  await expect.poll(async () => (await music(page)).playing).toBe(1);
+  expect((await music(page)).fetched).toEqual([expect.stringMatching(/^(day|night)\.m4a$/)]);
+
+  // Bei den Aufgaben: "Everyday Pulse"; das Lied des Hauses wird ausgeblendet.
+  await openTab(page, 'Today');
+  await expect.poll(async () => (await music(page)).fetched).toContain('pulse.m4a');
+  await expect.poll(async () => (await music(page)).started).toBe(2);
+  await expect.poll(async () => (await music(page)).playing).toBe(1);
+
+  // Abschalten blendet aus und bleibt nach dem Neuladen aus.
+  await openSettings(page);
+  const toggle = page.getByRole('switch', { name: 'Music' });
+  await expect(toggle).toHaveAttribute('aria-checked', 'true');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-checked', 'false');
+  await expect.poll(async () => (await music(page)).playing).toBe(0);
+
+  await page.reload();
+  await openSettings(page);
+  await expect(page.getByRole('switch', { name: 'Music' })).toHaveAttribute('aria-checked', 'false');
+  await closeSettings(page);
+  await page.getByRole('button', { name: 'Home' }).click();
+  await page.getByTestId('house-names').click();
+  // Ein Moment für einen Start, der nicht kommen darf.
+  await page.waitForTimeout(500);
+  expect((await music(page)).started).toBe(0);
 });

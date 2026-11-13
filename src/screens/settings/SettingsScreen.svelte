@@ -2,7 +2,7 @@
   // Einstellungen: Ton, Mitteilungen, Kopplungsstatus, Sichern und Wiederherstellen, Version und Updates.
   import AboutUpdates from '../../components/AboutUpdates.svelte';
   import DeviceSettings from '../../components/DeviceSettings.svelte';
-  import { playSound } from '../../lib/audio.ts';
+  import { playSound, refreshMusic } from '../../lib/audio.ts';
   import { session, updateSettings } from '../../lib/session.svelte.ts';
 
   async function toggleSound(): Promise<void> {
@@ -10,6 +10,12 @@
     await updateSettings({ sound: on });
     // Kostprobe, damit zu hören ist, was eingeschaltet wurde.
     if (on) playSound('place');
+  }
+
+  async function toggleMusic(): Promise<void> {
+    await updateSettings({ music: !session.settings.music });
+    // Ein- bzw. ausblenden – das Tippen selbst hat den AudioContext schon entsperrt.
+    refreshMusic();
   }
 </script>
 
@@ -25,6 +31,17 @@
         <button type="button" class="plain switch" role="switch" aria-checked={session.settings.sound} aria-labelledby="sound-title" aria-describedby="sound-text" onclick={toggleSound}>
           <span class="track"><span class="knob"></span></span>
           <span class="state">{session.settings.sound ? 'On' : 'Off'}</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="music-title">
+      <h2 id="music-title">Music</h2>
+      <div class="setting">
+        <p id="music-text">Quiet music: a warm tune by day, a softer one in the evening, a livelier one for your tasks.</p>
+        <button type="button" class="plain switch" role="switch" aria-checked={session.settings.music} aria-labelledby="music-title" aria-describedby="music-text" onclick={toggleMusic}>
+          <span class="track"><span class="knob"></span></span>
+          <span class="state">{session.settings.music ? 'On' : 'Off'}</span>
         </button>
       </div>
     </section>

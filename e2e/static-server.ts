@@ -16,6 +16,8 @@ const TYPES: Record<string, string> = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.woff2': 'font/woff2',
+  // Wie GitHub Pages: die Lieder unter public/music.
+  '.m4a': 'audio/mp4',
 };
 
 export interface StaticServer {

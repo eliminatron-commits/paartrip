@@ -62,6 +62,7 @@ e2e/                Playwright-Tests und Testserver (api-server.ts: lokaler Work
 generated/          erzeugt, nicht im Repo (content.json, content-rules.json)
 public/icons/       erzeugt, nicht im Repo (PNG-Icons aus public/icon.svg)
 public/splash/      erzeugt, nicht im Repo (Startbilder je iPhone-Größe)
+public/music/       die drei Lieder des Nutzers als AAC (day, night, pulse), im Precache
 screenshots/        erzeugt, nicht im Repo (e2e/screens.spec.ts legt dort jeden Bildschirm zur Sichtprüfung ab)
 ```
 
@@ -112,7 +113,7 @@ screenshots/        erzeugt, nicht im Repo (e2e/screens.spec.ts legt dort jeden 
 - Keine Spielregel, die sich auf die Gerätezeit verlässt. Kein Stand, der auf dem Gerät "optimistisch" umgeschrieben wird.
 - Keine Serverantwort, die Verborgenes enthält und es dem Client zum Ausblenden überlässt.
 - Kein automatisches Neuladen bei einem Update; kein `skipWaiting` ohne Tippen des Nutzers.
-- Kein `<audio>`-Element und keine Audiodateien – Ton nur über WebAudio; AudioContext bei jeder Nutzergeste entsperren und nach Sperre oder App-Wechsel neu aufbauen.
+- Kein `<audio>`-Element – Ton und Musik nur über WebAudio; AudioContext bei jeder Nutzergeste entsperren und nach Sperre oder App-Wechsel neu aufbauen. Audiodateien nur die Lieder in `public/music/` (Wunsch des Nutzers, 2026-11-13); Klänge bleiben synthetisch (`src/lib/sound.ts`).
 - Keine externen Bild-, Schrift- oder Skriptquellen zur Laufzeit; keine Rasterbilder außer den erzeugten Icons und Startbildern.
 - Keine Secrets im Repo (privater VAPID-Schlüssel, Cloudflare-Token nur als Worker- bzw. Repo-Secrets). Kein Bezahltarif bei Cloudflare.
 - Keine Inhalte im Code: Aufgaben, Rätseldaten, Fragen, Story, Katalog, Gutscheine und Meilensteine gehören nach `content/`.
@@ -167,7 +168,8 @@ Stil seit der Optik-Phase (vom Nutzer am 2026-11-13 freigegeben): "sehr cozy, ro
 - **Morgen-Mitteilung:** Die Aufgabe erscheint um Mitternacht, die Mitteilung kommt um 06:00 UTC, damit niemand nachts geweckt wird. Fällt ein Cron-Lauf aus, gibt es an dem Tag keine – gespielt wird trotzdem. Der Worker merkt sich nicht, dass er sie verschickt hat: Liefe der Cron an einem Morgen zweimal, käme sie doppelt (ein Merker kostete je Haus und Lauf einen Schreibzugriff). Der Lauf ist für das eine Haus gebaut: Je Haus fallen bis zu sechs Zugriffe auf Datenbank und Push-Dienst an, der Gratis-Tarif erlaubt 50 Unteranfragen je Lauf – vorsichtig gerechnet reicht das für rund acht Häuser mit Mitteilungen (`MAX_HOUSES` ist 20; ob Datenbankzugriffe mitzählen, ist nicht nachgemessen). Darüber fielen Mitteilungen aus, das Spiel liefe weiter.
 - **Keine "neue Aufgabe" beim Nachrücken:** Rückt eine Aufgabe nach einer Pause sofort nach, gibt es dafür keine eigene Mitteilung. Wer den letzten Schritt getan hat, sieht sie in der App; der andere bekommt "partner_done" und findet sie beim Öffnen. "new_task" kommt nur am Morgen.
 - **Startbilder nicht im Precache:** iOS holt sie beim Ablegen auf dem Home-Bildschirm; im Precache wären sie nur Ballast.
-- **Ton im Test:** Der Test-Browser hat kein Audio (der Konstruktor von `AudioContext` wirft dort). `e2e/settings.spec.ts` setzt deshalb einen Zähler mit derselben Schnittstelle ein und prüft den Weg von der Geste bis zum Ton; wie es klingt, lässt sich nur auf dem Gerät beurteilen.
+- **Musik (Wunsch des Nutzers, 2026-11-13):** drei vom Nutzer erzeugte Lieder, auf gleiche Lautheit gebracht, mit weichem Ein- und Ausblenden (die Schleife knackt nicht) und als AAC mit 112 kbit/s in `public/music/` (je rund 2,3 MB, im Precache, deshalb `maximumFileSizeToCacheInBytes` 4 MB). `src/lib/music.ts`: Bei den Aufgaben (Today) läuft `pulse`, sonst von 6 bis 19 Uhr `day`, danach `night` – nach der Uhr des Geräts, denn das ist Stimmung, keine Spielregel. Ein Wechsel blendet über; jedes Lied geht dort weiter, wo es zuletzt stand. Entpackt ist ein Lied rund 60 MB groß, deshalb hält der Player nur das gerade gebrauchte. Leise (`VOLUME`), an als Voreinstellung, eigener Schalter "Music" je Gerät; `navigator.audioSession.type = 'ambient'`, damit sie sich mit anderer Wiedergabe mischt und den Stummschalter achtet. Das Repo ist öffentlich, die Lieder also auch – vom Nutzer so bestätigt.
+- **Ton im Test:** Der Test-Browser hat kein Audio (der Konstruktor von `AudioContext` wirft dort). `e2e/settings.spec.ts` setzt deshalb einen Zähler mit derselben Schnittstelle ein und prüft den Weg von der Geste bis zum Ton, für die Musik auch, welches Lied geholt wird und wie viele Quellen klingen; wie es klingt, lässt sich nur auf dem Gerät beurteilen.
 - **TypeScript 6 statt 7:** svelte-check unterstützt TypeScript 7 noch nicht.
 - **Name:** voller Name "Nhà Mình – PaarTrip", unter dem Icon "PaarTrip" (dort passen nur rund zwölf Zeichen).
 

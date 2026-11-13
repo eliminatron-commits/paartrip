@@ -15,6 +15,12 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
 
+## Nach der Abnahme: Musik (2026-11-13)
+
+**Nutzer:** "ich würde gerne musik einfügen. die drei lieder habe ich erzeugt. eins ist eher nachts/abend themed." Entschieden (Auswahl im Gespräch): Tag-/Abendlied im Haus, auf Gifts und in den Einstellungen, "Everyday Pulse" bei den Aufgaben; an als Voreinstellung, leise, eigener Schalter "Music"; die Lieder dürfen im öffentlichen Repo liegen.
+
+**Gebaut:** `public/music/{day,night,pulse}.m4a` (aus den WAV-Dateien: Lautheit angeglichen, 1,5 s ein- und 4 s ausgeblendet, AAC 112 kbit/s), `src/lib/music.ts` (Player über WebAudio, ohne Browser testbar), Schalter "Music" in Settings, Lieder im Precache. Regeln dazu in `CLAUDE.md` (Verbotene Ansätze: Audiodateien nur diese Lieder; Abschnitt "Musik"). Wie es klingt und ob der Wechsel weich genug ist, beurteilt der Nutzer auf dem Gerät.
+
 ## Nach der Abnahme: Kopf und unterer Rand auf dem iPhone (2026-11-13)
 
 **Nutzer (Screenshot vom iPhone 16 Pro Max; seine Frau hat ein iPhone 18 Pro Max):** Unter der unteren Leiste ein heller Streifen, oben ein milchiger Schleier über "Nhà Mình"; der Platz oben soll besser genutzt, die Uhr gut ins Design eingebunden werden, mit Rücksicht auf die Dynamic Island. Hinweis des Nutzers: Sein Việt-Trainer hat das Problem nicht.

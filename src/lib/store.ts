@@ -24,6 +24,8 @@ export interface Settings {
   push: boolean;
   /** Klänge beim Platzieren, Lösen und Enthüllen. */
   sound: boolean;
+  /** Leise Musik: tags das Tag-, abends das Abendlied, bei den Aufgaben "Everyday Pulse". */
+  music: boolean;
   /** Rätselarten, deren Erklärung auf diesem Gerät schon gezeigt wurde. */
   introSeen: PuzzleKind[];
   /**
@@ -33,7 +35,7 @@ export interface Settings {
   draft: Draft | null;
 }
 
-export const DEFAULT_SETTINGS: Settings = { push: false, sound: true, introSeen: [], draft: null };
+export const DEFAULT_SETTINGS: Settings = { push: false, sound: true, music: true, introSeen: [], draft: null };
 
 export interface Stored {
   device: DeviceRecord | null;

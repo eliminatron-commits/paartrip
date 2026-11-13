@@ -11,6 +11,7 @@
   import { session } from './lib/session.svelte.ts';
   import { todayWaits } from './lib/tasks.ts';
   import { arrive } from './lib/motion.ts';
+  import { setMusicScreen } from './lib/audio.ts';
   import { ui } from './lib/ui.svelte.ts';
   import GiftsScreen from './screens/gifts/GiftsScreen.svelte';
   import HomeScreen from './screens/home/HomeScreen.svelte';
@@ -29,6 +30,11 @@
     home: myTurn(moves),
     today: view && chapter ? todayWaits(view, chapter, session.queued) : false,
     gifts: view ? view.coupons.some((c) => awaitsMyConfirm(c, view.you)) : false,
+  });
+
+  // Die Musik folgt dem Bildschirm: bei den Aufgaben ein anderes Lied als im Haus.
+  $effect(() => {
+    setMusicScreen(ui.settings ? 'settings' : view ? ui.tab : 'welcome');
   });
 
   // Ein neuer Bildschirm beginnt oben.

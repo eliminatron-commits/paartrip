@@ -58,6 +58,17 @@ test('ist installierbar: Manifest, Icons und iOS-Angaben stimmen', async ({ page
   await expect(page.locator('meta[name="apple-mobile-web-app-status-bar-style"]')).toHaveAttribute('content', 'default');
 });
 
+test('die drei Lieder werden ausgeliefert und liegen im Offline-Speicher', async ({ page, request }) => {
+  await page.goto('./');
+  const sw = await (await request.get(new URL('sw.js', page.url()).href)).text();
+  for (const track of ['day', 'night', 'pulse']) {
+    const response = await request.get(new URL(`music/${track}.m4a`, page.url()).href);
+    expect(response.ok(), track).toBe(true);
+    expect(response.headers()['content-type'], track).toMatch(/^audio\//);
+    expect(sw, `${track} im Precache`).toContain(`music/${track}.m4a`);
+  }
+});
+
 test('die Kopfleiste ist einfarbig und haftet am oberen Rand – so setzt iOS die Statusleiste in ihrer Farbe fort', async ({ page }) => {
   await page.goto('./');
   const bar = page.locator('header.top');
