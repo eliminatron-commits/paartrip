@@ -23,9 +23,13 @@
   const done = $derived(view.done.length);
 </script>
 
-<div class="page">
+<header class="dusk">
   <h2>Today</h2>
-
+  {#if partner}
+    <p class="note" data-testid="today-progress">{done} of {total} tasks done.</p>
+  {/if}
+</header>
+<div class="page">
   {#if !partner}
     <section class="panel">
       <p>Once your partner has moved in, a small task for the two of you waits here.</p>
@@ -61,8 +65,6 @@
         <p>A small task for the two of you is on its way.</p>
       </section>
     {/if}
-
-    <p class="note" data-testid="today-progress">{done} of {total} tasks done.</p>
 
     {#if move}
       <section class="panel" aria-labelledby="build-title">

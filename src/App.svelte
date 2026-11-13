@@ -19,6 +19,8 @@
 
   const view = $derived(session.status === 'paired' ? session.view : null);
   const chapter = $derived(view ? chapterFor(view, content) : null);
+  /** Das Dach des ersten Kapitels: Dort beginnt jedes Haus. */
+  const roof = content.chapters[0]?.roof;
   const moves = $derived(view ? openMoves(view, session.queued) : []);
   const move = $derived(nextMove(moves));
   const milestone = $derived(view ? unseenMilestone(view, session.queued) : null);
@@ -45,6 +47,10 @@
     {#if ui.settings}
       <SettingsScreen />
     {:else if session.status === 'unpaired'}
+      <!-- Willkommen: Über dem Blatt steht schon das Dach des Hauses, in das die beiden einziehen. -->
+      <div class="dusk welcome" aria-hidden="true">
+        {#if roof}<svg viewBox={roof.viewBox}>{@html roof.body}</svg>{/if}
+      </div>
       <div class="page"><Pairing /></div>
     {:else if view && chapter}
       {#if ui.tab === 'home'}
@@ -93,5 +99,18 @@
   .floor {
     flex: none;
     height: var(--safe-bottom);
+  }
+
+  /* Das Dach steht mittig im Himmel; sein unterer Rand verschwindet hinter dem Blatt. */
+  .welcome {
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 0;
+  }
+
+  .welcome svg {
+    display: block;
+    width: min(100%, 420px);
+    margin-bottom: 10px;
   }
 </style>

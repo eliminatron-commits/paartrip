@@ -83,9 +83,10 @@
   </li>
 {/snippet}
 
-<div class="page">
+<header class="dusk">
   <h2>Gifts</h2>
-
+</header>
+<div class="page">
   {#if !partner}
     <section class="panel">
       <p>Once your partner has moved in, your gifts for each other appear here.</p>
@@ -171,6 +172,10 @@
     padding: 14px;
     border-radius: 14px;
     background: var(--cream-deep);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--cream) 85%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--wood) 14%, transparent),
+      var(--lift);
   }
 
   .bow {
@@ -181,6 +186,9 @@
     height: 40px;
     border-radius: 12px;
     background: var(--sage-deep);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--cream) 30%, transparent),
+      inset 0 -2px 0 color-mix(in srgb, var(--ink) 24%, transparent);
   }
 
   .gift.veiled .bow {

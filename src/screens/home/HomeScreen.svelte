@@ -81,12 +81,7 @@
   /* Abendhimmel: schließt oben an die Kopfleiste an, unten an den Himmel über dem Dach (House). Dazu ein paar Sterne. */
   .sky {
     background:
-      radial-gradient(1.6px 1.6px at 8% 22%, var(--cream) 50%, transparent 52%),
-      radial-gradient(1.2px 1.2px at 27% 68%, var(--cream-deep) 50%, transparent 52%),
-      radial-gradient(1.4px 1.4px at 46% 12%, var(--cream) 50%, transparent 52%),
-      radial-gradient(1.2px 1.2px at 63% 44%, var(--cream-deep) 50%, transparent 52%),
-      radial-gradient(1.6px 1.6px at 78% 18%, var(--cream) 50%, transparent 52%),
-      radial-gradient(1.2px 1.2px at 92% 58%, var(--cream-deep) 50%, transparent 52%),
+      var(--stars),
       linear-gradient(to bottom, var(--petrol), var(--dusk));
   }
 

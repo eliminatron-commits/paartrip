@@ -18,7 +18,7 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 **Richtung des Nutzers (2026-11-12/13, wörtlich):** "grafik soll cozy, romantic sein, ohne übertrieben in kitsch zu geraten!!!! Nur romantisch angehaucht, sehr cozy. SEHR BEEINDRUCKEND visuell." Dazu: Dinge zu zweit sollen erkennbar seins und ihres sein ("dass ihre handschuhe kleiner sind als meine zum beispie. Sowas gibt einen gewissen detailtouch"). Und zur Probe: "es stört mich den mond doppelt sehen zu können" – der Mond steht nur noch über dem Dach, nicht mehr im Fenster.
 
-**Die Probe (gebaut, lokal gesichert, vom Nutzer am 2026-11-13 freigegeben):** Home-Bildschirm mit Abendhimmel, Dach, Dachboden und Wohnzimmer samt sechs Stücken (Sofa, Sessel, Stehlampe, Monstera, Bild, Kerzen). Bilder: `screenshots/probe/vorher-nachher-home.png` und `nachher-detail.png` (nicht im Repo). Küche, Garten, die übrigen 39 Stücke und alle anderen Bildschirme sind noch im alten Stil.
+**Die Probe (gebaut, lokal gesichert, vom Nutzer am 2026-11-13 freigegeben):** Home-Bildschirm mit Abendhimmel, Dach, Dachboden und Wohnzimmer samt sechs Stücken (Sofa, Sessel, Stehlampe, Monstera, Bild, Kerzen). Bilder: `screenshots/probe/vorher-nachher-home.png` und `nachher-detail.png` (nicht im Repo).
 
 **Was dafür gebaut ist:**
 - **Vordergrund je Raum:** `rooms/<id>.front.svg` liegt über den Stücken (Licht der Hängelampe, Halbdunkel in den Ecken, Hauswände im Schnitt) – `Room.front`, optional. So liegt das Licht auch auf den Stücken, und ein Lichtschein endet an der Hauswand.
@@ -30,13 +30,21 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 
 **Belegt am 2026-11-13:** Typecheck 0 Fehler, 323 Vitest-Tests, 54 Playwright-Tests (53 und der Hilfs-Test der Probe) in einem Lauf.
 
-**Ausrollen (freigegeben, in Arbeit):**
-- Küche und Garten im neuen Stil, jeweils mit Vordergrund; die übrigen 39 Stücke; je Raum ein Paar "seins und ihres".
-- Karten (MoveCard, Today, Gifts), Meilenstein-Szene, Willkommen, Einstellungen, untere Leiste; Übergänge (Stück setzt sich ab, Wechsel der Reiter).
+**Ausgerollt am 2026-11-13 (nach der Freigabe):**
+- **Küche** (`kitchen.svg` + `kitchen.front.svg`): halbhoch gefliest, Abendfenster mit Kräutern und Leinenrollo, Schränke in Petrol mit leuchtendem Backofen, Holzplatte, Läufer, Emaille-Hängelampe; das Paar: zwei Topfhandschuhe (groß in Petrol, klein in Rosé).
+- **Garten** (`garden.svg` + `garden.front.svg`): Dämmerung ohne Mond, Hecke, Holzzaun mit Querlatte, Nachbardächer, Glühwürmchen, im Vordergrund Gras und ein Zweig; das Paar: zwei Paar Gummistiefel am Zaun.
+- **Alle 45 Stücke** im neuen Stil (Schatten, Verläufe, Lichtschein bei Laterne, Lichterkette, Seidenlaterne, Grill, Zwerg). Wo es passt, "seins und ihres": Phở-Schalen, Kaffeegläser, Tassen an der Teekanne, Pfeffermühle und Salzstreuer, Krüge, Stuhlkissen, Bankkissen, Koi, Lotusblüten, Vögel, Zapfen der Kuckucksuhr.
+- **Neue Bewegung `fx-sway`** (pendelt um den Aufhängepunkt): Pendel, Quaste, Windspiel, Glücksumschläge.
+- **Prüfung der ids** in `checkContent`, mit Test: Jede id einer Zeichnung beginnt mit der id ihrer Datei (Raum, `<raum>-front-`, Stück, `roof-`).
+- **Übrige Bildschirme:** Today, Gifts und Einstellungen beginnen unter demselben Abendhimmel (`.dusk` in `app.css`, der Inhalt liegt als helles Blatt mit runden Ecken darüber; der Stand "x of 30" steht bei Today im Kopf). Willkommen zeigt das Dach des ersten Kapitels über dem Blatt. Meilenstein-Szene mit Himmel, Lichterkette und plastischem Geschenk. Karten, Knöpfe, Geschenk-Zeilen und die Auswahl im Bauzug liegen mit Schatten auf (`--lift`); Sterne als `--stars`.
+
+**Noch offen in der Optik-Phase:**
+- Übergänge (Stück setzt sich ab, Wechsel der Reiter).
 - Im Querformat steht neben dem Haus noch eine einfarbige Fläche (`--sage-deep`).
-- Die Regel für ids als Prüfung in `checkContent` (bisher nur von Hand eingehalten).
-- Das Stück `candle` zeigt jetzt zwei Kerzen (eine große, eine kleine) und heißt noch "Candle".
+- Die Rätsel-Bausteine und die Leiste beim Platzieren sind noch nicht eigens durchgesehen.
+- Das Stück `candle` zeigt zwei Kerzen (eine große, eine kleine) und heißt noch "Candle".
 - `e2e/optik-probe.spec.ts` ist ein vorübergehender Hilfs-Test für die Vorher-Nachher-Bilder: am Ende der Phase entfernen oder als Bild "eingerichtetes Haus" in `screens.spec.ts` übernehmen.
+- Dem Nutzer Bilder des ganzen Hauses und der übrigen Bildschirme zeigen.
 - Am Ende: Gestaltungsvorgaben in `CLAUDE.md` neu fassen, `tests.json` um die Punkte der Optik-Phase ergänzen, Review durch `pruefer`.
 
 **Fehler aus Phase 5, behoben am 2026-11-13:** `worker/test/chapter.test.ts` schwankte (drei von sechs Läufen rot): Am Meilenstein 25 fand das Vogelbad je nach Haus-id keinen freien Gartenplatz. Dahinter steckte ein Fehler der Regeln: War eine Platzart mit Stücken voll, die nur dorthin passen, wurde nie wieder ein Platz frei – das Dekostück wäre für immer ohne Platz geblieben. Nachgestellt für alle drei Dekostücke. Jetzt bleibt jedem ausstehenden Dekostück ein Platz frei (`placeSpotsFor`, `moveSpotsFor`, `decoNeeds` in `shared/rules.ts`; Begründung in `CLAUDE.md`). Belegt: neue Tests in `shared/rules.test.ts` (kleines Haus mit bekannten Größen; dazu das ganze Kapitel in 40 Häusern mit fünf Arten zu wählen, Dekostück sofort oder erst am Schluss, mit und ohne geheime Gutscheine), 338 Vitest-Tests, der Durchlauf über den Worker achtmal hintereinander grün. Der Test selbst ist unverändert. Ein Haus, das unter den alten Regeln schon eine Platzart gefüllt hat, repariert das nicht – vor dem echten Start beginnt ohnehin jedes Haus neu.

@@ -13,9 +13,10 @@
   }
 </script>
 
-<div class="page">
+<header class="dusk">
   <h2>Settings</h2>
-
+</header>
+<div class="page">
   {#if !session.storageFailed && session.status !== 'loading'}
     <section class="panel" aria-labelledby="sound-title">
       <h2 id="sound-title">Sound</h2>

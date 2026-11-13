@@ -100,13 +100,21 @@
     gap: 2px;
     padding: 10px 6px;
     border-radius: 14px;
-    background: var(--cream);
+    /* Jedes Stück steht in seinem kleinen Schaukasten, von oben beleuchtet. */
+    background: radial-gradient(ellipse 90% 70% at 50% 0%, color-mix(in srgb, var(--lantern) 26%, var(--cream)), var(--cream) 78%);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--wood) 18%, transparent),
+      0 8px 16px -12px color-mix(in srgb, var(--ink) 70%, transparent);
     text-align: center;
     line-height: 1.2;
+    transition: transform 0.15s ease-out;
   }
 
   .option.picked {
-    box-shadow: inset 0 0 0 3px var(--petrol);
+    box-shadow:
+      inset 0 0 0 3px var(--petrol),
+      0 12px 20px -12px color-mix(in srgb, var(--ink) 80%, transparent);
+    transform: translateY(-3px);
   }
 
   .name {
