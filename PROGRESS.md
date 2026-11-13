@@ -25,6 +25,8 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - Keine Secrets in Arbeitsbaum und Git-Historie. Cloudflare nur im Rahmen des Gratis-Tarifs (Worker-Bündel 117,5 KiB, gzip 29,3 KiB; 1 Cron; 1 D1).
 - Das Update ist auf beiden iPhones angekommen (Nutzer).
 
+**Echte Datenbank geleert am 2026-11-13** (Zustimmung des Nutzers, siehe oben): 4 Häuser, 8 Geräte und 6 Aktionen aus den Probeläufen gelöscht, Push-Anmeldungen gab es keine; `d1_migrations` unberührt, Worker antwortet. Vorher als SQL gesichert (nur lokal, nicht im Repo). Die Geräte zeigen danach "This phone isn't linked to the house anymore." → Start over → neu koppeln (Alex legt an), siehe `ANLEITUNG.md`.
+
 **Vom Nutzer zu prüfen:** Ton nach Sperre und App-Wechsel (P6-07), Push auf beiden iPhones nach dem neuen Koppeln (P6-08), Darstellung unter Uhr und Dynamic Island auf dem Gerät.
 
 **Beobachtung:** Unter Last scheitern im vollen Lauf am ehesten die Zwei-Geräte-Tests mit vielen Abgleichen (`puzzles.spec.ts` split-code-1 und sequence-1, `house.spec.ts`). Der Grund ist Zeit, nicht der Code. Wird das lästig, hilft im vollen Lauf ein Worker weniger (`workers` in `playwright.config.ts`), statt Zeitgrenzen weiter anzuheben.
