@@ -70,6 +70,16 @@ async function withArt<T extends { id: string }>(items: T[], dir: string): Promi
   return result;
 }
 
+/** Eine Zeichnung, die es nicht geben muss: null, wenn die Datei fehlt. */
+async function optionalArt(path: string): Promise<SvgArt | null> {
+  const source = await readFile(path, 'utf8').catch(() => null);
+  if (source === null) return null;
+  const art = parseSvg(source);
+  if (typeof art !== 'string') return art;
+  problems.push(`${path}: ${art}`);
+  return null;
+}
+
 /** Löst eine id-Liste aus chapter.json gegen die vorhandenen Dateien auf, in Listenreihenfolge. */
 function pick<T extends { id: string }>(ids: string[], items: T[], label: string, dir: string): T[] {
   const byId = new Map(items.map((item) => [item.id, item]));
@@ -89,9 +99,16 @@ async function readChapter(dir: string): Promise<Chapter | null> {
   const file = await readJson(chapterFileSchema, join(dir, 'chapter.json'));
   const tasks = await readItems(taskSchema, join(dir, 'tasks'));
   const story = await readItems(storySceneSchema, join(dir, 'story'));
-  const rooms = await withArt(await readItems(roomFileSchema, join(dir, 'rooms')), join(dir, 'rooms'));
+  const backs = await withArt(await readItems(roomFileSchema, join(dir, 'rooms')), join(dir, 'rooms'));
+  // Was über den Stücken liegt (Licht, Vordergrund), steht in einer zweiten Datei neben der Raumzeichnung.
+  const rooms: Chapter['rooms'] = [];
+  for (const room of backs) {
+    const front = await optionalArt(join(dir, 'rooms', `${room.id}.front.svg`));
+    rooms.push(front ? { ...room, front } : room);
+  }
   const pieces = await withArt(await readItems(pieceFileSchema, join(dir, 'pieces')), join(dir, 'pieces'));
   const coupons = (await readJson(couponsFileSchema, join(dir, 'coupons.json'))) ?? [];
+  const roof = await optionalArt(join(dir, 'roof.svg'));
   if (!file) return null;
   if (basename(dir) !== `chapter-${file.number}`) problems.push(`${dir}: number ${file.number} passt nicht zum Ordnernamen`);
   return {
@@ -101,6 +118,7 @@ async function readChapter(dir: string): Promise<Chapter | null> {
     story,
     pieces,
     coupons,
+    ...(roof ? { roof } : {}),
   };
 }
 

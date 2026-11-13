@@ -43,6 +43,11 @@ const TEXT: [foreground: string, background: string, where: string][] = [
   ['cream', 'petrol', 'Kopfleiste, Update-Hinweis'],
   ['cream-deep', 'petrol', 'Unterzeile der Kopfleiste'],
   ['cream', 'sage-deep', 'erreichte Meilensteine'],
+  ['cream', 'dusk', 'Namen auf dem Abendhimmel (Home), unteres Ende des Verlaufs'],
+  ['cream-deep', 'dusk', 'Überzeile und Stand auf dem Abendhimmel'],
+  ['lantern', 'dusk', 'Zweitname auf dem Abendhimmel'],
+  ['lantern', 'petrol', 'Zweitname auf dem Abendhimmel, oberes Ende des Verlaufs'],
+  ['ink', 'lantern', 'Zahl in einer leuchtenden Laterne'],
 ];
 
 // Zeichen und Teile von Bedienelementen, die ohne Schrift erkennbar sein müssen.
@@ -54,6 +59,7 @@ const SHAPES: [foreground: string, background: string, where: string][] = [
   ['terracotta', 'cream-deep', 'Punkt an der unteren Leiste, verhülltes Geschenk'],
   ['wood', 'wall', 'Bilderrahmen an der Galeriewand'],
   ['cream', 'wood', 'Notiz im Bilderrahmen'],
+  ['cream-deep', 'dusk', 'Umriss einer Laterne, die noch nicht leuchtet'],
 ];
 
 describe('Kontrast der Farb-Tokens', () => {
@@ -79,7 +85,7 @@ describe('Farben im Code', () => {
   const styles = files.map(({ path, text }) => ({ path, style: path.endsWith('.css') ? text : (/<style>([\s\S]*)<\/style>/.exec(text)?.[1] ?? '') }));
 
   it('die reinen Dekor-Töne stehen nirgends als Schriftfarbe', () => {
-    const misuse = styles.filter(({ style }) => /(^|[\s;{])color:\s*var\(--(terracotta-soft|sage|wood)\)/.test(style)).map(({ path }) => path);
+    const misuse = styles.filter(({ style }) => /(^|[\s;{])color:\s*var\(--(terracotta-soft|sage|wood|mauve|afterglow)\)/.test(style)).map(({ path }) => path);
     expect(misuse).toEqual([]);
   });
 

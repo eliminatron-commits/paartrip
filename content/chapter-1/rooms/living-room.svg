@@ -1,32 +1,260 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Wand und Sockelleiste -->
-  <rect width="400" height="252" fill="#EFE1C8"/>
-  <rect y="240" width="400" height="12" fill="#E2CFAE"/>
-  <!-- Dielenboden -->
-  <rect y="252" width="400" height="48" fill="#B98A5E"/>
-  <rect y="267" width="400" height="2" fill="#A87B50"/>
-  <rect y="283" width="400" height="2" fill="#A87B50"/>
+  <defs>
+    <!-- Lampenlicht: in der Mitte hell, zu den Ecken dunkler -->
+    <radialGradient id="living-room-wall" gradientUnits="userSpaceOnUse" cx="200" cy="112" r="255">
+      <stop offset="0" stop-color="#FBE6BE"/>
+      <stop offset="0.5" stop-color="#EFD0A3"/>
+      <stop offset="1" stop-color="#C79C78"/>
+    </radialGradient>
+    <linearGradient id="living-room-ceil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A2C20" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#4A2C20" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="living-room-drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A2C20" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#4A2C20" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="living-room-paper" width="26" height="30" patternUnits="userSpaceOnUse">
+      <path d="M13 3c2.200 2.200 2.200 5.800 0 8c-2.200-2.200-2.200-5.800 0-8zM0 18c2.200 2.200 2.200 5.800 0 8c-2.200-2.200-2.200-5.800 0-8zM26 18c2.200 2.200 2.200 5.800 0 8c-2.200-2.200-2.200-5.800 0-8z" fill="#B67F58" opacity="0.17"/>
+      <circle cx="13" cy="15" r="0.900" fill="#B67F58" opacity="0.22"/>
+      <circle cx="0" cy="0" r="0.900" fill="#B67F58" opacity="0.22"/>
+      <circle cx="26" cy="0" r="0.900" fill="#B67F58" opacity="0.22"/>
+      <circle cx="0" cy="30" r="0.900" fill="#B67F58" opacity="0.22"/>
+      <circle cx="26" cy="30" r="0.900" fill="#B67F58" opacity="0.22"/>
+    </pattern>
+    <pattern id="living-room-boards" x="10" y="196" width="24" height="44" patternUnits="userSpaceOnUse">
+      <rect width="1.200" height="44" fill="#3E5644" opacity="0.4"/>
+      <rect x="1.200" width="1" height="44" fill="#D5DFC6" opacity="0.5"/>
+    </pattern>
+    <radialGradient id="living-room-panel" gradientUnits="userSpaceOnUse" cx="200" cy="200" r="230">
+      <stop offset="0" stop-color="#B4C2A2"/>
+      <stop offset="1" stop-color="#7F9682"/>
+    </radialGradient>
+    <linearGradient id="living-room-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BE8A5E"/>
+      <stop offset="1" stop-color="#99653E"/>
+    </linearGradient>
+    <radialGradient id="living-room-pool">
+      <stop offset="0" stop-color="#FFDDA6" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FFDDA6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="living-room-rug">
+      <stop offset="0" stop-color="#DD8F6A"/>
+      <stop offset="1" stop-color="#BC5C38"/>
+    </radialGradient>
+    <linearGradient id="living-room-sky" gradientUnits="userSpaceOnUse" x1="0" y1="37" x2="0" y2="142">
+      <stop offset="0" stop-color="#1C3557"/>
+      <stop offset="0.38" stop-color="#3B4777"/>
+      <stop offset="0.62" stop-color="#8C5F87"/>
+      <stop offset="0.78" stop-color="#DE8A72"/>
+      <stop offset="0.9" stop-color="#F6BC7E"/>
+    </linearGradient>
+    <linearGradient id="living-room-frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8E8"/>
+      <stop offset="1" stop-color="#E6D2AF"/>
+    </linearGradient>
+    <linearGradient id="living-room-cloth" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#B24E2B"/>
+      <stop offset="0.45" stop-color="#D8774F"/>
+      <stop offset="1" stop-color="#A2452A"/>
+    </linearGradient>
+    <linearGradient id="living-room-rod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B98258"/>
+      <stop offset="1" stop-color="#6B3A22"/>
+    </linearGradient>
+    <clipPath id="living-room-glass">
+      <path d="M159 142V64Q159 37 200 37Q241 37 241 64V142Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Wand mit Tapete, Stuckleiste und Schatten unter der Decke -->
+  <rect x="8" y="6" width="384" height="246" fill="url(#living-room-wall)"/>
+  <rect x="8" y="14" width="384" height="177" fill="url(#living-room-paper)"/>
+  <rect x="8" y="8" width="384" height="6" fill="#F7E8CB"/>
+  <rect x="8" y="14" width="384" height="1.500" fill="#8A5E44" opacity="0.35"/>
+  <rect x="8" y="8" width="384" height="60" fill="url(#living-room-ceil)"/>
+
+  <!-- Holzvertäfelung und Sockelleiste -->
+  <rect x="8" y="194" width="384" height="46" fill="url(#living-room-panel)"/>
+  <rect x="8" y="196" width="384" height="44" fill="url(#living-room-boards)"/>
+  <rect x="8" y="190" width="384" height="5" rx="1" fill="#FCF1DB"/>
+  <rect x="8" y="195" width="384" height="1.600" fill="#8A5E44" opacity="0.3"/>
+  <rect x="8" y="240" width="384" height="12" fill="#F4E4C7"/>
+  <rect x="8" y="240" width="384" height="1.400" fill="#FFFAEE"/>
+  <rect x="8" y="248.500" width="384" height="3.500" fill="#6B4630" opacity="0.26"/>
+
+  <!-- Dielenboden: Bretter werden nach vorn breiter, in der Mitte liegt das Licht -->
+  <rect x="8" y="252" width="384" height="48" fill="url(#living-room-floor)"/>
+  <g fill="#FFE2B4" opacity="0.13">
+    <rect x="60" y="252" width="90" height="11"/>
+    <rect x="236" y="252" width="94" height="11"/>
+    <rect x="110" y="264" width="86" height="14"/>
+    <rect x="290" y="264" width="82" height="14"/>
+    <rect x="170" y="279" width="92" height="21"/>
+  </g>
+  <g fill="#4A2C1A" opacity="0.1">
+    <rect x="150" y="252" width="86" height="11"/>
+    <rect x="28" y="264" width="82" height="14"/>
+    <rect x="262" y="279" width="88" height="21"/>
+  </g>
+  <g fill="#4A2C1A" opacity="0.38">
+    <rect x="8" y="263" width="384" height="1"/>
+    <rect x="8" y="278" width="384" height="1.200"/>
+    <rect x="60" y="252" width="1" height="11"/>
+    <rect x="150" y="252" width="1" height="11"/>
+    <rect x="236" y="252" width="1" height="11"/>
+    <rect x="330" y="252" width="1" height="11"/>
+    <rect x="28" y="264" width="1" height="14"/>
+    <rect x="110" y="264" width="1" height="14"/>
+    <rect x="196" y="264" width="1" height="14"/>
+    <rect x="290" y="264" width="1" height="14"/>
+    <rect x="372" y="264" width="1" height="14"/>
+    <rect x="74" y="279" width="1.200" height="21"/>
+    <rect x="170" y="279" width="1.200" height="21"/>
+    <rect x="262" y="279" width="1.200" height="21"/>
+    <rect x="350" y="279" width="1.200" height="21"/>
+  </g>
+  <g fill="none" stroke="#6B4630" stroke-width="0.600" opacity="0.28" stroke-linecap="round">
+    <path d="M18 257.500q20-1.600 34 0M88 258q22 1.400 40-.400M250 257q26-1.200 52 .800M340 258.500q18-1 34 .200"/>
+    <path d="M40 271q26 1.600 52-.400M128 270.500q24-1.400 50 .600M212 272q28 1.400 60-.600M304 270.500q24 1.400 50-.200"/>
+    <path d="M18 289q22-1.800 44 .400M96 291q26 1.800 56-.600M280 290q26-1.600 54 .600M360 291.500q14-1 28 0"/>
+  </g>
+  <ellipse cx="200" cy="270" rx="176" ry="36" fill="url(#living-room-pool)"/>
+  <rect x="8" y="252" width="384" height="3" fill="#3A2216" opacity="0.3"/>
+
   <!-- Teppich -->
-  <ellipse cx="200" cy="279" rx="124" ry="14" fill="#C96A45"/>
-  <ellipse cx="200" cy="279" rx="100" ry="9" fill="#D98A66"/>
-  <!-- Fenster mit Blick ins Grüne -->
-  <rect x="156" y="34" width="88" height="112" rx="8" fill="#FAF3E7"/>
-  <rect x="164" y="42" width="72" height="96" rx="4" fill="#C7DED6"/>
-  <path d="M164 138v-26q18-14 36-4t36-10v40z" fill="#8FA68A"/>
-  <circle cx="218" cy="62" r="9" fill="#F2C76B"/>
-  <rect x="197" y="42" width="6" height="96" fill="#FAF3E7"/>
-  <rect x="164" y="87" width="72" height="6" fill="#FAF3E7"/>
-  <!-- Vorhänge und Stange -->
-  <path d="M150 30h22q-2 62-20 112h-2z" fill="#C96A45"/>
-  <path d="M250 30h-22q2 62 20 112h2z" fill="#C96A45"/>
-  <rect x="144" y="25" width="112" height="6" rx="3" fill="#8C5A3C"/>
-  <!-- Wandborde mit Konsolen -->
-  <path d="M42 157h10v12zM124 157h10l-10 12z" fill="#73492F"/>
-  <path d="M266 157h10v12zM348 157h10l-10 12z" fill="#73492F"/>
-  <rect x="30" y="150" width="116" height="7" rx="2" fill="#8C5A3C"/>
-  <rect x="254" y="150" width="116" height="7" rx="2" fill="#8C5A3C"/>
-  <!-- Hauswände und Deckenbalken -->
-  <rect width="10" height="300" fill="#1F4E5A"/>
-  <rect x="390" width="10" height="300" fill="#1F4E5A"/>
-  <rect width="400" height="8" fill="#17414B"/>
+  <ellipse cx="200" cy="283.500" rx="132" ry="15.800" fill="#3A2216" opacity="0.3"/>
+  <g stroke="#EBD3AC" stroke-width="1" stroke-linecap="round">
+    <path d="M72.500 276l-5-1.200M71.500 279l-5.500-.400M71.500 282.500l-5.500.600M72.500 286l-5 1.400"/>
+    <path d="M327.500 276l5-1.200M328.500 279l5.500-.400M328.500 282.500l5.500.600M327.500 286l5 1.400"/>
+  </g>
+  <ellipse cx="200" cy="281" rx="128" ry="15" fill="#A64C2B"/>
+  <ellipse cx="200" cy="281" rx="124" ry="13.600" fill="#EBD3AC"/>
+  <ellipse cx="200" cy="281" rx="121" ry="12.700" fill="url(#living-room-rug)"/>
+  <ellipse cx="200" cy="281" rx="105" ry="10" fill="none" stroke="#F4CE7C" stroke-width="1.100" stroke-dasharray="2.600 3.400" opacity="0.85"/>
+  <ellipse cx="200" cy="281" rx="88" ry="7.600" fill="none" stroke="#9A4024" stroke-width="0.900" opacity="0.55"/>
+  <ellipse cx="200" cy="281" rx="46" ry="4.300" fill="#EBD3AC" opacity="0.55"/>
+  <ellipse cx="200" cy="281" rx="31" ry="2.600" fill="#B25530" opacity="0.75"/>
+
+  <!-- Zwei Paar Hausschuhe, ein großes und ein kleines -->
+  <g transform="translate(206 287.500) rotate(-7) scale(1.250)">
+    <path d="M0 0c0-2.800 2.400-4.200 6-4.200s6 1.400 6 4.200c0 1.200-.800 1.800-2 1.800H2C.800 1.800 0 1.200 0 0z" fill="#255863"/>
+    <path d="M5.500-4.200c3.800-.200 6.500 1.200 6.500 4.200c0 1.200-.800 1.800-2 1.800H6.500C5 .600 4.800-2.200 5.500-4.200z" fill="#3C7A87"/>
+    <ellipse cx="3.400" cy="-1" rx="2.300" ry="1.300" fill="#143842"/>
+  </g>
+  <g transform="translate(223 291) rotate(4) scale(1.250)">
+    <path d="M0 0c0-2.800 2.400-4.200 6-4.200s6 1.400 6 4.200c0 1.200-.800 1.800-2 1.800H2C.800 1.800 0 1.200 0 0z" fill="#255863"/>
+    <path d="M5.500-4.200c3.800-.200 6.500 1.200 6.500 4.200c0 1.200-.800 1.800-2 1.800H6.500C5 .600 4.800-2.200 5.500-4.200z" fill="#3C7A87"/>
+    <ellipse cx="3.400" cy="-1" rx="2.300" ry="1.300" fill="#143842"/>
+  </g>
+  <g transform="translate(245 288.500) rotate(-4) scale(0.960)">
+    <path d="M0 0c0-2.800 2.400-4.200 6-4.200s6 1.400 6 4.200c0 1.200-.800 1.800-2 1.800H2C.800 1.800 0 1.200 0 0z" fill="#C97F78"/>
+    <path d="M5.500-4.200c3.800-.200 6.500 1.200 6.500 4.200c0 1.200-.800 1.800-2 1.800H6.500C5 .600 4.800-2.200 5.500-4.200z" fill="#E7A9A0"/>
+    <ellipse cx="3.400" cy="-1" rx="2.300" ry="1.300" fill="#8E4A46"/>
+  </g>
+  <g transform="translate(258 291.500) rotate(8) scale(0.960)">
+    <path d="M0 0c0-2.800 2.400-4.200 6-4.200s6 1.400 6 4.200c0 1.200-.800 1.800-2 1.800H2C.800 1.800 0 1.200 0 0z" fill="#C97F78"/>
+    <path d="M5.500-4.200c3.800-.200 6.500 1.200 6.500 4.200c0 1.200-.800 1.800-2 1.800H6.500C5 .600 4.800-2.200 5.500-4.200z" fill="#E7A9A0"/>
+    <ellipse cx="3.400" cy="-1" rx="2.300" ry="1.300" fill="#8E4A46"/>
+  </g>
+
+  <!-- Fenster: Abendhimmel, Mond, die Lichter der Nachbarn -->
+  <path d="M152 148V63Q152 30 200 30Q248 30 248 63V148Z" fill="#6B4630" opacity="0.2" transform="translate(0 2.500)"/>
+  <path d="M152 148V63Q152 30 200 30Q248 30 248 63V148Z" fill="url(#living-room-frame)"/>
+  <path d="M156 145V64Q156 34 200 34Q244 34 244 64V145Z" fill="#B49472"/>
+  <path d="M159 142V64Q159 37 200 37Q241 37 241 64V142Z" fill="url(#living-room-sky)"/>
+  <g clip-path="url(#living-room-glass)">
+    <!-- Kein Mond im Fenster: Er steht schon über dem Dach (Wunsch des Nutzers). -->
+    <g fill="#FFF4D2">
+      <circle class="fx-twinkle" cx="166" cy="78" r="0.800"/>
+      <circle class="fx-twinkle" style="animation-delay:-1.200s" cx="219" cy="57" r="0.900"/>
+      <circle cx="230" cy="72" r="0.700"/>
+      <circle class="fx-twinkle" style="animation-delay:-2.300s" cx="208" cy="80" r="0.700"/>
+      <circle cx="170" cy="46" r="0.600"/>
+      <circle cx="233" cy="50" r="0.600"/>
+      <circle class="fx-twinkle" style="animation-delay:-0.600s" cx="179" cy="60" r="1"/>
+      <circle cx="186" cy="72" r="0.600"/>
+      <circle cx="173" cy="66" r="0.500"/>
+    </g>
+    <path d="M159 100q10-3 22-.500t20-1.500v3q-10 2.500-20 1t-22 1z" fill="#D9A3B4" opacity="0.3"/>
+    <path d="M204 106q12-3 22-1t15-1.500v3q-7 2.200-15 1.200t-22 1.800z" fill="#F0B79C" opacity="0.35"/>
+    <path d="M159 124q14-10 30-5t26-3t26 4v22h-82z" fill="#4E4A72" opacity="0.75"/>
+    <path d="M159 142v-13l7-5.500l7 5.500v-5h9v9l4-9c2.600-5 6.400-5 9 0l3.500 8v-11l8-6l8 6v5h8v-6l5.500-4.500l5.500 4.500v8l4 4v14z" fill="#16293A"/>
+    <g fill="#FFD480">
+      <rect x="164.500" y="131" width="2.200" height="2.600"/>
+      <rect x="176.500" y="128.500" width="2" height="2.400"/>
+      <rect x="203.500" y="124" width="2.200" height="2.600"/>
+      <rect x="208.500" y="124" width="2.200" height="2.600"/>
+      <rect x="226" y="129.500" width="2" height="2.400"/>
+    </g>
+    <path d="M148 118L192 34h9l-44 84zM170 142l52-104h4l-52 104z" fill="#FFFFFF" opacity="0.07"/>
+  </g>
+  <rect x="198" y="37" width="4" height="105" fill="#FBF1DE"/>
+  <rect x="202" y="37" width="1" height="105" fill="#10202E" opacity="0.3"/>
+  <rect x="159" y="94" width="82" height="4" fill="#FBF1DE"/>
+  <rect x="159" y="98" width="82" height="1" fill="#10202E" opacity="0.3"/>
+  <!-- Fensterbank mit zwei Tassen, einer großen und einer kleinen -->
+  <path d="M147 153h106l-5 7H152z" fill="url(#living-room-drop)"/>
+  <rect x="146" y="146" width="108" height="4.600" rx="1.500" fill="#FFF8E8"/>
+  <rect x="147" y="150" width="106" height="3" fill="#DAC4A0"/>
+  <g fill="none" stroke="#FFF6E4" stroke-width="0.900" stroke-linecap="round" opacity="0.6">
+    <path class="fx-steam" d="M175.500 135c-1.600-2 1.600-3.200 0-5.400s1.400-3 0-4.800"/>
+    <path class="fx-steam" d="M186 137.500c-1.300-1.700 1.300-2.700 0-4.500s1.100-2.500 0-4"/>
+  </g>
+  <path d="M171 139.500c-3.600 0-3.600 5.200 0 5.200" fill="none" stroke="#FDF4E3" stroke-width="1.400"/>
+  <path d="M171 137h9.200v7.400a1.900 1.900 0 0 1-1.900 1.900h-5.400a1.900 1.900 0 0 1-1.900-1.900z" fill="#FDF4E3"/>
+  <path d="M177.500 137h2.700v7.400a1.900 1.900 0 0 1-1.900 1.900h-.800z" fill="#CBB48E" opacity="0.6"/>
+  <rect x="171" y="140.200" width="9.200" height="1.700" fill="#2C6370"/>
+  <path d="M189.200 141.300c2.800 0 2.800 4 0 4" fill="none" stroke="#DE8D7A" stroke-width="1.200"/>
+  <path d="M182.600 139.600h6.800v5.200a1.500 1.500 0 0 1-1.500 1.500h-3.800a1.500 1.500 0 0 1-1.500-1.500z" fill="#DE8D7A"/>
+  <path d="M187.400 139.600h2v5.200a1.500 1.500 0 0 1-1.500 1.500h-.500z" fill="#A9584A" opacity="0.6"/>
+
+  <!-- Vorhänge mit Raffhalter, Stange -->
+  <g id="living-room-curtain">
+    <path d="M135.500 27H169C169 60 166 86 150 106C154 118 156.500 132 157.500 149H134.500C136 132 137 118 137.500 106C135.500 80 135.500 52 135.500 27Z" fill="#5A3626" opacity="0.22"/>
+    <path d="M138 25H171C171 58 168 84 152 104C156 116 158.500 131 159.500 147H137C138.500 131 139.500 116 140 104C138 78 138 50 138 25Z" fill="url(#living-room-cloth)"/>
+    <g fill="none" stroke="#7A3018" stroke-linecap="round" opacity="0.38">
+      <path d="M145.500 26c0 30-1 54-2.500 77" stroke-width="2.200"/>
+      <path d="M154.500 26c0 30-2 56-8 77" stroke-width="2"/>
+      <path d="M163 26c0 28-3.500 55-12.500 76" stroke-width="1.800"/>
+      <path d="M145.500 108c1.400 13 1.200 26 .200 38" stroke-width="2"/>
+      <path d="M152 109c2.400 12 3.400 25 3.600 37" stroke-width="1.800"/>
+    </g>
+    <g fill="none" stroke="#F3A985" stroke-linecap="round" opacity="0.42">
+      <path d="M150 26c0 30-1.500 55-5 77" stroke-width="1.300"/>
+      <path d="M159 26c0 29-3 56-10.500 77" stroke-width="1.300"/>
+      <path d="M148.800 109c1.800 12 2.200 25 2 37" stroke-width="1.200"/>
+    </g>
+    <path d="M139 101.500c5 3 9.500 3 14.200.200l1 4.200c-5.200 3-10.600 3-16 .200z" fill="#F2C76B"/>
+    <path d="M139 101.500c5 3 9.500 3 14.200.200l.400 1.600c-5 2.800-9.400 2.800-14.400-.200z" fill="#FFE3A0"/>
+    <path d="M141.200 106l-1.600 7.500h3.400z" fill="#DFA544"/>
+  </g>
+  <use href="#living-room-curtain" transform="translate(400 0) scale(-1 1)"/>
+  <rect x="131" y="21.400" width="138" height="4.400" rx="2.200" fill="url(#living-room-rod)"/>
+  <g fill="#F2C76B">
+    <rect x="141" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="150" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="159" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="167.500" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="231" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="239.500" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="248.500" y="20.600" width="1.500" height="6" rx="0.700"/>
+    <rect x="257.500" y="20.600" width="1.500" height="6" rx="0.700"/>
+  </g>
+  <circle cx="130" cy="23.600" r="3.800" fill="#8C5A3C"/>
+  <circle cx="270" cy="23.600" r="3.800" fill="#8C5A3C"/>
+  <circle cx="128.800" cy="22.400" r="1.300" fill="#E0B58C" opacity="0.8"/>
+  <circle cx="268.800" cy="22.400" r="1.300" fill="#E0B58C" opacity="0.8"/>
+
+  <!-- Wandborde mit Konsolen und Schatten an der Wand -->
+  <g id="living-room-shelf">
+    <path d="M31 157h114l-5 8H36z" fill="url(#living-room-drop)"/>
+    <path d="M43 157h7.500v2c0 6.500-3.200 10.500-7.500 11.500z" fill="#5E3A22"/>
+    <path d="M133 157h-7.500v2c0 6.500 3.200 10.500 7.500 11.500z" fill="#5E3A22"/>
+    <rect x="30" y="150" width="116" height="3" rx="1" fill="#C6905F"/>
+    <rect x="30" y="152.500" width="116" height="4.500" rx="1" fill="#8C5A3C"/>
+    <rect x="30" y="155.800" width="116" height="1.200" rx="0.600" fill="#4A2C1A" opacity="0.5"/>
+    <rect x="34" y="150.400" width="108" height="0.800" fill="#F2CFA2" opacity="0.7"/>
+  </g>
+  <use href="#living-room-shelf" transform="translate(224 0)"/>
 </svg>

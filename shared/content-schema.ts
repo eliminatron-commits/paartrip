@@ -160,7 +160,11 @@ export const roomFileSchema = z.strictObject({
   outdoor: z.boolean().optional(),
   spots: z.array(spot).min(1),
 });
-export const roomSchema = roomFileSchema.extend({ art: svgArtSchema });
+/**
+ * `art` ist die Zeichnung hinter den Stücken (rooms/<id>.svg). `front` (rooms/<id>.front.svg) liegt über ihnen:
+ * Licht, Halbdunkel in den Ecken, was vorn im Raum hängt oder steht. Beide teilen sich die viewBox.
+ */
+export const roomSchema = roomFileSchema.extend({ art: svgArtSchema, front: svgArtSchema.optional() });
 export type Room = z.infer<typeof roomSchema>;
 
 export const pieceFileSchema = z.strictObject({
@@ -217,6 +221,8 @@ export const chapterSchema = chapterFileSchema.omit({ rooms: true }).extend({
   story: z.array(storySceneSchema),
   pieces: z.array(pieceSchema),
   coupons: z.array(fixedCouponSchema),
+  /** Was über dem Haus steht (roof.svg): das Dach und was am Himmel zu sehen ist. Durchsichtig, wo der Himmel der App durchscheint. */
+  roof: svgArtSchema.optional(),
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
@@ -242,8 +248,8 @@ export type Content = z.infer<typeof contentSchema>;
  * Inhalte ohne Zeichnungen, Story-Texte und Begriffsliste: alles, was die Spielregeln brauchen.
  * Der Worker bündelt nur das (generated/content-rules.json), die App das volle Bündel.
  */
-export type RulesChapter = Omit<Chapter, 'rooms' | 'pieces' | 'story'> & {
-  rooms: Omit<Room, 'art'>[];
+export type RulesChapter = Omit<Chapter, 'rooms' | 'pieces' | 'story' | 'roof'> & {
+  rooms: Omit<Room, 'art' | 'front'>[];
   pieces: Omit<Piece, 'art'>[];
 };
 export interface RulesContent {
@@ -252,9 +258,9 @@ export interface RulesContent {
 
 export function toRulesContent(content: Content): RulesContent {
   return {
-    chapters: content.chapters.map(({ story: _story, rooms, pieces, ...chapter }) => ({
+    chapters: content.chapters.map(({ story: _story, roof: _roof, rooms, pieces, ...chapter }) => ({
       ...chapter,
-      rooms: rooms.map(({ art: _art, ...room }) => room),
+      rooms: rooms.map(({ art: _art, front: _front, ...room }) => room),
       pieces: pieces.map(({ art: _art, ...piece }) => piece),
     })),
   };

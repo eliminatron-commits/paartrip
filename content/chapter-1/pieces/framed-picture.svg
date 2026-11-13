@@ -1,8 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="18" y="18" width="64" height="78" rx="3" fill="#8C5A3C"/>
-  <rect x="24" y="24" width="52" height="66" fill="#FAF3E7"/>
-  <rect x="28" y="28" width="44" height="58" fill="#A9B7BC"/>
-  <circle cx="60" cy="42" r="6" fill="#F2C76B"/>
-  <polygon points="28,70 42,54 56,66 64,58 72,68 72,86 28,86" fill="#557A5C"/>
-  <polygon points="28,86 28,78 40,72 50,80 60,74 72,80 72,86" fill="#46614B"/>
+  <defs>
+    <linearGradient id="framed-picture-wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B9825A"/>
+      <stop offset="1" stop-color="#6E4226"/>
+    </linearGradient>
+    <linearGradient id="framed-picture-sky" gradientUnits="userSpaceOnUse" x1="0" y1="29" x2="0" y2="62">
+      <stop offset="0" stop-color="#4D4F86"/>
+      <stop offset="0.55" stop-color="#D97F74"/>
+      <stop offset="1" stop-color="#FBCB80"/>
+    </linearGradient>
+    <linearGradient id="framed-picture-sea" gradientUnits="userSpaceOnUse" x1="0" y1="62" x2="0" y2="85">
+      <stop offset="0" stop-color="#3C7A87"/>
+      <stop offset="1" stop-color="#173F49"/>
+    </linearGradient>
+    <radialGradient id="framed-picture-sun" gradientUnits="userSpaceOnUse" cx="50" cy="62" r="20">
+      <stop offset="0" stop-color="#FFF3C8" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FFF3C8" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="framed-picture-glass">
+      <rect x="30" y="29" width="40" height="56"/>
+    </clipPath>
+  </defs>
+  <!-- Schatten an der Wand, Draht und Nagel -->
+  <rect x="18" y="20" width="68" height="80" rx="3" fill="#3A2216" opacity="0.22"/>
+  <path d="M28 16L50 6L72 16" fill="none" stroke="#6B4630" stroke-width="0.800"/>
+  <circle cx="50" cy="6" r="1.500" fill="#4A2C1A"/>
+  <!-- Rahmen und Passepartout -->
+  <rect x="16" y="14" width="68" height="82" rx="2.500" fill="url(#framed-picture-wood)"/>
+  <path d="M18 16h64" stroke="#E7BC92" stroke-width="1" opacity="0.6"/>
+  <rect x="20.500" y="18.500" width="59" height="73" fill="#4A2C1A"/>
+  <rect x="22" y="20" width="56" height="70" fill="#FBF3E3"/>
+  <rect x="29" y="28" width="42" height="58" fill="#C9B38E"/>
+  <!-- Abend am Meer mit zwei Segelbooten, einem großen und einem kleinen -->
+  <g clip-path="url(#framed-picture-glass)">
+    <rect x="30" y="29" width="40" height="33" fill="url(#framed-picture-sky)"/>
+    <circle cx="50" cy="62" r="20" fill="url(#framed-picture-sun)"/>
+    <circle cx="50" cy="62" r="6.500" fill="#FFF3C8"/>
+    <path d="M30 62c5-5 9-6.500 12-4l3 4z" fill="#3B3A63"/>
+    <rect x="30" y="62" width="40" height="23" fill="url(#framed-picture-sea)"/>
+    <g fill="#FBCB80">
+      <rect x="45" y="63.500" width="10" height="1" rx="0.500"/>
+      <rect x="46.500" y="66.200" width="7" height="1" rx="0.500" opacity="0.8"/>
+      <rect x="44" y="69" width="9" height="1" rx="0.500" opacity="0.6"/>
+      <rect x="47.500" y="72" width="6" height="1" rx="0.500" opacity="0.45"/>
+    </g>
+    <path d="M55 70h11l-2 3h-7.500z" fill="#12222C"/>
+    <path d="M60 69V58l6.500 11zM59 69v-9l-4.500 9z" fill="#FBF3E3"/>
+    <path d="M37.500 76h7l-1.300 2h-4.700z" fill="#12222C"/>
+    <path d="M40.800 75.300V68l4 7.300zM40.200 75.300v-5.800l-2.800 5.800z" fill="#FBF3E3"/>
+    <path d="M24 60L52 22h7L31 60zM46 92l30-44h3l-30 44z" fill="#FFFFFF" opacity="0.13"/>
+  </g>
 </svg>

@@ -1,5 +1,6 @@
 <script lang="ts">
-  // Ein Raum im Querschnitt: Zeichnung, darauf die platzierten Stücke, darüber die Tippflächen.
+  // Ein Raum im Querschnitt: Zeichnung, darauf die platzierten Stücke, darüber Licht und Vordergrund des Raums
+  // (room.front), ganz oben die Tippflächen.
   // (x, y) eines Platzes ist die Mitte der Unterkante des Felds, in dem das Stück steht oder hängt.
   import type { Piece, Room } from '../../../shared/content-schema.ts';
 
@@ -43,10 +44,12 @@
   <svg viewBox={room.art.viewBox} role="img" aria-label={room.name}>
     {@html room.art.body}
     {#each standing as { spot, piece } (spot.id)}
-      <svg x={spot.x - spot.size / 2} y={spot.y - spot.size} width={spot.size} height={spot.size} viewBox={piece.art.viewBox} data-piece={piece.id} data-spot={spot.id}>
+      <!-- overflow: Der Lichtschein einer Lampe oder Kerze reicht über das Feld des Stücks hinaus. -->
+      <svg x={spot.x - spot.size / 2} y={spot.y - spot.size} width={spot.size} height={spot.size} viewBox={piece.art.viewBox} overflow="visible" data-piece={piece.id} data-spot={spot.id}>
         {@html piece.art.body}
       </svg>
     {/each}
+    {#if room.front}{@html room.front.body}{/if}
   </svg>
 
   {#each room.spots as spot (spot.id)}

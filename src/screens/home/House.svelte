@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Das Haus im Querschnitt: Dach, Galerie der Erinnerungsstücke, die Räume des Kapitels von oben nach unten,
+  // Das Haus im Querschnitt: Dach (chapter.roof), Galerie der Erinnerungsstücke, die Räume des Kapitels von oben nach unten,
   // darunter, was draußen liegt. Sucht ein Stück seinen Platz (ui.placing), leuchten die passenden freien
   // Plätze; sonst lässt sich ein platziertes Stück antippen und umstellen.
   import type { Chapter } from '../../../shared/content-schema.ts';
@@ -50,13 +50,13 @@
   }
 </script>
 
+{#if chapter.roof}
+  <!-- Das Dach vor dem Abendhimmel: Der Himmel ist Sache der App, die Zeichnung kommt aus dem Kapitel. -->
+  <div class="crown" aria-hidden="true">
+    <svg viewBox={chapter.roof.viewBox}>{@html chapter.roof.body}</svg>
+  </div>
+{/if}
 <div class="house" bind:this={house}>
-  <svg class="roof" viewBox="0 0 400 96" aria-hidden="true">
-    <path d="M200 6 400 96H0z" fill="var(--petrol)" />
-    <path d="M200 72c-13-9-18-17-12-23 4-5 10-3 12 2 2-5 8-7 12-2 6 6 1 14-12 23z" fill="var(--cream)" />
-    <rect x="286" y="26" width="26" height="46" fill="var(--terracotta)" />
-    <rect x="281" y="20" width="36" height="10" rx="3" fill="var(--petrol)" />
-  </svg>
   <MemoryWall {view} {chapter} />
   {#each indoor as room (room.id)}
     <RoomView {room} {placed} {targets} selected={selected?.id ?? null} onspot={place} onpiece={(id) => (selectedId = selectedId === id ? null : id)} />
@@ -102,9 +102,16 @@
     margin: 0 auto;
   }
 
-  .roof {
+  /* Setzt den Himmel von Home fort: von der Dämmerung ins Abendrot an der Traufe. */
+  .crown {
+    background: linear-gradient(to bottom, var(--dusk), var(--mauve) 58%, var(--afterglow));
+  }
+
+  .crown svg {
     display: block;
     width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
   }
 
   /* Sockel: schließt das Haus nach unten ab. */

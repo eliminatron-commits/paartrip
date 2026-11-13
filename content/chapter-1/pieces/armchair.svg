@@ -1,9 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="18" y="36" width="64" height="30" rx="8" fill="#9E4526"/>
-  <rect x="6" y="54" width="14" height="42" rx="6" fill="#9E4526"/>
-  <rect x="80" y="54" width="14" height="42" rx="6" fill="#9E4526"/>
-  <rect x="10" y="60" width="80" height="20" rx="6" fill="#C96A45"/>
-  <rect x="26" y="52" width="48" height="12" rx="4" fill="#D98A66"/>
-  <rect x="12" y="92" width="6" height="6" rx="2" fill="#6B3A22"/>
-  <rect x="82" y="92" width="6" height="6" rx="2" fill="#6B3A22"/>
+  <defs>
+    <radialGradient id="armchair-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="armchair-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D0734C"/>
+      <stop offset="1" stop-color="#93401F"/>
+    </linearGradient>
+    <linearGradient id="armchair-arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C5683F"/>
+      <stop offset="1" stop-color="#7A3117"/>
+    </linearGradient>
+    <linearGradient id="armchair-seat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E9A27D"/>
+      <stop offset="1" stop-color="#C0623C"/>
+    </linearGradient>
+    <linearGradient id="armchair-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#98431F"/>
+      <stop offset="1" stop-color="#6A2A13"/>
+    </linearGradient>
+    <linearGradient id="armchair-cushion" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B3C5A8"/>
+      <stop offset="1" stop-color="#7C9678"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="43" ry="3.800" fill="url(#armchair-shadow)"/>
+  <path d="M17 90h6.500l-1.200 8h-3.600zM76.500 90h6.500l-1.700 8h-3.600z" fill="#5E3A22"/>
+  <path d="M18.300 90h2.200l-.600 8h-1.200zM77.800 90h2.200l-.900 8h-1.200z" fill="#9A6A46"/>
+  <!-- hohe, runde Lehne mit Knöpfen -->
+  <path d="M19 70V40c0-10.500 7.500-17.500 17.500-17.500h27C73.500 22.500 81 29.500 81 40v30z" fill="url(#armchair-back)"/>
+  <path d="M33 26.500h34" stroke="#F3B594" stroke-width="1.400" stroke-linecap="round" opacity="0.55"/>
+  <path d="M34.500 28v30M50 26.500v32M65.500 28v30" stroke="#6A2A13" stroke-width="1" opacity="0.24"/>
+  <!-- Sockel, Sitzkissen, Kissen -->
+  <rect x="15" y="71" width="70" height="20" rx="6" fill="url(#armchair-base)"/>
+  <rect x="22" y="60" width="56" height="16" rx="6.500" fill="url(#armchair-seat)"/>
+  <path d="M28 62.300h44" stroke="#FFD2B6" stroke-width="1.100" stroke-linecap="round" opacity="0.6"/>
+  <rect x="23" y="74" width="54" height="2.600" rx="1.300" fill="#4E1D0C" opacity="0.4"/>
+  <rect x="41" y="43.500" width="19" height="18" rx="4.500" transform="rotate(-7 50.500 52.500)" fill="url(#armchair-cushion)"/>
+  <g fill="none" stroke="#46614B" stroke-width="0.900" stroke-linecap="round" transform="rotate(-7 50.500 52.500)">
+    <path d="M50.500 58v-10M50.500 55c-2.600-.400-4-1.800-4.400-4M50.500 52.500c2.600-.400 4-1.800 4.400-4"/>
+  </g>
+  <!-- Armlehnen -->
+  <rect x="7" y="49" width="18.500" height="43" rx="9.200" fill="url(#armchair-arm)"/>
+  <rect x="74.500" y="49" width="18.500" height="43" rx="9.200" fill="url(#armchair-arm)"/>
+  <ellipse cx="16.200" cy="53.500" rx="5.800" ry="2.200" fill="#F3B594" opacity="0.45"/>
+  <ellipse cx="83.800" cy="53.500" rx="5.800" ry="2.200" fill="#F3B594" opacity="0.45"/>
 </svg>

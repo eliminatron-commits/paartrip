@@ -1,11 +1,60 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="10" y="38" width="80" height="36" rx="9" fill="#2C6370"/>
-  <rect x="3" y="56" width="17" height="36" rx="7" fill="#1F4E5A"/>
-  <rect x="80" y="56" width="17" height="36" rx="7" fill="#1F4E5A"/>
-  <rect x="16" y="66" width="68" height="22" rx="6" fill="#2C6370"/>
-  <rect x="21" y="60" width="28" height="12" rx="4" fill="#A9B7BC"/>
-  <rect x="51" y="60" width="28" height="12" rx="4" fill="#A9B7BC"/>
-  <rect x="56" y="44" width="20" height="16" rx="4" fill="#F2C76B"/>
-  <rect x="12" y="90" width="6" height="6" rx="2" fill="#6B3A22"/>
-  <rect x="82" y="90" width="6" height="6" rx="2" fill="#6B3A22"/>
+  <defs>
+    <radialGradient id="sofa-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sofa-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4F8F9C"/>
+      <stop offset="1" stop-color="#245661"/>
+    </linearGradient>
+    <linearGradient id="sofa-arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#458491"/>
+      <stop offset="1" stop-color="#18404A"/>
+    </linearGradient>
+    <linearGradient id="sofa-seat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#62A2AE"/>
+      <stop offset="1" stop-color="#2E6A77"/>
+    </linearGradient>
+    <linearGradient id="sofa-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#245661"/>
+      <stop offset="1" stop-color="#12343D"/>
+    </linearGradient>
+    <linearGradient id="sofa-pillow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBDA8E"/>
+      <stop offset="1" stop-color="#D99F3F"/>
+    </linearGradient>
+    <linearGradient id="sofa-throw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E6D2AE"/>
+      <stop offset="0.5" stop-color="#FBF1DC"/>
+      <stop offset="1" stop-color="#DCC49C"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="96" rx="49" ry="4.200" fill="url(#sofa-shadow)"/>
+  <path d="M12.500 88h6.500l-1.200 9.500h-3.600zM81 88h6.500l-1.700 9.500h-3.600z" fill="#5E3A22"/>
+  <path d="M13.800 88h2.200l-.600 9.500h-1.200zM82.300 88h2.200l-.900 9.500h-1.200z" fill="#9A6A46"/>
+  <!-- Rückenlehne -->
+  <rect x="9" y="32" width="82" height="44" rx="13" fill="url(#sofa-back)"/>
+  <path d="M22 35.800h56" stroke="#9CCBD4" stroke-width="1.400" stroke-linecap="round" opacity="0.55"/>
+  <path d="M36.500 36v28M50 35.500v28M63.500 36v28" stroke="#143842" stroke-width="1" opacity="0.3"/>
+  <!-- Wolldecke, über die Lehne geworfen -->
+  <path d="M9.500 46c0-8 5-14 13-14h12.500l2.500 31l-3 2.500l-3-2.500l-3 2.500l-3-2.500l-3 2.500l-3-2.500l-3 2.500l-3-2.500l-4 1z" fill="url(#sofa-throw)"/>
+  <path d="M10 41.500c.600-1.300 1.400-2.500 2.300-3.500h23.200l.300 3.500zM9.500 49h26.800l.300 3.500H9.500z" fill="#C96A45"/>
+  <path d="M9.500 45h26.500l.100 1.100H9.500z" fill="#F2C76B"/>
+  <!-- Sockel und Sitzkissen -->
+  <rect x="12" y="72" width="76" height="18" rx="5" fill="url(#sofa-base)"/>
+  <rect x="18.500" y="61" width="31.800" height="15.500" rx="5.500" fill="url(#sofa-seat)"/>
+  <rect x="49.700" y="61" width="31.800" height="15.500" rx="5.500" fill="url(#sofa-seat)"/>
+  <path d="M23 63.200h23M54.200 63.200h23" stroke="#A9D5DD" stroke-width="1.100" stroke-linecap="round" opacity="0.6"/>
+  <rect x="19" y="74.200" width="62" height="2.600" rx="1.300" fill="#0F2C34" opacity="0.4"/>
+  <!-- Kissen: ein großes und ein kleines -->
+  <rect x="58" y="41.500" width="19.500" height="19.500" rx="4.500" transform="rotate(9 67.700 51.200)" fill="url(#sofa-pillow)"/>
+  <rect x="60.500" y="44" width="14.500" height="14.500" rx="3" transform="rotate(9 67.700 51.200)" fill="none" stroke="#B9812C" stroke-width="0.700" opacity="0.45"/>
+  <rect x="45.500" y="47.500" width="14" height="14" rx="3.600" transform="rotate(-11 52.500 54.500)" fill="#FBF1DC"/>
+  <path d="M45.500 51.300h14M45.500 54.500h14M45.500 57.700h14" stroke="#C96A45" stroke-width="1.100" transform="rotate(-11 52.500 54.500)"/>
+  <!-- Armlehnen -->
+  <rect x="2" y="50" width="19" height="41" rx="9.500" fill="url(#sofa-arm)"/>
+  <rect x="79" y="50" width="19" height="41" rx="9.500" fill="url(#sofa-arm)"/>
+  <ellipse cx="88.500" cy="54.500" rx="6" ry="2.300" fill="#A9D5DD" opacity="0.4"/>
+  <ellipse cx="11.500" cy="54.500" rx="6" ry="2.300" fill="#A9D5DD" opacity="0.4"/>
 </svg>

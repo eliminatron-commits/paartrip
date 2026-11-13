@@ -57,11 +57,17 @@
   .gallery {
     display: flex;
     align-items: center;
-    min-height: 84px;
-    padding: 10px 0;
+    min-height: 76px;
+    padding: 8px 0;
     /* So breit wie die Hauswände in den Raum-Zeichnungen (10 von 400 Einheiten). */
     border-inline: 2.5cqw solid var(--petrol);
-    background: var(--wall);
+    /* Dachboden: Licht fällt von oben aus dem Dachfenster, unter dem Dach liegt Schatten, die Wand ist aus Brettern. */
+    background:
+      radial-gradient(ellipse 55% 130% at 50% 0%, color-mix(in srgb, var(--lantern) 45%, transparent), transparent 72%),
+      linear-gradient(to bottom, color-mix(in srgb, var(--ink) 28%, transparent), transparent 32%),
+      linear-gradient(to right, color-mix(in srgb, var(--ink) 22%, transparent), transparent 14%, transparent 86%, color-mix(in srgb, var(--ink) 22%, transparent)),
+      repeating-linear-gradient(to right, transparent 0 27px, color-mix(in srgb, var(--wood) 22%, transparent) 27px 28px),
+      var(--wall);
   }
 
   .empty {
@@ -95,6 +101,10 @@
     border: 5px solid var(--wood);
     border-radius: 4px;
     background: var(--cream);
+    box-shadow:
+      0 4px 7px color-mix(in srgb, var(--ink) 38%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent),
+      inset 0 3px 4px color-mix(in srgb, var(--ink) 18%, transparent);
   }
 
   .paper svg {

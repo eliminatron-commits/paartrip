@@ -12,5 +12,7 @@
     display: block;
     width: 100%;
     height: 100%;
+    /* Der Lichtschein einer Lampe oder Kerze reicht über das Feld hinaus und soll nicht kantig abgeschnitten sein. */
+    overflow: visible;
   }
 </style>

@@ -40,7 +40,11 @@
     /* Der Hintergrund läuft bis zum unteren Rand, die Knöpfe bleiben über dem Home-Indikator. */
     padding: 6px calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 10px);
     background: var(--cream-deep);
-    box-shadow: 0 -1px 0 rgb(35 55 60 / 0.12);
+    /* Die Leiste liegt über dem Inhalt: ein weicher Schatten nach oben. */
+    position: relative;
+    box-shadow:
+      0 -1px 0 color-mix(in srgb, var(--ink) 12%, transparent),
+      0 -10px 24px color-mix(in srgb, var(--ink) 16%, transparent);
   }
 
   .tab {

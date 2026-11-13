@@ -1,7 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="94" rx="16" ry="4" fill="#6B3A22"/>
-  <rect x="48" y="28" width="4" height="66" fill="#8C5A3C"/>
-  <rect x="42" y="86" width="16" height="8" rx="3" fill="#8C5A3C"/>
-  <polygon points="32,30 68,30 60,8 40,8" fill="#F2C76B"/>
-  <circle cx="50" cy="34" r="4" fill="#FAF3E7"/>
+  <defs>
+    <radialGradient id="floor-lamp-halo" gradientUnits="userSpaceOnUse" cx="50" cy="26" r="66">
+      <stop offset="0" stop-color="#FFDF9E" stop-opacity="0.62"/>
+      <stop offset="0.35" stop-color="#FFD386" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FFD386" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="floor-lamp-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="floor-lamp-floor">
+      <stop offset="0" stop-color="#FFDF9E" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#FFDF9E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="floor-lamp-shade" gradientUnits="userSpaceOnUse" cx="50" cy="31" r="30">
+      <stop offset="0" stop-color="#FFF8DA"/>
+      <stop offset="0.5" stop-color="#FCD884"/>
+      <stop offset="1" stop-color="#E5A14A"/>
+    </radialGradient>
+    <linearGradient id="floor-lamp-cone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE9B0" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#FFE9B0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="floor-lamp-stem" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8A5F2E"/>
+      <stop offset="0.45" stop-color="#F0CB84"/>
+      <stop offset="1" stop-color="#8A5F2E"/>
+    </linearGradient>
+  </defs>
+  <!-- Lichtschein, reicht über das Feld hinaus -->
+  <circle cx="50" cy="26" r="66" fill="url(#floor-lamp-halo)"/>
+  <path d="M31 37h38l11 34H20z" fill="url(#floor-lamp-cone)"/>
+  <ellipse cx="50" cy="95" rx="42" ry="5.500" fill="url(#floor-lamp-floor)"/>
+  <ellipse cx="50" cy="96.500" rx="19" ry="2.800" fill="url(#floor-lamp-shadow)"/>
+  <!-- Fuß und Stange aus Messing -->
+  <ellipse cx="50" cy="95" rx="13.500" ry="3" fill="#6E4A22"/>
+  <ellipse cx="50" cy="93.800" rx="13.500" ry="2.700" fill="#C79A52"/>
+  <ellipse cx="47" cy="93.300" rx="6" ry="1" fill="#F6DDA0" opacity="0.7"/>
+  <rect x="48.700" y="35" width="2.600" height="59" fill="url(#floor-lamp-stem)"/>
+  <rect x="47.600" y="62" width="4.800" height="2.600" rx="1.200" fill="#9A6C30"/>
+  <rect x="47.600" y="36.500" width="4.800" height="2.600" rx="1.200" fill="#9A6C30"/>
+  <!-- Schirm -->
+  <path d="M38 9h24l8.500 27h-41z" fill="url(#floor-lamp-shade)"/>
+  <g stroke="#C4853A" stroke-width="0.700" opacity="0.35">
+    <path d="M44 9.500l-5.500 26M50 9.500v26M56 9.500l5.500 26"/>
+  </g>
+  <rect x="37.300" y="7.800" width="25.400" height="2.400" rx="1.200" fill="#C4853A"/>
+  <path d="M29.200 35h41.600l.700 2.300h-43z" fill="#C4853A"/>
+  <ellipse cx="50" cy="37.300" rx="10" ry="1.200" fill="#FFFDF0"/>
+  <path d="M58.500 37.500v8.500" stroke="#9A6C30" stroke-width="0.700"/>
+  <circle cx="58.500" cy="47" r="1.400" fill="#F0CB84"/>
 </svg>

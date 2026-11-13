@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 130">
+  <defs>
+    <radialGradient id="roof-moonlight">
+      <stop offset="0" stop-color="#FFF4D2" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FFF4D2" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="roof-slope" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3F808D"/>
+      <stop offset="0.5" stop-color="#245A66"/>
+      <stop offset="1" stop-color="#143943"/>
+    </linearGradient>
+    <linearGradient id="roof-shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.55" stop-color="#0B222A" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0B222A" stop-opacity="0.45"/>
+    </linearGradient>
+    <pattern id="roof-tiles" width="20" height="16" patternUnits="userSpaceOnUse">
+      <path d="M0 0v3a10 6 0 0 0 20 0V0M-10 8v3a10 6 0 0 0 20 0V8M10 8v3a10 6 0 0 0 20 0V8" fill="none" stroke="#0B222A" stroke-width="1.100" opacity="0.5"/>
+      <path d="M0 1.200v3a10 6 0 0 0 20 0v-3M-10 9.200v3a10 6 0 0 0 20 0v-3M10 9.200v3a10 6 0 0 0 20 0v-3" fill="none" stroke="#9FD0D9" stroke-width="0.600" opacity="0.22"/>
+    </pattern>
+    <linearGradient id="roof-brick" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C5633C"/>
+      <stop offset="1" stop-color="#84361B"/>
+    </linearGradient>
+    <radialGradient id="roof-puff">
+      <stop offset="0" stop-color="#F4E9DC" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#F4E9DC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="roof-glow">
+      <stop offset="0" stop-color="#FFD98C" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#FFD98C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="roof-pane" gradientUnits="userSpaceOnUse" cx="200" cy="86" r="16">
+      <stop offset="0" stop-color="#FFF6D6"/>
+      <stop offset="1" stop-color="#F6BA5C"/>
+    </radialGradient>
+    <clipPath id="roof-heart">
+      <path d="M200 97c-13-9-18-17-12-23 4-5 10-3 12 2 2-5 8-7 12-2 6 6 1 14-12 23z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Himmel: Mond, Sterne, zwei Wolken -->
+  <circle cx="58" cy="40" r="36" fill="url(#roof-moonlight)"/>
+  <path d="M60 28A12.800 12.800 0 1 0 69.600 48.800A10.400 10.400 0 0 1 60 28Z" fill="#FFF4D2"/>
+  <g fill="#FFF4D2">
+    <circle class="fx-twinkle" cx="24" cy="16" r="1.100"/>
+    <circle cx="112" cy="20" r="0.900"/>
+    <circle class="fx-twinkle" style="animation-delay:-1.300s" cx="140" cy="46" r="1"/>
+    <circle cx="252" cy="12" r="0.900"/>
+    <circle class="fx-twinkle" style="animation-delay:-2.100s" cx="334" cy="24" r="1.200"/>
+    <circle cx="368" cy="54" r="0.900"/>
+    <circle class="fx-twinkle" style="animation-delay:-0.700s" cx="16" cy="74" r="0.900"/>
+    <circle cx="384" cy="88" r="1"/>
+    <circle cx="176" cy="10" r="0.800"/>
+  </g>
+  <path d="M318 70q7-6 15-2q7-7 16-1.500q10 .500 9 7.500h-44q-4-2 4-4z" fill="#FFFFFF" opacity="0.12"/>
+  <path d="M8 104q6-5 13-1.500q6-5 13-1q8 .500 7 6.500h-36q-3-2 3-4z" fill="#FFFFFF" opacity="0.1"/>
+
+  <!-- Dach mit Ziegeln; links trifft es das Mondlicht -->
+  <path d="M200 26L400 126H0Z" fill="url(#roof-slope)"/>
+  <path d="M200 26L400 126H0Z" fill="url(#roof-tiles)"/>
+  <path d="M200 26L400 126H0Z" fill="url(#roof-shade)"/>
+  <path d="M200 26L0 126" stroke="#8CC5CF" stroke-width="2.200" opacity="0.6"/>
+  <path d="M200 26L400 126" stroke="#0B222A" stroke-width="2.200" opacity="0.5"/>
+  <circle cx="200" cy="24.500" r="3" fill="#143943"/>
+  <circle cx="199" cy="23.500" r="1" fill="#8CC5CF" opacity="0.8"/>
+
+  <!-- Zwei Vögel auf dem Dach, ein großer und ein kleiner -->
+  <g fill="#0E1F28" stroke="#0E1F28" stroke-width="0.700" stroke-linejoin="round">
+    <g transform="translate(131 60.500)">
+      <path d="M-10-2.200L-5.500-5C-4.500-8-1-9 1.500-8.200C2-10.800 5-11.600 6.300-9.600L8.600-9L6.500-8C6.600-5 4.500-2.200.500-2.200H-5z"/>
+      <path d="M-.500-2.200V0M2-2.200V0" fill="none"/>
+    </g>
+    <g transform="translate(147 52.500) scale(-0.760 0.760)">
+      <path d="M-10-2.200L-5.500-5C-4.500-8-1-9 1.500-8.200C2-10.800 5-11.600 6.300-9.600L8.600-9L6.500-8C6.600-5 4.500-2.200.500-2.200H-5z"/>
+      <path d="M-.500-2.200V0M2-2.200V0" fill="none"/>
+    </g>
+  </g>
+
+  <!-- Schornstein mit Rauch -->
+  <g fill="url(#roof-puff)">
+    <ellipse class="fx-smoke" cx="299" cy="35" rx="6.500" ry="5.500"/>
+    <ellipse class="fx-smoke" style="animation-delay:-1.500s" cx="303" cy="27" rx="8.500" ry="7"/>
+    <ellipse class="fx-smoke" style="animation-delay:-3s" cx="309.500" cy="18" rx="10.500" ry="8.500" opacity="0.8"/>
+    <ellipse class="fx-smoke" style="animation-delay:-4.500s" cx="319" cy="9" rx="12.500" ry="9.500" opacity="0.55"/>
+  </g>
+  <path d="M286 46h26v37l-26-13z" fill="url(#roof-brick)"/>
+  <g stroke="#5E2410" stroke-width="0.700" opacity="0.45">
+    <path d="M286 52h26M286 58h26M286 64h26M286 70h26M299 76h13M293 46v6M305 46v6M299 52v6M293 58v6M305 58v6M299 64v6M305 70v6"/>
+  </g>
+  <rect x="282" y="40" width="34" height="7.500" rx="2" fill="#123840"/>
+  <rect x="283.500" y="40.600" width="31" height="1.200" rx="0.600" fill="#8CC5CF" opacity="0.6"/>
+
+  <!-- Dachfenster in Herzform, innen brennt Licht -->
+  <circle cx="200" cy="85" r="34" fill="url(#roof-glow)"/>
+  <path d="M200 97c-13-9-18-17-12-23 4-5 10-3 12 2 2-5 8-7 12-2 6 6 1 14-12 23z" fill="url(#roof-pane)"/>
+  <g clip-path="url(#roof-heart)" stroke="#FBF1DE" stroke-width="1.500">
+    <path d="M200 70v28M184 83.500h32"/>
+  </g>
+  <path d="M200 97c-13-9-18-17-12-23 4-5 10-3 12 2 2-5 8-7 12-2 6 6 1 14-12 23z" fill="none" stroke="#FBF1DE" stroke-width="2.200" stroke-linejoin="round"/>
+
+  <!-- Traufe mit Lichterkette -->
+  <rect y="123.500" width="400" height="6.500" fill="#123840"/>
+  <rect y="123.500" width="400" height="1.200" fill="#8CC5CF" opacity="0.5"/>
+  <g fill="url(#roof-glow)">
+    <circle cx="20" cy="127" r="6"/><circle cx="56" cy="127" r="6"/><circle cx="92" cy="127" r="6"/><circle cx="128" cy="127" r="6"/><circle cx="164" cy="127" r="6"/><circle cx="200" cy="127" r="6"/><circle cx="236" cy="127" r="6"/><circle cx="272" cy="127" r="6"/><circle cx="308" cy="127" r="6"/><circle cx="344" cy="127" r="6"/><circle cx="380" cy="127" r="6"/>
+  </g>
+  <g fill="#FFE9B0">
+    <circle cx="20" cy="127" r="1.600"/><circle class="fx-twinkle" style="animation-delay:-0.400s" cx="56" cy="127" r="1.600"/><circle cx="92" cy="127" r="1.600"/><circle cx="128" cy="127" r="1.600"/><circle class="fx-twinkle" style="animation-delay:-1.900s" cx="164" cy="127" r="1.600"/><circle cx="200" cy="127" r="1.600"/><circle cx="236" cy="127" r="1.600"/><circle class="fx-twinkle" style="animation-delay:-1.100s" cx="272" cy="127" r="1.600"/><circle cx="308" cy="127" r="1.600"/><circle cx="344" cy="127" r="1.600"/><circle class="fx-twinkle" style="animation-delay:-2.600s" cx="380" cy="127" r="1.600"/>
+  </g>
+</svg>

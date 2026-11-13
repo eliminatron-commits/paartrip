@@ -1,9 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M50 68 C30 60 16 44 18 24 C36 26 52 42 50 68 Z" fill="#46614B"/>
-  <path d="M50 68 C70 58 84 42 82 20 C64 24 50 42 50 68 Z" fill="#557A5C"/>
-  <path d="M50 66 C44 46 46 26 52 10 C60 26 58 48 50 66 Z" fill="#8FA68A"/>
-  <circle cx="32" cy="46" r="2.5" fill="#FAF3E7"/>
-  <circle cx="68" cy="44" r="2.5" fill="#FAF3E7"/>
-  <polygon points="36,72 64,72 60,96 40,96" fill="#C96A45"/>
-  <rect x="32" y="68" width="36" height="6" rx="2" fill="#9E4526"/>
+  <defs>
+    <radialGradient id="monstera-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="monstera-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4E7458"/>
+      <stop offset="1" stop-color="#2C4534"/>
+    </linearGradient>
+    <linearGradient id="monstera-mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6F9A72"/>
+      <stop offset="1" stop-color="#3E6048"/>
+    </linearGradient>
+    <linearGradient id="monstera-light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9CBF8E"/>
+      <stop offset="1" stop-color="#55805C"/>
+    </linearGradient>
+    <linearGradient id="monstera-basket" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#B08350"/>
+      <stop offset="0.4" stop-color="#E8C690"/>
+      <stop offset="1" stop-color="#A47645"/>
+    </linearGradient>
+    <!-- Ein Blatt mit Einschnitten; Spitze oben, Stielansatz bei (0, 14) -->
+    <g id="monstera-leaf">
+      <path d="M0 14C5 17 12 15 15 9L8 7L16 4C17 0 16-4 14-7L7-4L12-11C9-15 4-18 0-19C-4-18-9-15-12-11L-7-4L-14-7C-16-4-17 0-16 4L-8 7L-15 9C-12 15-5 17 0 14Z"/>
+      <path d="M0 13V-16M0 8L7 5.500M0 8L-7 5.500M0 0L7-5M0 0L-7-5M0-8L5-12M0-8L-5-12" fill="none" stroke="#DCEBC8" stroke-width="0.700" stroke-linecap="round" opacity="0.5"/>
+    </g>
+  </defs>
+  <ellipse cx="50" cy="96.500" rx="27" ry="3.400" fill="url(#monstera-shadow)"/>
+  <!-- Stiele -->
+  <g fill="none" stroke="#4E7458" stroke-width="1.500" stroke-linecap="round">
+    <path d="M48 68C44 58 38 52 31 47"/>
+    <path d="M52 68C56 58 63 51 70 45"/>
+    <path d="M50 68C50 56 50 48 50 40"/>
+    <path d="M46 68C40 66 34 64 29 62"/>
+    <path d="M54 68C60 66 66 64 71 62"/>
+  </g>
+  <!-- Blätter: hinten dunkel, vorn hell -->
+  <use href="#monstera-leaf" transform="translate(23 60) rotate(-74) scale(0.720)" fill="url(#monstera-dark)"/>
+  <use href="#monstera-leaf" transform="translate(77 60) rotate(72) scale(0.760)" fill="url(#monstera-dark)"/>
+  <use href="#monstera-leaf" transform="translate(26 36) rotate(-40) scale(1.150)" fill="url(#monstera-mid)"/>
+  <use href="#monstera-leaf" transform="translate(75 34) rotate(36) scale(1.100)" fill="url(#monstera-dark)"/>
+  <use href="#monstera-leaf" transform="translate(50 23) rotate(-3) scale(1.200)" fill="url(#monstera-light)"/>
+  <use href="#monstera-leaf" transform="translate(41 51) rotate(-20) scale(0.780)" fill="url(#monstera-light)"/>
+  <use href="#monstera-leaf" transform="translate(61 52) rotate(24) scale(0.700)" fill="url(#monstera-mid)"/>
+  <!-- Geflochtener Korb -->
+  <path d="M33.500 68h33c1.200 9.500 0 20.500-4.500 28h-24c-4.500-7.500-5.700-18.500-4.500-28z" fill="url(#monstera-basket)"/>
+  <g fill="none" stroke="#8A5F34" stroke-width="0.700" opacity="0.5">
+    <path d="M33.300 74.500q16.700 2.600 33.400 0M33.800 80.500q16.200 2.600 32.400 0M35 86.500q15 2.400 30 0M36.800 92q13.200 2 26.400 0"/>
+    <path d="M38 71v4.500M43 71.500v4.800M48 72v4.800M53 72v4.800M58 71.500v4.800M62.500 71v4.500M40.500 77.500v4.800M45.500 78v4.800M50.500 78.200v4.800M55.500 78v4.800M60.300 77.500v4.800M38.500 83.500v4.800M43.500 84v4.800M48.500 84.200v4.800M53.500 84.200v4.800M58.500 84v4.800M62.500 83.500v4.500M41.500 89.500v4.500M46.500 90v4.500M51.500 90v4.500M56.500 90v4.500M60.500 89.500v4.200"/>
+  </g>
+  <rect x="32" y="65" width="36" height="5.500" rx="2.700" fill="#C99B63"/>
+  <rect x="34" y="65.800" width="32" height="1.200" rx="0.600" fill="#F3DDB0" opacity="0.8"/>
+  <path d="M32.500 73c-4.500.500-4.500 7 0 7.500M67.500 73c4.500.500 4.500 7 0 7.500" fill="none" stroke="#A47645" stroke-width="1.600" stroke-linecap="round"/>
 </svg>

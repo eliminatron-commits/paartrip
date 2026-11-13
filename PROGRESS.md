@@ -9,10 +9,37 @@ Wiedereinstieg: diese Datei, `tests.json`, `git log`. Regeln und Architektur: `C
 - **Phase 3/6 – Haus und Gutscheine:** abgeschlossen am 2026-11-12, P3-01 bis P3-09 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, mit eingeschaltetem Test-Knopf.
 - **Phase 4/6 – Aufgaben und Rätsel:** abgeschlossen am 2026-11-12, P4-01 bis P4-07 erfüllt. Mit Zustimmung des Nutzers am 2026-11-12 hochgeladen, live seit Commit `7947867` – mit zehn Test-Aufgaben, zum Ausprobieren (siehe unten).
 - **Phase 5/6 – Inhalte Kapitel 1:** abgeschlossen am 2026-11-12, P5-01 bis P5-06 erfüllt. Lokal committet, **nicht hochgeladen**: Der Nutzer hat entschieden, dass Phase 5 und der Knopf "Refresh" erst nach der Optik-Phase hochgeladen werden (dann noch einmal fragen).
-- **Nächste Phase:** Optik (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch) – siehe "Wünsche des Nutzers". Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
+- **Optik-Phase (vom Nutzer gewünscht, eingeschoben vor der Abnahme) | Opus 5.5 (hoch):** in Arbeit seit 2026-11-13. Die Probe ist gebaut und dem Nutzer als Vorher-Nachher-Bild geschickt; **sein Urteil steht aus** – erst nach seinem Ja ausrollen. Stand und offene Punkte: Abschnitt "Optik-Phase" unten. Danach 6/6 – Abnahme | Opus 5.5 (mittel). Der Projekt-Prompt liegt nicht im Repo; er steht im Sitzungsverlauf oder der Nutzer fügt ihn wieder ein.
 - **Auf beiden iPhones installiert** (vom Nutzer gemeldet am 2026-11-11, Stand Phase 1). Seitdem erreicht jeder Push auf `main` zwei echte Geräte. Der Update-Ablauf nach einem echten Deploy (`7027c8e` → `50fb2a7`) hat laut Nutzer auf beiden iPhones funktioniert. Noch nicht auf dem Gerät bestätigt: Darstellung unter Uhr und Dynamic Island.
 - Phase 1 lief auf Fable 5.2 statt Opus 5.5. Ein Review durch `pruefer` fand nicht statt, weil die Subagenten erst nach dem Neustart geladen sind.
 - Commits tragen die anonyme GitHub-Adresse (lokale Git-Einstellung dieses Repos), damit die private E-Mail-Adresse nicht im öffentlichen Repo steht.
+
+## Optik-Phase: in Arbeit seit 2026-11-13
+
+**Richtung des Nutzers (2026-11-12/13, wörtlich):** "grafik soll cozy, romantic sein, ohne übertrieben in kitsch zu geraten!!!! Nur romantisch angehaucht, sehr cozy. SEHR BEEINDRUCKEND visuell." Dazu: Dinge zu zweit sollen erkennbar seins und ihres sein ("dass ihre handschuhe kleiner sind als meine zum beispie. Sowas gibt einen gewissen detailtouch"). Und zur Probe: "es stört mich den mond doppelt sehen zu können" – der Mond steht nur noch über dem Dach, nicht mehr im Fenster.
+
+**Die Probe (gebaut, lokal gesichert, Urteil des Nutzers steht aus):** Home-Bildschirm mit Abendhimmel, Dach, Dachboden und Wohnzimmer samt sechs Stücken (Sofa, Sessel, Stehlampe, Monstera, Bild, Kerzen). Bilder: `screenshots/probe/vorher-nachher-home.png` und `nachher-detail.png` (nicht im Repo). Küche, Garten, die übrigen 39 Stücke und alle anderen Bildschirme sind noch im alten Stil.
+
+**Was dafür gebaut ist:**
+- **Vordergrund je Raum:** `rooms/<id>.front.svg` liegt über den Stücken (Licht der Hängelampe, Halbdunkel in den Ecken, Hauswände im Schnitt) – `Room.front`, optional. So liegt das Licht auch auf den Stücken, und ein Lichtschein endet an der Hauswand.
+- **Dach als Inhalt:** `content/chapter-N/roof.svg` (`Chapter.roof`, optional) – Dach, Mond, Sterne, Rauch, zwei Vögel. Den Himmel dahinter malt die App aus den Tokens (`.sky` in HomeScreen, `.crown` in House), die Zeichnung ist dort durchsichtig. Ein anderes Kapitel kann ein anderes Dach mitbringen.
+- **Licht der Stücke:** Lampen und Kerzen zeichnen ihren Schein selbst, über ihr Feld hinaus (`overflow="visible"` in RoomView, `overflow: visible` in PieceArt). Wer eine Lampe aufstellt, macht den Raum heller.
+- **Bewegung:** Die Zeichnungen nennen nur, was sich regt (`class="fx-flicker|fx-twinkle|fx-steam|fx-smoke|fx-drift"`); wie, steht in `src/app.css`. Bewegt werden nur kleine Teile; bei "Bewegung reduzieren" steht alles.
+- **Meilensteine als Laternen** an einer Schnur (HomeScreen), erreichte leuchten. Neue Tokens `--dusk`, `--mauve`, `--afterglow`, `--lantern`, mit Kontrastprüfung.
+- **Regel für die Zeichnungen:** Jede `id` in einer SVG beginnt mit der id der Datei (`sofa-shadow`, `living-room-wall`, beim Dach `roof-`, beim Vordergrund `<raum>-front-`), in Komponenten mit `ui-`. Alle Zeichnungen stehen inline in derselben Seite; gleiche ids aus verschiedenen Dateien würden sich gegenseitig die Verläufe nehmen. Keine SVG-Filter (Weichheit über Verläufe) – Filter würden bei jeder Bewegung neu gerechnet.
+
+**Belegt am 2026-11-13:** Typecheck 0 Fehler, 323 Vitest-Tests, 54 Playwright-Tests (53 und der Hilfs-Test der Probe) in einem Lauf.
+
+**Offen, wenn der Nutzer Ja sagt (Ausrollen):**
+- Küche und Garten im neuen Stil, jeweils mit Vordergrund; die übrigen 39 Stücke; je Raum ein Paar "seins und ihres".
+- Karten (MoveCard, Today, Gifts), Meilenstein-Szene, Willkommen, Einstellungen, untere Leiste; Übergänge (Stück setzt sich ab, Wechsel der Reiter).
+- Im Querformat steht neben dem Haus noch eine einfarbige Fläche (`--sage-deep`).
+- Die Regel für ids als Prüfung in `checkContent` (bisher nur von Hand eingehalten).
+- Das Stück `candle` zeigt jetzt zwei Kerzen (eine große, eine kleine) und heißt noch "Candle".
+- `e2e/optik-probe.spec.ts` ist ein vorübergehender Hilfs-Test für die Vorher-Nachher-Bilder: am Ende der Phase entfernen oder als Bild "eingerichtetes Haus" in `screens.spec.ts` übernehmen.
+- Am Ende: Gestaltungsvorgaben in `CLAUDE.md` neu fassen, `tests.json` um die Punkte der Optik-Phase ergänzen, Review durch `pruefer`.
+
+**Fehler aus Phase 5, beim Testlauf aufgefallen (noch nicht behoben):** `worker/test/chapter.test.ts` schwankt (am 2026-11-13 drei von sechs Läufen rot): Am Meilenstein 25 findet das Dekostück Vogelbad je nach Haus-id keinen freien Gartenplatz. Dahinter steckt mehr als der Test: Sind alle acht Gartenplätze mit Stücken belegt, die nur in den Garten passen, wird nie wieder einer frei – das Vogelbad bliebe für immer ohne Platz ("wartet, bis einer frei wird" stimmt dann nicht). Betrifft genauso die anderen Dekostücke, wenn ihre Platzart voll ist. Lösung steht aus (etwa: der Bauzug bietet kein Stück an, das einem noch ausstehenden Dekostück den letzten Platz nähme). Vor dem Hochladen beheben; den Test nicht abschwächen.
 
 ## Phase 5/6 – Inhalte Kapitel 1: abgeschlossen am 2026-11-12
 

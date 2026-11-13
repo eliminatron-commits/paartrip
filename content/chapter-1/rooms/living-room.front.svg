@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <radialGradient id="living-room-front-dim" gradientUnits="userSpaceOnUse" cx="200" cy="140" r="275">
+      <stop offset="0.48" stop-color="#2B1710" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2B1710" stop-opacity="0.42"/>
+    </radialGradient>
+    <radialGradient id="living-room-front-halo" gradientUnits="userSpaceOnUse" cx="200" cy="46" r="170">
+      <stop offset="0" stop-color="#FFE2A6" stop-opacity="0.5"/>
+      <stop offset="0.28" stop-color="#FFD48C" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FFD48C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="living-room-front-cone">
+      <stop offset="0" stop-color="#FFE9B6" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FFE9B6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="living-room-front-shade" gradientUnits="userSpaceOnUse" cx="200" cy="48" r="22">
+      <stop offset="0" stop-color="#FFF6D6"/>
+      <stop offset="0.55" stop-color="#F9CE7C"/>
+      <stop offset="1" stop-color="#DE9642"/>
+    </radialGradient>
+    <linearGradient id="living-room-front-cut" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#153A44"/>
+      <stop offset="1" stop-color="#235562"/>
+    </linearGradient>
+  </defs>
+  <!-- Die Ecken liegen im Halbdunkel, die Hängelampe wirft ihr Licht in die Mitte -->
+  <rect x="8" y="6" width="384" height="294" fill="url(#living-room-front-dim)"/>
+  <ellipse cx="200" cy="170" rx="100" ry="135" fill="url(#living-room-front-cone)"/>
+  <rect x="8" y="6" width="384" height="294" fill="url(#living-room-front-halo)"/>
+  <g fill="#FFF6DE">
+    <circle class="fx-drift" cx="176" cy="96" r="0.700" opacity="0.7"/>
+    <circle class="fx-drift" cx="214" cy="122" r="0.600" opacity="0.6"/>
+    <circle class="fx-drift" cx="190" cy="160" r="0.700" opacity="0.5"/>
+    <circle class="fx-drift" cx="226" cy="186" r="0.600" opacity="0.5"/>
+    <circle class="fx-drift" cx="168" cy="210" r="0.700" opacity="0.4"/>
+  </g>
+  <!-- Hängelampe -->
+  <rect x="199.400" y="6" width="1.200" height="20" fill="#3B2A22"/>
+  <rect x="196.800" y="23.500" width="6.400" height="4.500" rx="1.600" fill="#6B3A22"/>
+  <path d="M182.500 47.500c0-12.500 7.500-20.500 17.500-20.500s17.500 8 17.500 20.500z" fill="url(#living-room-front-shade)"/>
+  <g fill="none" stroke="#B9722F" stroke-width="0.700" opacity="0.32">
+    <path d="M189.500 33.500q10.500 3 21 0M185.500 39q14.500 4 29 0M183.200 44q16.800 4.400 33.600 0"/>
+    <path d="M193.500 29.500q-5 8-6.500 18M200 27v20.500M206.500 29.500q5 8 6.500 18"/>
+  </g>
+  <ellipse cx="200" cy="47.500" rx="17.500" ry="2.700" fill="#FFF8DC"/>
+  <ellipse cx="200" cy="48" rx="8" ry="1.600" fill="#FFFFFF"/>
+  <!-- Hauswände und Decke im Schnitt -->
+  <rect width="10" height="300" fill="url(#living-room-front-cut)"/>
+  <rect x="390" width="10" height="300" fill="url(#living-room-front-cut)" transform="translate(790 0) scale(-1 1)"/>
+  <rect x="9" y="8" width="1" height="292" fill="#4C8794" opacity="0.5"/>
+  <rect x="390" y="8" width="1" height="292" fill="#4C8794" opacity="0.5"/>
+  <rect width="400" height="8" fill="#12333C"/>
+  <rect x="10" y="7" width="380" height="1" fill="#4C8794" opacity="0.45"/>
+</svg>

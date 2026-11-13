@@ -1,7 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <ellipse cx="50" cy="91" rx="26" ry="5" fill="#B98A5E"/>
-  <rect x="38" y="40" width="24" height="52" rx="2" fill="#D98A66"/>
-  <path d="M50 16 C58 26 60 32 56 38 C54 42 46 42 44 38 C40 32 42 26 50 16 Z" fill="#F2C76B"/>
-  <ellipse cx="50" cy="34" rx="3" ry="5" fill="#FAF3E7"/>
-  <rect x="38" y="60" width="5" height="10" rx="2" fill="#C96A45"/>
+  <defs>
+    <radialGradient id="candle-halo" gradientUnits="userSpaceOnUse" cx="46" cy="34" r="52">
+      <stop offset="0" stop-color="#FFDD96" stop-opacity="0.7"/>
+      <stop offset="0.4" stop-color="#FFCD78" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#FFCD78" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="candle-shadow">
+      <stop offset="0" stop-color="#2A160E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2A160E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="candle-wax" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E9D7B4"/>
+      <stop offset="0.4" stop-color="#FFF8E8"/>
+      <stop offset="1" stop-color="#D6BE96"/>
+    </linearGradient>
+    <linearGradient id="candle-rose" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#CE7C68"/>
+      <stop offset="0.4" stop-color="#F0AE9A"/>
+      <stop offset="1" stop-color="#B9624F"/>
+    </linearGradient>
+    <linearGradient id="candle-lit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD98A" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#FFD98A" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="candle-flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FFF9DE"/>
+      <stop offset="0.45" stop-color="#FFCF5E"/>
+      <stop offset="1" stop-color="#F08A36"/>
+    </linearGradient>
+  </defs>
+  <circle cx="46" cy="34" r="52" fill="url(#candle-halo)"/>
+  <ellipse cx="50" cy="95" rx="34" ry="3.600" fill="url(#candle-shadow)"/>
+  <!-- Holzteller -->
+  <ellipse cx="50" cy="92" rx="31" ry="5.200" fill="#7A4A2E"/>
+  <ellipse cx="50" cy="90.300" rx="31" ry="4.700" fill="#BC8C5E"/>
+  <ellipse cx="50" cy="90.300" rx="25.500" ry="3.400" fill="#A47648"/>
+  <!-- Große Kerze -->
+  <rect x="27" y="37" width="21" height="53" rx="2.500" fill="url(#candle-wax)"/>
+  <rect x="27" y="37" width="21" height="53" rx="2.500" fill="url(#candle-lit)"/>
+  <ellipse cx="37.500" cy="37.500" rx="10.500" ry="2.300" fill="#FFF6DC"/>
+  <path d="M29 38v10a2 2 0 0 0 4 0V38zM41.500 38v6a1.700 1.700 0 0 0 3.400 0v-6z" fill="#FFF8E8"/>
+  <rect x="37" y="31.500" width="1.100" height="6" fill="#3A2216"/>
+  <g class="fx-flicker">
+    <path d="M37.500 10c5.500 7 7 11.500 5.300 16c-1.200 3.100-3.100 4.600-5.300 4.600s-4.100-1.500-5.300-4.600c-1.700-4.500-.200-9 5.300-16z" fill="url(#candle-flame)"/>
+    <ellipse cx="37.500" cy="26.300" rx="2.100" ry="3.700" fill="#FFFDF2"/>
+  </g>
+  <!-- Kleine Kerze -->
+  <rect x="54" y="61" width="17" height="29" rx="2.300" fill="url(#candle-rose)"/>
+  <rect x="54" y="61" width="17" height="29" rx="2.300" fill="url(#candle-lit)"/>
+  <ellipse cx="62.500" cy="61.500" rx="8.500" ry="1.900" fill="#F9C9B8"/>
+  <rect x="62" y="56.500" width="1" height="5" fill="#3A2216"/>
+  <g class="fx-flicker">
+    <path d="M62.500 40c4.200 5.400 5.400 8.800 4.100 12.300c-.900 2.400-2.400 3.500-4.100 3.500s-3.200-1.100-4.100-3.500c-1.300-3.500-.100-6.900 4.100-12.300z" fill="url(#candle-flame)"/>
+    <ellipse cx="62.500" cy="52.500" rx="1.600" ry="2.800" fill="#FFFDF2"/>
+  </g>
 </svg>
